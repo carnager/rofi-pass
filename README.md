@@ -10,13 +10,14 @@ foobarmysecurepassword
 UserName: MyUser
 URL http://my.url.foo
 ```
-* Auto Typing of more than one field. This expects numbered fields in password file:
+* Auto Typing of more than one field. This expects a CustomOrder field in password file:
 ```
 foobarmysecurepassword
-1 UserName: MyUser
-2 SomeField: foobar
-3 AnotherField: barfoo
+UserName: MyUser
+SomeField: foobar
+AnotherField: barfoo
 URL http://my.url.foo
+CustomOrder: SomeField UserName AnotherField
 ```
 * Open URLs of entries with hotkey
 * Add new Entries to Password Storage
