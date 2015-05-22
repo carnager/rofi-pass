@@ -8,7 +8,7 @@
 ```
 foobarmysecurepassword
 UserName: MyUser
-URL http://my.url.foo
+URL: http://my.url.foo
 ```
 * Auto Typing of more than one field. This expects a CustomOrder field in password file:
 ```
