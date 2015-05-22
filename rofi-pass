@@ -5,6 +5,8 @@
 # (c) 2015 Thore Bödecker <me@foxxx0.de>
 
 shopt -s nullglob globstar
+source /etc/rofi-pass.conf
+source $HOME/.config/rofi-pass/config
 
 basedir=~/.password-store/
 URL_field='URL'

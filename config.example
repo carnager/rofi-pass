@@ -1,0 +1,5 @@
+basedir=~/.password-store/
+URL_field='URL'
+USERNAME_field='UserName'
+EDITOR='gvim -f'
+
