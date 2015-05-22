@@ -16,7 +16,7 @@ foobarmysecurepassword
 UserName: MyUser
 SomeField: foobar
 AnotherField: barfoo
-URL http://my.url.foo
+URL: http://my.url.foo
 CustomOrder: SomeField UserName AnotherField
 ```
 * Open URLs of entries with hotkey
