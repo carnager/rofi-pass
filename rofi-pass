@@ -37,14 +37,14 @@ xdotool_type() {
 }
 
 mainMenu () {
-    selected_password="$(echo -e "Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -dmenu -p "Enter: Chose Entry | Alt+1: Open Entry in Browser > ")"
+    selected_password="$(echo -e "Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -dmenu -p "Enter: Chose Entry | Alt+1: Type User | Alt+2: Type Password | Alt+3: Open Entry in Browser > ")"
 	rofi_exit=$?
 
 	case ${rofi_exit} in
 		0)
 			true
 			;;
-        10) chromium $(pass "$selected_password" | grep "URL" | awk '{ print $2 }')
+        12) chromium $(pass "$selected_password" | grep "URL: " | awk -F 'URL: ' '{ print $2 }')
             exit
             ;;
 		1)
@@ -66,6 +66,13 @@ mainMenu () {
         stuff["${_id}"]=${_val}
 	done < <(pass "${selected_password}" | tail -n+2 | grep ': ')
 
+    if [[ $rofi_exit -eq 10 ]]; then
+        xdotool_type "${stuff[${USERNAME_field}]}"
+        exit
+    elif [[ $rofi_exit -eq 11 ]]; then
+        xdotool_type "$password"
+        exit
+    fi
 	case "$1" in
 		password)
 			xdotool_type "$password"
@@ -89,7 +96,7 @@ mainMenu () {
             else
                 if [[ $(echo "$menu" | grep ": ") == "" ]]; then
                     if [[ $val -eq 10 ]]; then
-                        chromium $(echo -e "${menu}" | awk '{ print $2 }')
+                        chromium $(echo -e "${menu}" | awk -F 'URL: ' '{ print $2 }')
                     else
                         echo -n "$menu" | xclip
                         xclip -o | xclip -selection clipboard
@@ -104,33 +111,37 @@ mainMenu () {
             ;;
 		url)
 			xdotool_type "${stuff[${URL_field}]}"
-			;;
-		*)
-			if [[ $(echo "${password_temp}" | tail -1) == "NOTAB" ]]; then
-				for i in "${!stuff[@]}"; do
-					xdotool_type "${stuff[$i]}"
-				done
-				xdotool_type "$password"
-			else
-				for i in "${!stuff[@]}"; do
-					if [[ ! "$i" == "${URL_field}" ]]; then
-						xdotool_type "${stuff[$i]}"
-						xdotool key Tab
-					fi
-				done
-				xdotool_type "$password"
-			fi
-			;;
+            ;;
+        *)
+            if [[ $(echo "${password_temp}" | tail -1) == "NOTAB" ]]; then
+                if [[ -z "${stuff['CustomOrder']}" ]]; then
+                    xdotool_type "${stuff[${USERNAME_field}]}"
+                    xdotool_type "$password"
+                else
+                    for word in ${stuff['CustomOrder']}; do
+                        xdotool_type "${stuff[${word}]}"
+                    done
+                    xdotool_type "$password"
+                fi
+            else
+                if [[ -z "${stuff['CustomOrder']}" ]]; then
+                    xdotool_type "${stuff[${USERNAME_field}]}"
+                    xdotool key Tab
+                    xdotool_type "$password"
+                else
+                    for word in ${stuff['CustomOrder']}; do
+                        xdotool_type "${stuff[${word}]}"
+                        xdotool key Tab
+                    done
+                    xdotool_type "$password"
+                fi
+            fi
+            ;;
 	esac
 
 	# cleanup (for the paranoid)
 	password=''
 	selected_password=''
-	password_temp=''
-	for i in "${!stuff[@]}"; do
-		stuff[$i]=''
-		unset stuff[$i]
-	done
 	unset stuff
 	unset password
 	unset selected_password
@@ -173,11 +184,11 @@ insertPass () {
 	group=$(find . -maxdepth 1 -type d -not -name '.' -not -name '.git' | sed 's/^.\///g' | rofi -dmenu -p "Choose Group")
 
 	if [[ "$notab" == "No" ]]; then
-		pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUser: ${user}\n---\nURL ${domain}")
+		pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUser: ${user}\n---\nURL: ${domain}")
         w
 
 	elif [[ "$notab" == "Yes" ]]; then
-		pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUser: ${user}\n---\n${domain}\nNOTAB")
+		pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUser: ${user}\n---\nURL: ${domain}\nNOTAB")
 	fi
 }
 
