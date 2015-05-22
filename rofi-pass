@@ -1,0 +1,211 @@
+#!/bin/bash
+
+# rofi-pass
+# (c) 2015 Rasmus Steinke <rasi@xssn.at>
+# (c) 2015 Thore Bödecker <me@foxxx0.de>
+
+shopt -s nullglob globstar
+
+basedir=~/.password-store/
+URL_field='URL'
+USERNAME_field='UserName'
+EDITOR='gvim -f'
+
+if [[ $(find "$basedir" -maxdepth 1 \( ! -name '.*' \) -type d | wc -l) == "1" ]]; then
+    root="$(ls -1 "$basedir")"
+else
+    root=$(ls -1 "$basedir" | rofi -dmenu -p "Choose Database")
+fi
+
+list_passwords() {
+	passwords=( ~/.password-store/**/*.gpg )
+    passwords=( ~/.password-store/"${root}"/**/*.gpg )
+
+	for password in "${passwords[@]}"; do
+		filename="${password#$basedir}"
+		filename="${filename%.gpg}"
+		echo "$filename"
+	done
+}
+
+xdotool_type() {
+	for (( i=0; i<${#1}; i++ )); do
+		xdotool type "${1:$i:1}"
+	done
+}
+
+mainMenu () {
+    selected_password="$(echo -e "Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -dmenu -p "Enter: Chose Entry | Alt+1: Open Entry in Browser > ")"
+	rofi_exit=$?
+
+	case ${rofi_exit} in
+		0)
+			true
+			;;
+        10) chromium $(pass "$selected_password" | grep "URL" | awk '{ print $2 }')
+            exit
+            ;;
+		1)
+			exit ${rofi_exit}
+			;;
+	esac
+
+    if [[ "$selected_password" == "Return to Main Menu" ]]; then
+        globalMenu
+    fi
+
+	password_temp=$(pass "$selected_password")
+	password=$(echo "${password_temp}" | head -1)
+	declare -A stuff
+
+    while read LINE; do
+        _id=$(echo "${LINE}" | awk -F': ' '{print $1}')
+        _val=$(echo "${LINE}" | awk -F': ' '{print $2}')
+        stuff["${_id}"]=${_val}
+	done < <(pass "${selected_password}" | tail -n+2 | grep ': ')
+
+	case "$1" in
+		password)
+			xdotool_type "$password"
+			;;
+		user)
+			xdotool_type "${stuff[${USERNAME_field}]}"
+			;;
+        show)
+            while true; do
+
+            menu=$(echo -e "Return to Main Menu\n---\nEdit Entry\n---\n$(pass "$selected_password")" | rofi -dmenu -p "Enter: Copy Entry to Clipboard | Alt+1: Open Selection in Browser")
+
+            val=$?
+
+            if [[ "$menu" == "Edit Entry" ]]; then
+                EDITOR=$EDITOR pass edit "${selected_password}"
+            elif [[ "$menu" == "" ]]; then
+                exit
+            elif [[ "$menu" == "Return to Main Menu" ]]; then
+                globalMenu
+            else
+                if [[ $(echo "$menu" | grep ": ") == "" ]]; then
+                    if [[ $val -eq 10 ]]; then
+                        chromium $(echo -e "${menu}" | awk '{ print $2 }')
+                    else
+                        echo -n "$menu" | xclip
+                        xclip -o | xclip -selection clipboard
+                    fi
+                else
+                    menu=$(echo -n "${menu}" | awk -F ': ' '{ print $2 }')
+                    echo -n "${menu}" | xclip
+                    xclip -o | xclip -selection clipboard
+                fi
+            fi
+            done
+            ;;
+		url)
+			xdotool_type "${stuff[${URL_field}]}"
+			;;
+		*)
+			if [[ $(echo "${password_temp}" | tail -1) == "NOTAB" ]]; then
+				for i in "${!stuff[@]}"; do
+					xdotool_type "${stuff[$i]}"
+				done
+				xdotool_type "$password"
+			else
+				for i in "${!stuff[@]}"; do
+					if [[ ! "$i" == "${URL_field}" ]]; then
+						xdotool_type "${stuff[$i]}"
+						xdotool key Tab
+					fi
+				done
+				xdotool_type "$password"
+			fi
+			;;
+	esac
+
+	# cleanup (for the paranoid)
+	password=''
+	selected_password=''
+	password_temp=''
+	for i in "${!stuff[@]}"; do
+		stuff[$i]=''
+		unset stuff[$i]
+	done
+	unset stuff
+	unset password
+	unset selected_password
+	unset password_temp
+	unset stuff
+}
+
+globalMenu () {
+    menu=$(echo -e "Exit\n---\nAutotype Entries\nShow/Edit Entries\nInsert Entry" | rofi -dmenu -p "TypePasswd > ")
+
+    if [[ $menu == "Autotype Entries" ]]; then
+        mainMenu "$root"
+    elif [[ $menu == "Show/Edit Entries" ]]; then
+        mainMenu show
+    elif [[ $menu == "Insert Entry" ]]; then
+        insertPass
+    elif [[ $menu == "Exit" ]]; then
+        exit
+    elif [[ $menu == "" ]]; then
+        exit
+    fi
+}
+
+insertPass () {
+    quiT () {
+        if [[ $? -eq 1 ]]; then
+            exit
+        fi
+    }
+    target=$(wmctrl -l | grep Chromium | awk '{print $(NF-2)}' | sed 's~http[s]*://~~g')
+    domain=${target%/}
+	pass=$(echo -e "Password for site $domain" | rofi -dmenu -p "Enter Password > ")
+    quiT
+	user=$(echo -e "Username for site $domain" | rofi -dmenu -p "Enter User > ")
+    quiT
+	notab=$(echo -e "Yes\nNo" | rofi -dmenu -p "Page uses Auto Tab? > ")
+    quiT
+
+	cd "$HOME"/.password-store/"${root}"
+	group=$(find . -maxdepth 1 -type d -not -name '.' -not -name '.git' | sed 's/^.\///g' | rofi -dmenu -p "Choose Group")
+
+	if [[ "$notab" == "No" ]]; then
+		pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUser: ${user}\n---\nURL ${domain}")
+        w
+
+	elif [[ "$notab" == "Yes" ]]; then
+		pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUser: ${user}\n---\n${domain}\nNOTAB")
+	fi
+}
+
+
+##########################
+##						##
+##	script entry point	##
+##						##
+##########################
+
+case "$1" in
+	insert)
+		insertPass
+		;;
+	type_password)
+		mainMenu password
+		;;
+	type_user)
+		mainMenu user
+		;;
+	type_url)
+		mainMenu url
+		;;
+    show_entry)
+        mainMenu show
+        ;;
+	type)
+		mainMenu
+		;;
+      *)
+        globalMenu
+esac
+
