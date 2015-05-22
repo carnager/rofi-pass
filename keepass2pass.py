@@ -17,6 +17,8 @@
 # * Besides the password also the fields 'UserName', 'URL' and 'Notes' (comment) will be inserted.
 # * You get a warning if an entry has no password, but it will still insert it.
 
+# Minor Modifications by Rasmus Steinke <rasi@xssn.at>
+
 import getopt, sys
 from subprocess import Popen, PIPE
 from xml.etree import ElementTree
