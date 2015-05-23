@@ -5,13 +5,19 @@
 # (c) 2015 Thore Bödecker <me@foxxx0.de>
 
 shopt -s nullglob globstar
-source /etc/rofi-pass.conf
-source $HOME/.config/rofi-pass/config
 
-basedir=~/.password-store/
-URL_field='URL'
-USERNAME_field='UserName'
-EDITOR='gvim -f'
+# read global config file
+source /etc/rofi-pass.conf
+
+# check if local config exists and load it
+if [[ -f $HOME/.config/rofi-pass/config ]]; then
+    source $HOME/.config/rofi-pass/config
+fi
+
+# check for BROWSER variable, use xdg-open as fallback
+if [[ -z $BROWSER ]]; then
+    export BROWSER=xdg-open
+fi
 
 if [[ $(find "$basedir" -maxdepth 1 \( ! -name '.*' \) -type d | wc -l) == "1" ]]; then
     root="$(ls -1 "$basedir")"
