@@ -26,10 +26,6 @@ CustomOrder: SomeField UserName AnotherField
 * Add new Entries to Password Storage
 * Edit existing Entries
 
-Because rofi-pass is 100% hotkey based, it comes with a little help screen. (Using notifications for now - Open for better ideas)
-
-![rofi-pass](screenshot2.png "rofi-pass help")
-
 ## Requirements
 * pass (https://github.com/zx2c4/password-store)
 * sed
