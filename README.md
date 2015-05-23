@@ -26,6 +26,7 @@ CustomOrder: SomeField UserName AnotherField
 * Edit existing Entries
 
 Because rofi-pass is 100% hotkey based, it comes with a little help screen. (Using notifications for now - Open for better ideas)
+
 ![rofi-pass](screenshot2.png "rofi-pass help")
 
 ## Requirements
