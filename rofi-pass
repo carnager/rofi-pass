@@ -36,8 +36,12 @@ xdotool_type() {
 	done
 }
 
+notify () {
+    notify-send "Help" "Alt+1: Autotype (Default)\nAlt+2: Type User\nAlt+3: Type Password\nAlt+4: Open in Browser\nAlt+5: Show/Edit"
+}
+
 mainMenu () {
-    notify-send "Help" "Alt+1: Autotype\nAlt+2: Type User\nAlt+3: Type Password\nAlt+4: Open in Browser\nAlt+5: Show/Edit"
+    notify
     selected_password="$(echo -e "[ Add Entry ]\n---\n$(list_passwords 2>/dev/null)" | rofi -dmenu -select "$entry" -p "Alt+9 for Help - rofi-pass > ")"
 	rofi_exit=$?
 
@@ -53,7 +57,7 @@ mainMenu () {
             ;;
         14) show
             ;;
-        18) notify-send "Help" "Alt+1: Autotype\nAlt+2: Type User\nAlt+3: Type Password\nAlt+4: Open in Browser\nAlt+5: Show/Edit"
+        18) notify
             entry="$selected_password"
             mainMenu
             ;;
