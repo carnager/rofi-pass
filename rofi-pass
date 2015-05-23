@@ -37,7 +37,7 @@ xdotool_type() {
 }
 
 mainMenu () {
-    selected_password="$(echo -e "Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -dmenu -p "Enter: Chose Entry | Alt+1: Type User | Alt+2: Type Password | Alt+3: Open Entry in Browser > ")"
+    selected_password="$(echo -e "Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -dmenu -p "Enter: Autotype Entry | Alt+1: Type User | Alt+2: Type Password | Alt+3: Open Entry in Browser > ")"
 	rofi_exit=$?
 
 	case ${rofi_exit} in
