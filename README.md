@@ -21,6 +21,7 @@ AnotherField: barfoo
 URL: http://my.url.foo
 CustomOrder: SomeField UserName AnotherField
 ```
+* Handling webpages, that autotab to next field. For these sites add `NOTAB` in last line of the password file
 * Open URLs of entries with hotkey
 * Add new Entries to Password Storage
 * Edit existing Entries
