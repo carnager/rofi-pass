@@ -66,6 +66,8 @@ Alt+4: Open URL | Alt+5: Show/Edit</span>'
 
     if [[ "$selected_password" == "Return to Main Menu" ]]; then
         globalMenu
+    elif [[ "$selected_password" == "[ Add Entry ]" ]]; then
+        insertPass
     fi
 
 	password_temp=$(pass "$selected_password")
