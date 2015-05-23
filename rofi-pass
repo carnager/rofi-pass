@@ -37,7 +37,7 @@ xdotool_type() {
 }
 
 mainMenu () {
-    selected_password="$(echo -e "Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -dmenu -p "Alt+1: Autotype (Default) | Alt+2: Type User | Alt+3: Type Password | Alt+4: Open Entry in Browser > ")"
+    selected_password="$(echo -e "Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -dmenu -p "Alt+1: Autotype (Default) | Alt+2: Type User | Alt+3: Type Password | Alt+4: Open in Browser | Alt+5: Show/Edit> ")"
 	rofi_exit=$?
 
 	case ${rofi_exit} in
@@ -49,6 +49,8 @@ mainMenu () {
             ;;
         13) chromium $(pass "$selected_password" | grep "URL: " | awk -F 'URL: ' '{ print $2 }')
             exit
+            ;;
+        14) show
             ;;
 		1)
 			exit ${rofi_exit}
@@ -83,37 +85,8 @@ mainMenu () {
 		user)
 			xdotool_type "${stuff[${USERNAME_field}]}"
 			;;
-        show)
-            while true; do
-
-            menu=$(echo -e "Return to Main Menu\n---\nEdit Entry\n---\n$(pass "$selected_password")" | rofi -dmenu -p "Alt+1: Copy Selection to Clipboard (Default) | Alt+2: Open Selection in Browser")
-
-            val=$?
-
-            if [[ "$menu" == "Edit Entry" ]]; then
-                EDITOR=$EDITOR pass edit "${selected_password}"
-            elif [[ "$menu" == "" ]]; then
-                exit
-            elif [[ "$menu" == "Return to Main Menu" ]]; then
-                globalMenu
-            else
-                if [[ $(echo "$menu" | grep ": ") == "" ]]; then
-                    if [[ $val -eq 11 ]]; then
-                        chromium $(echo -e "${menu}" | awk -F 'URL: ' '{ print $2 }')
-                    else
-                        echo -n "$menu" | xclip
-                        xclip -o | xclip -selection clipboard
-                    fi
-                elif [[ $val -eq 10 || $val -eq 0 ]]; then
-                    menu=$(echo -n "${menu}" | awk -F ': ' '{ print $2 }')
-                    echo -n "${menu}" | xclip
-                    xclip -o | xclip -selection clipboard
-                fi
-            fi
-            done
-            ;;
-		url)
-			xdotool_type "${stuff[${URL_field}]}"
+        url)
+        	xdotool_type "${stuff[${URL_field}]}"
             ;;
         *)
             if [[ $(echo "${password_temp}" | tail -1) == "NOTAB" ]]; then
@@ -152,16 +125,44 @@ mainMenu () {
 	unset stuff
 }
 
-globalMenu () {
-    menu=$(echo -e "Exit\n---\nAutotype Entries\nShow/Edit Entries\nInsert Entry" | rofi -dmenu -p "TypePasswd > ")
+show () {
+    while true; do
 
-    if [[ $menu == "Autotype Entries" ]]; then
+    menu=$(echo -e "Return to Main Menu\n---\nEdit Entry\n---\n$(pass "$selected_password")" | rofi -dmenu -p "Alt+1: Copy Selection to Clipboard (Default) | Alt+2: Open Selection in Browser")
+
+    val=$?
+
+    if [[ "$menu" == "Edit Entry" ]]; then
+        EDITOR=$EDITOR pass edit "${selected_password}"
+    elif [[ "$menu" == "" ]]; then
+        exit
+    elif [[ "$menu" == "Return to Main Menu" ]]; then
+        globalMenu
+    else
+        if [[ $(echo "$menu" | grep ": ") == "" ]]; then
+            if [[ $val -eq 11 ]]; then
+                chromium $(echo -e "${menu}" | awk -F 'URL: ' '{ print $2 }')
+            else
+                echo -n "$menu" | xclip
+                xclip -o | xclip -selection clipboard
+            fi
+        elif [[ $val -eq 10 || $val -eq 0 ]]; then
+            menu=$(echo -n "${menu}" | awk -F ': ' '{ print $2 }')
+            echo -n "${menu}" | xclip
+            xclip -o | xclip -selection clipboard
+        fi
+    fi
+    done
+}
+
+globalMenu () {
+    menu=$(echo -e "0  Exit\n---\n1. Autotype Entries\n2. Insert Entry" | rofi -dmenu -p "TypePasswd > ")
+
+    if [[ $menu == "1. Autotype Entries" ]]; then
         mainMenu "$root"
-    elif [[ $menu == "Show/Edit Entries" ]]; then
-        mainMenu show
-    elif [[ $menu == "Insert Entry" ]]; then
+    elif [[ $menu == "2. Insert Entry" ]]; then
         insertPass
-    elif [[ $menu == "Exit" ]]; then
+    elif [[ $menu == "0  Exit" ]]; then
         exit
     elif [[ $menu == "" ]]; then
         exit
