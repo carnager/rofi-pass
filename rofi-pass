@@ -38,7 +38,7 @@ xdotool_type() {
 
 mainMenu () {
     notify-send "Help" "Alt+1: Autotype\nAlt+2: Type User\nAlt+3: Type Password\nAlt+4: Open in Browser\nAlt+5: Show/Edit"
-    selected_password="$(echo -e "[ Add Entry ]\n---\n$(list_passwords 2>/dev/null)" | rofi -dmenu -p "rofi-pass > ")"
+    selected_password="$(echo -e "[ Add Entry ]\n---\n$(list_passwords 2>/dev/null)" | rofi -dmenu -select "$entry" -p "Alt+9 for Help - rofi-pass > ")"
 	rofi_exit=$?
 
 	case ${rofi_exit} in
@@ -53,7 +53,11 @@ mainMenu () {
             ;;
         14) show
             ;;
-		1)
+        18) notify-send "Help" "Alt+1: Autotype\nAlt+2: Type User\nAlt+3: Type Password\nAlt+4: Open in Browser\nAlt+5: Show/Edit"
+            entry="$selected_password"
+            mainMenu
+            ;;
+		*)
 			exit ${rofi_exit}
 			;;
 	esac
