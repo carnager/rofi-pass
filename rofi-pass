@@ -203,5 +203,12 @@ insertPass () {
 ##						##
 ##########################
 
-mainMenu
+case $1 in
+    insert)
+        insertPass
+        ;;
+    *)
+        mainMenu
+        ;;
+esac
 
