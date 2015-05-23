@@ -20,9 +20,9 @@ if [[ -z $BROWSER ]]; then
 fi
 
 if [[ $(find "$basedir" -maxdepth 1 \( ! -name '.*' \) -type d | wc -l) == "1" ]]; then
-    root="$(ls -1 "$basedir")"
+    root="$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \;)"
 else
-    root=$(ls -1 "$basedir" | rofi -dmenu -p "Choose Database")
+    root=$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \; | rofi -dmenu -p "Choose Database")
 fi
 
 list_passwords() {
