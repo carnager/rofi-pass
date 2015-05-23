@@ -71,7 +71,7 @@ mainMenu () {
         stuff["${_id}"]=${_val}
 	done < <(pass "${selected_password}" | tail -n+2 | grep ': ')
 
-    if [[$rofi_exit -eq 11 ]]; then
+    if [[ $rofi_exit -eq 11 ]]; then
         xdotool_type "${stuff[${USERNAME_field}]}"
         exit
     elif [[ $rofi_exit -eq 12 ]]; then
