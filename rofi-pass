@@ -61,7 +61,7 @@ mainMenu () {
             entry="$selected_password"
             mainMenu
             ;;
-		*)
+		1)
 			exit ${rofi_exit}
 			;;
 	esac
