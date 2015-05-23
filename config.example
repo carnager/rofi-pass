@@ -1,5 +1,13 @@
+# set path to password store
 basedir=~/.password-store/
+
+# fields to be used
 URL_field='URL'
 USERNAME_field='UserName'
+
+## Programs to be used
+# Editor
 EDITOR='gvim -f'
 
+# Browser
+BROWSER='chromium'
