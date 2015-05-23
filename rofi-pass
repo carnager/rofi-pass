@@ -42,7 +42,7 @@ notify () {
 
 mainMenu () {
     #notify
-    HELP='<span color="#FFB2B2">Alt+1: Autotype | Alt+2: Type User | Alt+3: Type Password
+    HELP='<span color="#0C73C2">Alt+1: Autotype | Alt+2: Type User | Alt+3: Type Password
 Alt+4: Open URL | Alt+5: Show/Edit</span>'
     selected_password="$(echo -e "[ Add Entry ]\n---\n$(list_passwords 2>/dev/null)" | rofi -mesg "${HELP}" -dmenu -select "$entry" -p "rofi-pass > ")"
 	rofi_exit=$?
@@ -178,7 +178,7 @@ insertPass () {
     quiT
 
 	cd "$HOME"/.password-store/"${root}"
-	group=$(find . -maxdepth 1 -type d -not -name '.' -not -name '.git' | sed 's/^.\///g' | rofi -dmenu -p "Choose Group")
+    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)
 
 	if [[ "$notab" == "No" ]]; then
 		pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUser: ${user}\n---\nURL: ${domain}")
