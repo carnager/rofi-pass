@@ -37,14 +37,17 @@ xdotool_type() {
 }
 
 mainMenu () {
-    selected_password="$(echo -e "Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -dmenu -p "Enter: Autotype Entry | Alt+1: Type User | Alt+2: Type Password | Alt+3: Open Entry in Browser > ")"
+    selected_password="$(echo -e "Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -dmenu -p "Alt+1: Autotype (Default) | Alt+2: Type User | Alt+3: Type Password | Alt+4: Open Entry in Browser > ")"
 	rofi_exit=$?
 
 	case ${rofi_exit} in
 		0)
 			true
 			;;
-        12) chromium $(pass "$selected_password" | grep "URL: " | awk -F 'URL: ' '{ print $2 }')
+        10)
+            true
+            ;;
+        13) chromium $(pass "$selected_password" | grep "URL: " | awk -F 'URL: ' '{ print $2 }')
             exit
             ;;
 		1)
@@ -66,10 +69,10 @@ mainMenu () {
         stuff["${_id}"]=${_val}
 	done < <(pass "${selected_password}" | tail -n+2 | grep ': ')
 
-    if [[ $rofi_exit -eq 10 ]]; then
+    if [[$rofi_exit -eq 11 ]]; then
         xdotool_type "${stuff[${USERNAME_field}]}"
         exit
-    elif [[ $rofi_exit -eq 11 ]]; then
+    elif [[ $rofi_exit -eq 12 ]]; then
         xdotool_type "$password"
         exit
     fi
@@ -83,7 +86,7 @@ mainMenu () {
         show)
             while true; do
 
-            menu=$(echo -e "Return to Main Menu\n---\nEdit Entry\n---\n$(pass "$selected_password")" | rofi -dmenu -p "Enter: Copy Entry to Clipboard | Alt+1: Open Selection in Browser")
+            menu=$(echo -e "Return to Main Menu\n---\nEdit Entry\n---\n$(pass "$selected_password")" | rofi -dmenu -p "Alt+1: Copy Selection to Clipboard (Default) | Alt+2: Open Selection in Browser")
 
             val=$?
 
@@ -95,13 +98,13 @@ mainMenu () {
                 globalMenu
             else
                 if [[ $(echo "$menu" | grep ": ") == "" ]]; then
-                    if [[ $val -eq 10 ]]; then
+                    if [[ $val -eq 11 ]]; then
                         chromium $(echo -e "${menu}" | awk -F 'URL: ' '{ print $2 }')
                     else
                         echo -n "$menu" | xclip
                         xclip -o | xclip -selection clipboard
                     fi
-                else
+                elif [[ $val -eq 10 || $val -eq 0 ]]; then
                     menu=$(echo -n "${menu}" | awk -F ': ' '{ print $2 }')
                     echo -n "${menu}" | xclip
                     xclip -o | xclip -selection clipboard
