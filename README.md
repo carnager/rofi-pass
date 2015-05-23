@@ -2,6 +2,8 @@
 
 #### bash script to handle pass storages in a convenient way
 
+![rofi-pass](screenshot.png "rofi-pass in action")
+
 ## rofi-pass has the following features:
 
 * Auto Type User and Password. Format of password files are expected to be like:
