@@ -30,9 +30,9 @@ Because rofi-pass is 100% hotkey based, it comes with a little help screen. (Usi
 ![rofi-pass](screenshot2.png "rofi-pass help")
 
 ## Requirements
-* pass
+* pass (https://github.com/zx2c4/password-store)
 * sed
-* rofi
+* rofi (https://github.com/DaveDavenport/rofi)
 * wmctrl
 * xprop
 * xdotool
