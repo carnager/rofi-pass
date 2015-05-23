@@ -180,7 +180,7 @@ insertPass () {
     quiT
 
 	cd "$HOME"/.password-store/"${root}"
-    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)
+    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | rofi -dmenu -p "Choose Group > ")
 
 	if [[ "$notab" == "No" ]]; then
 		pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUser: ${user}\n---\nURL: ${domain}")
