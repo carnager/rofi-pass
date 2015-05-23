@@ -170,7 +170,7 @@ insertPass () {
             exit
         fi
     }
-    target=$(wmctrl -l | grep Chromium | awk '{print $(NF-2)}' | sed 's~http[s]*://~~g')
+    target=$(wmctrl -l | grep Chromium | awk '{print $(NF-2)}' | sed 's~http[s]*://~~g'| sed 's/^\[//' | sed 's/\]$//')
     domain=${target%/}
 	pass=$(echo -e "Password for site $domain" | rofi -dmenu -p "Enter Password > ")
     quiT
