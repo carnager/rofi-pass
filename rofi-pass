@@ -193,7 +193,7 @@ insertPass () {
         w
 
 	elif [[ "$notab" == "Yes" ]]; then
-		pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUser: ${user}\n---\nURL: ${domain}\nNOTAB")
+		pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}\nNOTAB")
 	fi
 }
 
