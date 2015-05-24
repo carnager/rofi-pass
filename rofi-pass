@@ -48,7 +48,7 @@ notify () {
 
 mainMenu () {
     #notify
-    HELP='<span color="#0C73C2">Alt+1: Autotype | Alt+2: Type User | Alt+3: Type Password
+    HELP='<span color="$help_color">Alt+1: Autotype | Alt+2: Type User | Alt+3: Type Password
 Alt+4: Open URL | Alt+5: Show/Edit</span>'
     selected_password="$(echo -e "[ Add Entry ]\n---\n$(list_passwords 2>/dev/null)" | rofi -mesg "${HELP}" -dmenu -select "$entry" -p "rofi-pass > ")"
 	rofi_exit=$?
@@ -143,7 +143,7 @@ Alt+4: Open URL | Alt+5: Show/Edit</span>'
 show () {
     while true; do
 
-    menu=$(echo -e "Return to Main Menu\n---\nEdit Entry\n---\n$(pass "$selected_password")" | rofi -dmenu  -mesg '<span color="#FFB2B2">Alt+1: Copy Selection to Clipboard (Default) | Alt+2: Open Selection in Browser</span>' -p "Choose Entry > ")
+    menu=$(echo -e "Return to Main Menu\n---\nEdit Entry\n---\n$(pass "$selected_password")" | rofi -dmenu  -mesg '<span color="$help_color">Alt+1: Copy Selection to Clipboard (Default) | Alt+2: Open Selection in Browser</span>' -p "Choose Entry > ")
 
     val=$?
 

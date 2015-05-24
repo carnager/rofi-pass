@@ -11,3 +11,7 @@ EDITOR='gvim -f'
 
 # Browser
 BROWSER='chromium'
+
+## Misc settings
+
+help_color="#0C73C2"
