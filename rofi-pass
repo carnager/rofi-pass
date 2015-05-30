@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # rofi-pass
 # (c) 2015 Rasmus Steinke <rasi@xssn.at>
@@ -17,6 +17,10 @@ fi
 # check for BROWSER variable, use xdg-open as fallback
 if [[ -z $BROWSER ]]; then
     export BROWSER=xdg-open
+fi
+
+if [[ -n "$2" ]]; then
+    root="$2"
 fi
 
 get_root () {
