@@ -19,15 +19,17 @@ if [[ -z $BROWSER ]]; then
     export BROWSER=xdg-open
 fi
 
-if [[ -n "$root" ]]; then
-        root="${root}"
-else
-    if [[ $(find "$basedir" -maxdepth 1 \( ! -name '.*' \) -type d | wc -l) == "1" ]]; then
-        root="$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \;)"
+get_root () {
+    if [[ -n "$2" ]]; then
+        root="$2"
     else
-        root=$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \; | rofi -dmenu -p "Choose Database")
+        if [[ $(find "$basedir" -maxdepth 1 \( ! -name '.*' \) -type d | wc -l) == "1" ]]; then
+            root="$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \;)"
+        else
+            root=$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \; | rofi -dmenu -p "Choose Database")
+        fi
     fi
-fi
+}
 
 list_passwords() {
 	passwords=( ~/.password-store/**/*.gpg )
@@ -51,7 +53,12 @@ notify () {
 }
 
 mainMenu () {
-    #notify
+    if [[ -z "$root" ]]; then
+        get_root
+    fi
+    if [[ -n "$2" ]]; then
+        root="$2"
+    fi
     HELP="<span color='$help_color'>Alt+1: Autotype | Alt+2: Type User | Alt+3: Type Password
 Alt+4: Open URL | Alt+5: Show/Edit</span>"
     selected_password="$(echo -e "[ Add Entry ]\n---\n$(list_passwords 2>/dev/null)" | rofi -mesg "${HELP}" -dmenu -select "$entry" -p "rofi-pass > ")"
@@ -203,6 +210,18 @@ insertPass () {
 	fi
 }
 
+help_msg () {
+    echo "rofi-pass - a rofi driven frontend to pass"
+    echo "--------------------------------------"
+    echo "(C) 2015 Rasmus Steinke <rasi@xssn.at>"
+    echo "(C) 2015 Thore Bödecker <me@foxxx0.de>"
+    echo "--------------------------------------"
+    echo -e "Usage\n"
+    echo "--insert    insert new entry to password store"
+    echo -e "--root      set custom root directory\n"
+    echo "Running rofi-pass without arguments will ask for root to be used,"
+    echo "if multiple directories exist"
+}
 
 ##########################
 ##						##
@@ -211,8 +230,14 @@ insertPass () {
 ##########################
 
 case $1 in
-    insert)
+    --insert)
         insertPass
+        ;;
+    --root)
+        mainMenu $2
+        ;;
+    --help)
+        help_msg
         ;;
     *)
         mainMenu
