@@ -25,6 +25,7 @@ CustomOrder: SomeField UserName AnotherField
 * Open URLs of entries with hotkey
 * Add new Entries to Password Storage
 * Edit existing Entries
+* Support for multiple roots for password-store (e.g. separate work from private passwords)
 
 ## Requirements
 * pass (https://github.com/zx2c4/password-store)
