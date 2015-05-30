@@ -20,7 +20,7 @@ if [[ -z $BROWSER ]]; then
 fi
 
 if [[ -n "$root" ]]; then
-    root="$root"
+        root="${root}"
 else
     if [[ $(find "$basedir" -maxdepth 1 \( ! -name '.*' \) -type d | wc -l) == "1" ]]; then
         root="$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \;)"
@@ -158,7 +158,7 @@ show () {
     elif [[ "$menu" == "" ]]; then
         exit
     elif [[ "$menu" == "Return to Main Menu" ]]; then
-        globalMenu
+        mainMenu
     else
         if [[ $(echo "$menu" | grep ": ") == "" ]]; then
             if [[ $val -eq 11 ]]; then

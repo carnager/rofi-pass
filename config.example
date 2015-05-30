@@ -15,3 +15,9 @@ BROWSER='chromium'
 ## Misc settings
 
 help_color="#0C73C2"
+
+## rofi expects a root directory in your basedir
+## underneath this directory all your password groups
+## are stored inside directories.
+## if you don't want to separate roots, enable this setting
+#root=.
