@@ -19,10 +19,14 @@ if [[ -z $BROWSER ]]; then
     export BROWSER=xdg-open
 fi
 
-if [[ $(find "$basedir" -maxdepth 1 \( ! -name '.*' \) -type d | wc -l) == "1" ]]; then
-    root="$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \;)"
+if [[ -n "$root" ]]; then
+    root="$root"
 else
-    root=$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \; | rofi -dmenu -p "Choose Database")
+    if [[ $(find "$basedir" -maxdepth 1 \( ! -name '.*' \) -type d | wc -l) == "1" ]]; then
+        root="$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \;)"
+    else
+        root=$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \; | rofi -dmenu -p "Choose Database")
+    fi
 fi
 
 list_passwords() {
@@ -74,6 +78,8 @@ Alt+4: Open URL | Alt+5: Show/Edit</span>"
         globalMenu
     elif [[ "$selected_password" == "[ Add Entry ]" ]]; then
         insertPass
+    elif [[ "$selected_password" == "" ]]; then
+        exit
     fi
 
 	password_temp=$(pass "$selected_password")
