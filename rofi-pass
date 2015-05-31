@@ -79,7 +79,7 @@ mainMenu () {
             mainMenu manage
         fi
     else
-        HELP="<span color='$help_color'>Alt+1: Autotype | Alt+2: Type User | Alt+3: Type Password
+        HELP="<span color='$help_color'>Alt+1: Autotype | Alt+2: Type User     | Alt+3: Type Password
 Alt+4: Open URL | Alt+c: Copy Username | Alt+Shift+c: Copy Password</span>"
         selected_password="$(echo -e "[ Add Entry ]>\n[ Manage Database ]>\n---\n$(list_passwords 2>/dev/null)" | rofi -mesg "${HELP}" -dmenu -select "$entry" -kb-custom-8 "Alt+c" -kb-custom-9 "Alt+Shift+c" -p "rofi-pass > ")"
     	rofi_exit=$?
