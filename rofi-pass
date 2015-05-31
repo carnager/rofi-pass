@@ -131,6 +131,7 @@ Alt+4: Open URL | Alt+c: Copy Username | Alt+Shift+c: Copy Password</span>"
             done
             xdotool_type "$password"
         fi
+        exit
         else
         if [[ -z "${stuff['CustomOrder']}" ]]; then
             xdotool_type "${stuff[${USERNAME_field}]}"
@@ -143,6 +144,7 @@ Alt+4: Open URL | Alt+c: Copy Username | Alt+Shift+c: Copy Password</span>"
             done
             xdotool_type "$password"
         fi
+        exit
     fi
 
 	# cleanup (for the paranoid)
