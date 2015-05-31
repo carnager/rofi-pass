@@ -88,7 +88,7 @@ Alt+4: Open URL | Alt+5: Show/Edit</span>"
     if [[ "$selected_password" == "Return to Main Menu" ]]; then
         globalMenu
     elif [[ "$selected_password" == "[ Add Entry ]" ]]; then
-        insertPass
+        insertPass2
     elif [[ "$selected_password" == "" ]]; then
         exit
     fi
@@ -187,32 +187,79 @@ show () {
     done
 }
 
-insertPass () {
-    quiT () {
-        if [[ $? -eq 1 ]]; then
-            exit
+insertPass2 () {
+    if [[ -z "$pass" ]]; then
+        if [[ -n "$1" ]]; then pass="$1" pass2="***"; else pass2="Empty"; fi
+    fi
+    if [[ -z "$user" ]]; then user="Empty"; fi
+    if [[ -z "$domain" ]]; then domain="Empty"; fi
+
+    menu=$(echo -e "0  Return to Main Menu\n*  Accept Values and Add Password Entry\n---\n1  URL ($domain)\n2  User ($user)\n3  Password ($pass2)" | rofi -dmenu -p "Add Entry > ")
+    if [[ $menu == "0  Return to Main Menu" ]]; then mainMenu
+    elif [[ $menu == "" ]]; then exit
+    elif [[ $menu == "*  Accept Values and Add Password Entry" ]]; then
+        notab=$(echo -e "Yes\nNo" | rofi -dmenu -p "Page uses Auto Tab? > ")
+        cd "$HOME"/.password-store/"${root}"
+        group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | rofi -dmenu -p "Choose Group > ")
+        if [[ "$notab" == "No" ]]; then
+            pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}")
+        elif [[ "$notab" == "Yes" ]]; then
+            pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}\nNOTAB")
         fi
-    }
-    target=$(wmctrl -l | grep Chromium | awk '{print $(NF-2)}' | sed 's~http[s]*://~~g'| sed 's/^\[//' | sed 's/\]$//')
-    domain=${target%/}
-	pass=$(echo -e "Password for site $domain" | rofi -dmenu -p "Enter Password > ")
-    quiT
-	user=$(echo -e "Username for site $domain" | rofi -dmenu -p "Enter User > ")
-    quiT
-	notab=$(echo -e "Yes\nNo" | rofi -dmenu -p "Page uses Auto Tab? > ")
-    quiT
 
-	cd "$HOME"/.password-store/"${root}"
-    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | rofi -dmenu -p "Choose Group > ")
-
-	if [[ "$notab" == "No" ]]; then
-		pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}")
-        w
-
-	elif [[ "$notab" == "Yes" ]]; then
-		pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}\nNOTAB")
-	fi
+    elif [[ $menu == "1  URL"* ]]; then
+        HELP="<span color='$help_color'>Enter Domain Name or chose one of the Options below</span>"
+        domain=$(echo -e "Get URL from active Chromium Tab" | rofi -dmenu -mesg "${HELP}" -p "URL > ")
+        if [[ $domain == "Get URL from active Chromium Tab" ]]; then
+            target=$(wmctrl -l | grep Chromium | awk '{print $(NF-2)}' | sed 's~http[s]*://~~g'| sed 's/^\[//' | sed 's/\]$//')
+            domain=${target%/}
+            insertPass2
+        fi
+    elif [[ $menu == "2  User"* ]]; then
+        HELP="<span color='$help_color'>Enter Username</span>"
+        user=$(echo -e "" | rofi -dmenu -mesg "${HELP}" -p "Username > ")
+        insertPass2
+    elif [[ $menu == "3  Password"* ]]; then
+        password_length=12
+        symbols="False"
+        numerals="True"
+        capitals="True"
+        password_gen
+    else
+      insertPass2
+    fi
 }
+
+password_gen () {
+    if [[ $capitals == "True" ]]; then cap="-c"; else cap="-A"; fi
+    if [[ $symbols == "True" ]]; then sym="-y"; else sym=""; fi
+    if [[ $numerals == "True" ]]; then num="-n"; else num="-0"; fi
+    HELP="<span color='$help_color'>Choose one password or type your own</span>"
+    menu=$(echo -e "0  Return to Insert Menu\n*  Generate new Password\n---\n1  Password Length\n2  Include Capitals ($capitals)\n3  Include Numerals ($numerals)\n4  Include Symbols ($symbols)\n---\n$(pwgen $num $cap $sym -B -1 $password_length 5)" | rofi -dmenu -mesg "${HELP}" -p "Password > ")
+
+    if [[ $menu == "1  Password Length" ]]; then
+        password_length=$(echo -e "5\n7\n10\n12\n15\n20" | rofi -dmenu -p "Choose Length > ")
+        password_gen
+    elif [[ $menu == "0  Return to Insert Menu" ]]; then
+        insertPass2
+    elif [[ $menu == "*  Generate new Password" ]]; then
+        password_gen
+    elif [[ $menu == "2  Include Capitals"* ]]; then
+        capitals=$(echo -e "True\nFalse" | rofi -dmenu -p "Capitals? > ")
+        password_gen
+    elif [[ $menu == "3  Include Numerals"* ]]; then
+        numerals=$(echo -e "True\nFalse" | rofi -dmenu -p "Numerals? > ")
+        password_gen
+    elif [[ $menu == "4  Include Symbols"* ]]; then
+        symbols=$(echo -e "True\nFalse" | rofi -dmenu -p "Symbols? > ")
+        password_gen
+    else
+       insertPass2 "$menu"
+    fi
+}
+
+mainMenu
+
 
 help_msg () {
     echo "rofi-pass - a rofi driven frontend to pass"
