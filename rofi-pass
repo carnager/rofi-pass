@@ -63,45 +63,50 @@ mainMenu () {
     if [[ -n "$2" ]]; then
         root="$2"
     fi
-    HELP="<span color='$help_color'>Alt+1: Autotype | Alt+2: Type User | Alt+3: Type Password
-Alt+4: Open URL | Alt+5: Show/Edit</span>"
-    selected_password="$(echo -e "[ Add Entry ]\n---\n$(list_passwords 2>/dev/null)" | rofi -mesg "${HELP}" -dmenu -select "$entry" -p "rofi-pass > ")"
-	rofi_exit=$?
+    if [[ $1 == "manage" ]]; then
+        HELP="<span color='$help_color'>Alt+1: Edit Entry | Alt+2: Move Entry | Alt+3: Delete Entry</span>"
+        selected_password="$(echo -e "0  Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -mesg "${HELP}" -dmenu -select "$entry" -p "rofi-pass > ")"
+        rofi_exit=$?
+        if [[ "${rofi_exit}" -eq 0 ]]; then true;
+        elif [[ "${rofi_exit}" -eq 10 ]]; then manageEntry edit;
+        elif [[ "${rofi_exit}" -eq 11 ]]; then manageEntry move;
+        elif [[ "${rofi_exit}" -eq 1 ]]; then exit;
+        elif [[ "${rofi_exit}" -eq 12 ]]; then manageEntry delete;
+        fi
+        if [[ "$selected_password" == "0  Return to Main Menu" ]]; then
+            mainMenu
+        else
+            mainMenu manage
+        fi
+    else
+        HELP="<span color='$help_color'>Alt+1: Autotype | Alt+2: Type User | Alt+3: Type Password
+Alt+4: Open URL | Alt+c: Copy Username | Alt+Shift+c: Copy Password</span>"
+        selected_password="$(echo -e "[ Add Entry ]>\n[ Manage Database ]>\n---\n$(list_passwords 2>/dev/null)" | rofi -mesg "${HELP}" -dmenu -select "$entry" -kb-custom-8 "Alt+c" -kb-custom-9 "Alt+Shift+c" -p "rofi-pass > ")"
+    	rofi_exit=$?
+        if [[ "${rofi_exit}" -eq 0 ]]; then true;
+        elif [[ "${rofi_exit}" -eq 10 ]]; then true;
+        elif [[ "${rofi_exit}" -eq 13 ]]; then chromium $(pass "$selected_password" | grep "URL: " | awk -F 'URL: ' '{ print $2 }');
+        elif [[ "${rofi_exit}" -eq 1 ]]; then exit ${rofi_exit};
+        fi
 
-	case ${rofi_exit} in
-		0)
-			true
-			;;
-        10)
-            true
-            ;;
-        13) chromium $(pass "$selected_password" | grep "URL: " | awk -F 'URL: ' '{ print $2 }')
+        if [[ "$selected_password" == "[ Add Entry ]>" ]]; then
+            insertPass2
+        elif [[ "$selected_password" == "[ Manage Database ]>" ]]; then
+            mainMenu manage
+        elif [[ "$selected_password" == "" ]]; then
             exit
-            ;;
-        14) show
-            ;;
-		1)
-			exit ${rofi_exit}
-			;;
-	esac
-
-    if [[ "$selected_password" == "Return to Main Menu" ]]; then
-        globalMenu
-    elif [[ "$selected_password" == "[ Add Entry ]" ]]; then
-        insertPass2
-    elif [[ "$selected_password" == "" ]]; then
-        exit
+        fi
     fi
 
-	password_temp=$(pass "$selected_password")
-	password=$(echo "${password_temp}" | head -1)
-	declare -A stuff
+    password_temp=$(pass "$selected_password")
+    password=$(echo "${password_temp}" | head -1)
+    declare -A stuff
 
     while read LINE; do
         _id=$(echo "${LINE}" | awk -F': ' '{print $1}')
         _val=$(echo "${LINE}" | awk -F': ' '{print $2}')
         stuff["${_id}"]=${_val}
-	done < <(pass "${selected_password}" | tail -n+2 | grep ': ')
+    done < <(pass "${selected_password}" | tail -n+2 | grep ': ')
 
     if [[ $rofi_exit -eq 11 ]]; then
         xdotool_type "${stuff[${USERNAME_field}]}"
@@ -109,43 +114,36 @@ Alt+4: Open URL | Alt+5: Show/Edit</span>"
     elif [[ $rofi_exit -eq 12 ]]; then
         xdotool_type "$password"
         exit
+    elif [[ $rofi_exit -eq 17 ]]; then
+        echo -n "${stuff[${USERNAME_field}]}" | xclip
+        exit
+    elif [[ $rofi_exit -eq 18 ]]; then
+        echo -n "$password" | xclip
+        exit
     fi
-	case "$1" in
-		password)
-			xdotool_type "$password"
-			;;
-		user)
-			xdotool_type "${stuff[${USERNAME_field}]}"
-			;;
-        url)
-        	xdotool_type "${stuff[${URL_field}]}"
-            ;;
-        *)
-            if [[ $(echo "${password_temp}" | tail -1) == "NOTAB" ]]; then
-                if [[ -z "${stuff['CustomOrder']}" ]]; then
-                    xdotool_type "${stuff[${USERNAME_field}]}"
-                    xdotool_type "$password"
-                else
-                    for word in ${stuff['CustomOrder']}; do
-                        xdotool_type "${stuff[${word}]}"
-                    done
-                    xdotool_type "$password"
-                fi
-            else
-                if [[ -z "${stuff['CustomOrder']}" ]]; then
-                    xdotool_type "${stuff[${USERNAME_field}]}"
-                    xdotool key Tab
-                    xdotool_type "$password"
-                else
-                    for word in ${stuff['CustomOrder']}; do
-                        xdotool_type "${stuff[${word}]}"
-                        xdotool key Tab
-                    done
-                    xdotool_type "$password"
-                fi
-            fi
-            ;;
-	esac
+    if [[ $(echo "${password_temp}" | tail -1) == "NOTAB" ]]; then
+        if [[ -z "${stuff['CustomOrder']}" ]]; then
+            xdotool_type "${stuff[${USERNAME_field}]}"
+            xdotool_type "$password"
+        else
+            for word in ${stuff['CustomOrder']}; do
+                xdotool_type "${stuff[${word}]}"
+            done
+            xdotool_type "$password"
+        fi
+        else
+        if [[ -z "${stuff['CustomOrder']}" ]]; then
+            xdotool_type "${stuff[${USERNAME_field}]}"
+            xdotool key Tab
+            xdotool_type "$password"
+        else
+            for word in ${stuff['CustomOrder']}; do
+                xdotool_type "${stuff[${word}]}"
+                xdotool key Tab
+            done
+            xdotool_type "$password"
+        fi
+    fi
 
 	# cleanup (for the paranoid)
 	password=''
@@ -157,34 +155,26 @@ Alt+4: Open URL | Alt+5: Show/Edit</span>"
 	unset stuff
 }
 
-show () {
-    while true; do
-
-    menu=$(echo -e "Return to Main Menu\n---\nEdit Entry\n---\n$(pass "$selected_password")" | rofi -dmenu  -mesg "<span color='$help_color'>Alt+1: Copy Selection to Clipboard (Default) | Alt+2: Open Selection in Browser</span>" -p "Choose Entry > ")
-
-    val=$?
-
-    if [[ "$menu" == "Edit Entry" ]]; then
+manageEntry () {
+    if [[ "$1" == "edit" ]]; then
         EDITOR=$EDITOR pass edit "${selected_password}"
-    elif [[ "$menu" == "" ]]; then
-        exit
-    elif [[ "$menu" == "Return to Main Menu" ]]; then
-        mainMenu
-    else
-        if [[ $(echo "$menu" | grep ": ") == "" ]]; then
-            if [[ $val -eq 11 ]]; then
-                chromium $(echo -e "${menu}" | awk -F 'URL: ' '{ print $2 }')
-            else
-                echo -n "$menu" | xclip
-                xclip -o | xclip -selection clipboard
-            fi
-        elif [[ $val -eq 10 || $val -eq 0 ]]; then
-            menu=$(echo -n "${menu}" | awk -F ': ' '{ print $2 }')
-            echo -n "${menu}" | xclip
-            xclip -o | xclip -selection clipboard
+        mainMenu manage
+    elif [[ $1 == "move" ]]; then
+        cd "$HOME"/.password-store/"${root}"
+        selected_password2=$(basename "$selected_password" .gpg)
+        group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | rofi -dmenu -p "Choose Group > ")
+        pass mv "$selected_password" "${root}"/"${group}"/"${selected_password2}"
+        mainMenu manage
+    elif [[ "$1" == "delete" ]]; then
+        ask=$(echo -e "Yes\nNo" | rofi -dmenu -p "Are You Sure? >")
+        if [[ "$ask" == "Yes" ]]; then
+            pass rm --force "${selected_password}"
+        elif [[ "$ask" == "no" ]]; then
+            mainMenu manage
         fi
+    else
+        mainMenu manage
     fi
-    done
 }
 
 insertPass2 () {
