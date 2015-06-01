@@ -85,7 +85,7 @@ Alt+4: Open URL | Alt+c: Copy Username | Alt+Shift+c: Copy Password</span>"
     	rofi_exit=$?
         if [[ "${rofi_exit}" -eq 0 ]]; then true;
         elif [[ "${rofi_exit}" -eq 10 ]]; then true;
-        elif [[ "${rofi_exit}" -eq 13 ]]; then chromium $(pass "$selected_password" | grep "URL: " | awk -F 'URL: ' '{ print $2 }');
+        elif [[ "${rofi_exit}" -eq 13 ]]; then $BROWSER $(pass "$selected_password" | grep "URL: " | awk -F 'URL: ' '{ print $2 }');
         elif [[ "${rofi_exit}" -eq 1 ]]; then exit ${rofi_exit};
         fi
 
