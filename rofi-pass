@@ -72,13 +72,7 @@ mainMenu () {
         elif [[ "${rofi_exit}" -eq 11 ]]; then manageEntry move;
         elif [[ "${rofi_exit}" -eq 1 ]]; then exit;
         elif [[ "${rofi_exit}" -eq 12 ]]; then manageEntry delete;
-        elif [[ "${rofi_exit}" -eq 13 ]]; then
-            menu=$(echo -e "0  Return to Manage Menu\n---\n$(pass "$selected_password")" | rofi -dmenu -p "> ")
-            if [[ $menu == "0  Return to Manage Menu" ]]; then mainMenu manage
-            elif [[ $menu == "" ]]; then exit
-            else
-                :
-            fi
+        elif [[ "${rofi_exit}" -eq 13 ]]; then showEntry;
         fi
         if [[ "$selected_password" == "0  Return to Main Menu" ]]; then
             mainMenu
@@ -162,6 +156,15 @@ Alt+4: Open URL | Alt+c: Copy Username | Alt+Shift+c: Copy Password</span>"
 	unset selected_password
 	unset password_temp
 	unset stuff
+}
+
+showEntry () {
+    menu=$(echo -e "0  Return to Manage Menu\n---\n$(pass "$selected_password")" | rofi -dmenu -p "> ")
+        if [[ $menu == "0  Return to Manage Menu" ]]; then mainMenu manage
+        elif [[ $menu == "" ]]; then exit
+        else
+            showEntry
+        fi
 }
 
 manageEntry () {
