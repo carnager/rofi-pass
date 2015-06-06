@@ -223,8 +223,8 @@ insertPass2 () {
             insertPass2
         elif [[ $domain == "Get URL from active Firefox Tab" ]]; then
             # https://addons.mozilla.org/en-uS/firefox/addon/add-url-to-window-title/
-            # set "Show full URL" in preferences
-            domain=$(wmctrl -l | grep Firefox | awk '{print $(NF-3)}')
+            # set "Show full URL" in preferences and separator to "::"
+            domain=$(wmctrl -l | grep Firefox | grep "::" | awk '{print $(NF-3)}')
             insertPass2
         elif [[ $domain == "< Return" ]]; then
             insertPass2
