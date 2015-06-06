@@ -86,7 +86,7 @@ Alt+4: Open URL | Alt+c: Copy Username | Alt+Shift+c: Copy Password</span>"
     	rofi_exit=$?
         if [[ "${rofi_exit}" -eq 0 ]]; then true;
         elif [[ "${rofi_exit}" -eq 10 ]]; then true;
-        elif [[ "${rofi_exit}" -eq 13 ]]; then $BROWSER $(pass "$selected_password" | grep "URL: " | awk -F 'URL: ' '{ print $2 }');
+        elif [[ "${rofi_exit}" -eq 13 ]]; then $BROWSER $(pass "$selected_password" | grep "URL: " | awk -F 'URL: ' '{ print $2 }'); exit;
         elif [[ "${rofi_exit}" -eq 1 ]]; then exit ${rofi_exit};
         fi
 
@@ -195,8 +195,9 @@ insertPass2 () {
     fi
     if [[ -z "$user" ]]; then user="Empty"; fi
     if [[ -z "$domain" ]]; then domain="Empty"; fi
+    if [[ -z "$name" ]]; then name="Empty"; fi
 
-    menu=$(echo -e "0  Return to Main Menu\n*  Accept Values and Add Password Entry\n---\n1  URL ($domain)\n2  User ($user)\n3  Password ($pass2)" | rofi -dmenu -p "Add Entry > ")
+    menu=$(echo -e "0  Return to Main Menu\n*  Accept Values and Add Password Entry\n---\n1  Name ($name)\n2  URL ($domain)\n3  User ($user)\n4  Password ($pass2)" | rofi -dmenu -p "Add Entry > ")
     if [[ $menu == "0  Return to Main Menu" ]]; then mainMenu
     elif [[ $menu == "" ]]; then exit
     elif [[ $menu == "*  Accept Values and Add Password Entry" ]]; then
@@ -204,24 +205,31 @@ insertPass2 () {
         cd "$HOME"/.password-store/"${root}"
         group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | rofi -dmenu -p "Choose Group > ")
         if [[ "$notab" == "No" ]]; then
-            pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}")
+            pass insert -m -f "${root}"/"$group"/"$name" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}")
         elif [[ "$notab" == "Yes" ]]; then
-            pass insert -m -f "${root}"/"$group"/"$domain" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}\nNOTAB")
+            pass insert -m -f "${root}"/"$group"/"$name" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}\nNOTAB")
         fi
+    elif [[ $menu == "1  Name"* ]]; then
+        name=$(echo "" | rofi -dmenu -p "Enter Name > ")
+        insertPass2
 
-    elif [[ $menu == "1  URL"* ]]; then
+    elif [[ $menu == "2  URL"* ]]; then
         HELP="<span color='$help_color'>Enter Domain Name or chose one of the Options below</span>"
         domain=$(echo -e "Get URL from active Chromium Tab" | rofi -dmenu -mesg "${HELP}" -p "URL > ")
         if [[ $domain == "Get URL from active Chromium Tab" ]]; then
-            target=$(wmctrl -l | grep Chromium | awk '{print $(NF-2)}' | sed 's~http[s]*://~~g'| sed 's/^\[//' | sed 's/\]$//')
-            domain=${target%/}
+            # use url in title chrome extension with format: "{protocol}://{hostname}{port}/{path}/{args}"
+            domain=$(wmctrl -l | grep Chromium | awk '{print $(NF-2)}')
+            insertPass2
+        elif [[ $domain == "" ]]; then
+            exit
+        else
             insertPass2
         fi
-    elif [[ $menu == "2  User"* ]]; then
+    elif [[ $menu == "3  User"* ]]; then
         HELP="<span color='$help_color'>Enter Username</span>"
         user=$(echo -e "" | rofi -dmenu -mesg "${HELP}" -p "Username > ")
         insertPass2
-    elif [[ $menu == "3  Password"* ]]; then
+    elif [[ $menu == "4  Password"* ]]; then
         password_length=12
         symbols="False"
         numerals="True"
