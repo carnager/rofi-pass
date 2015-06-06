@@ -215,10 +215,18 @@ insertPass2 () {
 
     elif [[ $menu == "2  URL"* ]]; then
         HELP="<span color='$help_color'>Enter Domain Name or chose one of the Options below</span>"
-        domain=$(echo -e "Get URL from active Chromium Tab" | rofi -dmenu -mesg "${HELP}" -p "URL > ")
+        domain=$(echo -e "< Return\n---\nGet URL from active Chromium Tab\nGet URL from active Firefox Tab" | rofi -dmenu -mesg "${HELP}" -p "URL > ")
         if [[ $domain == "Get URL from active Chromium Tab" ]]; then
             # use url in title chrome extension with format: "{protocol}://{hostname}{port}/{path}/{args}"
+            # https://chrome.google.com/webstore/detail/url-in-title/ignpacbgnbnkaiooknalneoeladjnfgb?utm_source=chrome-app-launcher-info-dialog
             domain=$(wmctrl -l | grep Chromium | awk '{print $(NF-2)}')
+            insertPass2
+        elif [[ $domain == "Get URL from active Firefox Tab" ]]; then
+            # https://addons.mozilla.org/en-uS/firefox/addon/add-url-to-window-title/
+            # set "Show full URL" in preferences
+            domain=$(wmctrl -l | grep Firefox | awk '{print $(NF-3)}')
+            insertPass2
+        elif [[ $domain == "< Return" ]]; then
             insertPass2
         elif [[ $domain == "" ]]; then
             exit
