@@ -16,8 +16,21 @@ BROWSER='chromium'
 
 help_color="#0C73C2"
 
-## rofi expects a root directory in your basedir
-## underneath this directory all your password groups
-## are stored inside directories.
-## if you don't want to separate roots, enable this setting
-#root=.
+# get active URL from browser
+# Chose the one for your browser or create your own.
+
+# chromium - needs url in title extension
+# https://chrome.google.com/webstore/detail/url-in-title/ignpacbgnbnkaiooknalneoeladjnfgb
+# set string to "{protocol}://{hostname}{port}/{path}/{args}"
+domain () {
+    wmctrl -l | grep Chromium | awk '{print $(NF-2)}'
+}
+
+# firefox - needs Add URL to Window Title extension
+# https://addons.mozilla.org/en-US/firefox/addon/add-url-to-window-title/
+# set delimiter to "::"
+
+# domain () {
+#   wmctrl -l | grep Firefox | grep "::" | awk '{print $(NF-3)}'
+# }
+
