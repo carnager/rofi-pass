@@ -2,7 +2,4 @@
 # https://addons.mozilla.org/en-US/firefox/addon/add-url-to-window-title/
 # set delimiter to "::"
 
-domain () {
-    wmctrl -l | grep Firefox | grep "::" | awk '{print $(NF-3)}'
-}
-
+wmctrl -l | grep Firefox | grep "::" | awk '{print $(NF-3)}'
