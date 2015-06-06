@@ -7,3 +7,5 @@ install:
 	install -Dm644 config.example $(DESTDIR)$(PREFIX)/share/doc/rofi-pass/config.example
 	install -Dm644 README.md $(DESTDIR)$(PREFIX)/share/doc/rofi-pass/README.md
 	install -Dm644 config.example $(DESTDIR)/etc/rofi-pass.conf
+	install -Dm755 parsers/chromium $(DESTDIR)$(PREFIX)/share/doc/rofi-pass/parsers/chromium
+	install -Dm755 parsers/firefox $(DESTDIR)$(PREFIX)/share/doc/rofi-pass/parsers/firefox
