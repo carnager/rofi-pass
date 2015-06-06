@@ -5,4 +5,4 @@
 # https://chrome.google.com/webstore/detail/url-in-title/ignpacbgnbnkaiooknalneoeladjnfgb
 # set string to "{protocol}://{hostname}{port}/{path}/{args}"
 
-wmctrl -l | grep Chromium | awk '{print $(NF-2)}'
+wmctrl -l | grep Chromium | awk '{ print $4 }'
