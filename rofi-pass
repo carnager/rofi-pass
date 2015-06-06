@@ -9,6 +9,11 @@ shopt -s nullglob globstar
 # read global config file
 source /etc/rofi-pass.conf
 
+if [[ ! -d $HOME/.config/rofi-pass/parsers ]]; then
+    mkdir $HOME/.config/rofi-pass/parsers
+    cp /usr/share/doc/rofi-pass/parsers/* $HOME/.config/rofi-pass/parsers
+fi
+
 # check if local config exists and load it
 if [[ -f $HOME/.config/rofi-pass/config ]]; then
     source $HOME/.config/rofi-pass/config
@@ -217,7 +222,7 @@ insertPass2 () {
         HELP="<span color='$help_color'>Enter Domain Name or chose one of the Options below</span>"
         domain=$(echo -e "< Return\n---\nGet URL from active Browser Tab" | rofi -dmenu -mesg "${HELP}" -p "URL > ")
         if [[ $domain == "Get URL from active Browser Tab" ]]; then
-            domain=$(domain)
+            domain=$($HOME/.config/rofi-pass/parsers/$BROWSER)
             insertPass2
         elif [[ $domain == "< Return" ]]; then
             insertPass2
