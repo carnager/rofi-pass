@@ -57,10 +57,6 @@ xdotool_type() {
 	done
 }
 
-notify () {
-7aa3C2
-}
-
 mainMenu () {
     if [[ -z "$root" ]]; then
         get_root
@@ -85,9 +81,9 @@ mainMenu () {
             mainMenu manage
         fi
     else
-        HELP="<span color='$help_color'>Alt+1: Autotype | Alt+2: Type User     | Alt+3: Type Password
-Alt+4: Open URL | Alt+c: Copy Username | Alt+Shift+c: Copy Password</span>"
-        selected_password="$(echo -e "[ Add Entry ]>\n[ Manage Database ]>\n---\n$(list_passwords 2>/dev/null)" | rofi -mesg "${HELP}" -dmenu -select "$entry" -kb-custom-8 "Alt+c" -kb-custom-9 "Alt+Shift+c" -p "rofi-pass > ")"
+        HELP="<span color='$help_color'>${autotype}: Autotype | ${type_user}: Type User     | ${type_pass}: Type Password
+${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Password</span>"
+        selected_password="$(echo -e "[ Add Entry ]>\n[ Manage Database ]>\n---\n$(list_passwords 2>/dev/null)" | rofi -mesg "${HELP}" -dmenu -kb-custom-1 "${autotype}" -kb-custom-2 "${type_user}" -kb-custom-3 "${type_pass}" -kb-custom-4 "${open_url}" -kb-custom-5 "${copy_name}" -kb-custom-6 "${copy_pass}" -dmenu -select "$entry" -kb-custom-8 "Alt+c" -kb-custom-9 "Alt+Shift+c" -p "rofi-pass > ")"
     	rofi_exit=$?
         if [[ "${rofi_exit}" -eq 0 ]]; then true;
         elif [[ "${rofi_exit}" -eq 10 ]]; then true;
@@ -137,8 +133,8 @@ Alt+4: Open URL | Alt+c: Copy Username | Alt+Shift+c: Copy Password</span>"
             done
             xdotool_type "$password"
         fi
-        exit
-        else
+            exit
+    else
         if [[ -z "${stuff['CustomOrder']}" ]]; then
             xdotool_type "${stuff[${USERNAME_field}]}"
             xdotool key Tab
@@ -165,11 +161,11 @@ Alt+4: Open URL | Alt+c: Copy Username | Alt+Shift+c: Copy Password</span>"
 
 showEntry () {
     menu=$(echo -e "0  Return to Manage Menu\n---\n$(pass "$selected_password")" | rofi -dmenu -p "> ")
-        if [[ $menu == "0  Return to Manage Menu" ]]; then mainMenu manage
+    if [[ $menu == "0  Return to Manage Menu" ]]; then mainMenu manage
         elif [[ $menu == "" ]]; then exit
-        else
-            showEntry
-        fi
+    else
+        showEntry
+    fi
 }
 
 manageEntry () {
@@ -242,7 +238,7 @@ insertPass2 () {
         capitals="True"
         password_gen
     else
-      insertPass2
+        insertPass2
     fi
 }
 
@@ -270,11 +266,12 @@ password_gen () {
         symbols=$(echo -e "True\nFalse" | rofi -dmenu -p "Symbols? > ")
         password_gen
     else
-       insertPass2 "$menu"
+        insertPass2 "$menu"
     fi
 }
 
 mainMenu
+
 
 help_msg () {
     echo "rofi-pass - a rofi driven frontend to pass"

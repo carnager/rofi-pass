@@ -15,3 +15,10 @@ BROWSER='chromium'
 ## Misc settings
 
 help_color="#0C73C2"
+
+autotype="Alt+1"
+type_user="Alt+2"
+type_pass="Alt+3"
+open_url="Alt+4"
+copy_name="Alt+c"
+copy_pass="Alt+Shift+c"
