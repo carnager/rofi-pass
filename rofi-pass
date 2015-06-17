@@ -65,8 +65,8 @@ mainMenu () {
         root="$2"
     fi
     if [[ $1 == "manage" ]]; then
-        HELP="<span color='$help_color'>Alt+1: Edit Entry | Alt+2: Move Entry | Alt+3: Delete Entry | Alt+4 Show Entry</span>"
-        selected_password="$(echo -e "0  Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -mesg "${HELP}" -dmenu -select "$entry" -p "rofi-pass > ")"
+        HELP="<span color='$help_color'>${edit}: Edit Entry | ${move}: Move Entry | ${delete}: Delete Entry | ${show}: Show Entry</span>"
+        selected_password="$(echo -e "0  Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -custom-kb-1 "${edit}" -custom-kb-2 "${move}" -custom-kb-3 "${delete}" -custom-kb-4 "${show}" -mesg "${HELP}" -dmenu -select "$entry" -p "rofi-pass > ")"
         rofi_exit=$?
         if [[ "${rofi_exit}" -eq 0 ]]; then true;
         elif [[ "${rofi_exit}" -eq 10 ]]; then manageEntry edit;
