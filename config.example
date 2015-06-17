@@ -16,6 +16,7 @@ BROWSER='chromium'
 
 help_color="#0C73C2"
 
+# Custom Keybindings
 autotype="Alt+1"
 type_user="Alt+2"
 type_pass="Alt+3"
