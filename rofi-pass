@@ -127,24 +127,37 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
         if [[ -z "${stuff['CustomOrder']}" ]]; then
             xdotool_type "${stuff[${USERNAME_field}]}"
             xdotool_type "$password"
+            if [[ ${auto_enter} == "true" ]]; then
+                xdotool key Return
+            fi
         else
             for word in ${stuff['CustomOrder']}; do
                 xdotool_type "${stuff[${word}]}"
             done
             xdotool_type "$password"
+            if [[ ${auto_enter} == "true" ]]; then
+                xdotool key Return
+            fi
         fi
-            exit
+        exit
     else
         if [[ -z "${stuff['CustomOrder']}" ]]; then
             xdotool_type "${stuff[${USERNAME_field}]}"
             xdotool key Tab
             xdotool_type "$password"
+            sleep 1
+            if [[ ${auto_enter} == "true" ]]; then
+                xdotool key Return
+            fi
         else
             for word in ${stuff['CustomOrder']}; do
                 xdotool_type "${stuff[${word}]}"
                 xdotool key Tab
             done
             xdotool_type "$password"
+            if [[ ${auto_enter} == "true" ]]; then
+                xdotool key Return
+            fi
         fi
         exit
     fi
