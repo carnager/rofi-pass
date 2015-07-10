@@ -15,7 +15,7 @@ BROWSER='chromium'
 ## Misc settings
 
 help_color='#0C73C2'
-auto_enter="'true'
+auto_enter='false'
 
 # Custom Keybindings
 autotype="Alt+1"
