@@ -283,9 +283,6 @@ password_gen () {
     fi
 }
 
-mainMenu
-
-
 help_msg () {
     echo "rofi-pass - a rofi driven frontend to pass"
     echo "--------------------------------------"
