@@ -121,6 +121,9 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
         exit
     elif [[ $rofi_exit -eq 15 ]]; then
         echo -n "$password" | xclip
+        xclip -o | xclip -selection clipboard
+        notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
+        $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
         exit
     fi
     if [[ $(echo "${password_temp}" | tail -1) == "NOTAB" ]]; then
