@@ -24,7 +24,7 @@ if [[ -z $BROWSER ]]; then
     export BROWSER=xdg-open
 fi
 
-if [[ -n "$2" ]]; then
+if [[ -n "$2" && "$1" == "--root" ]]; then
     root="${2}"
 else
     :
