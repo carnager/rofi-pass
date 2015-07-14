@@ -24,24 +24,6 @@ if [[ -z $BROWSER ]]; then
     export BROWSER=xdg-open
 fi
 
-if [[ -n "$2" ]]; then
-    root="$2"
-else
-    root=""
-fi
-
-#get_root () {
-#    if [[ -n "$2" ]]; then
-#        root="$2"
-#    else
-#        if [[ $(find "$basedir" -maxdepth 1 \( ! -name '.*' \) -type d | wc -l) == "1" ]]; then
-#            root="$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \;)"
-#        else
-#            root=$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \; | rofi -dmenu -p "Choose Database")
-#        fi
-#    root="${basedir}"
-#    fi
-#}
 
 list_passwords() {
 	passwords=( ~/.password-store/**/*.gpg )
@@ -61,12 +43,11 @@ xdotool_type() {
 }
 
 mainMenu () {
-#    if [[ -z "$root" ]]; then
-#        get_root
-#    fi
-#    if [[ -n "$2" ]]; then
-#        root="$2"
-#    fi
+    if [[ -n "$2" ]]; then
+        root="$2"
+    else
+        root=""
+    fi
     if [[ $1 == "manage" ]]; then
         HELP="<span color='$help_color'>${edit}: Edit Entry | ${move}: Move Entry | ${delete}: Delete Entry | ${show}: Show Entry</span>"
         selected_password="$(echo -e "0  Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -custom-kb-1 "${edit}" -custom-kb-2 "${move}" -custom-kb-3 "${delete}" -custom-kb-4 "${show}" -mesg "${HELP}" -dmenu -select "$entry" -p "rofi-pass > ")"
@@ -95,7 +76,7 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
         fi
 
         if [[ "$selected_password" == "[ Add Entry ]>" ]]; then
-            insertPass2
+            insertPass
         elif [[ "$selected_password" == "[ Manage Database ]>" ]]; then
             mainMenu manage
         elif [[ "$selected_password" == "" ]]; then
@@ -209,7 +190,7 @@ manageEntry () {
     fi
 }
 
-insertPass2 () {
+insertPass () {
     if [[ -z "$pass" ]]; then
         if [[ -n "$1" ]]; then pass="$1" pass2="***"; else pass2="Empty"; fi
     fi
@@ -231,25 +212,25 @@ insertPass2 () {
         fi
     elif [[ $menu == "1  Name"* ]]; then
         name=$(echo "" | rofi -dmenu -p "Enter Name > ")
-        insertPass2
+        insertPass
 
     elif [[ $menu == "2  URL"* ]]; then
         HELP="<span color='$help_color'>Enter Domain Name or chose one of the Options below</span>"
         domain=$(echo -e "< Return\n---\nGet URL from active Browser Tab" | rofi -dmenu -mesg "${HELP}" -p "URL > ")
         if [[ $domain == "Get URL from active Browser Tab" ]]; then
             domain=$($HOME/.config/rofi-pass/parsers/$BROWSER)
-            insertPass2
+            insertPass
         elif [[ $domain == "< Return" ]]; then
-            insertPass2
+            insertPass
         elif [[ $domain == "" ]]; then
             exit
         else
-            insertPass2
+            insertPass
         fi
     elif [[ $menu == "3  User"* ]]; then
         HELP="<span color='$help_color'>Enter Username</span>"
         user=$(echo -e "" | rofi -dmenu -mesg "${HELP}" -p "Username > ")
-        insertPass2
+        insertPass
     elif [[ $menu == "4  Password"* ]]; then
         password_length=12
         symbols="False"
@@ -257,7 +238,7 @@ insertPass2 () {
         capitals="True"
         password_gen
     else
-        insertPass2
+        insertPass
     fi
 }
 
@@ -272,7 +253,7 @@ password_gen () {
         password_length=$(echo -e "5\n7\n10\n12\n15\n20" | rofi -dmenu -p "Choose Length > ")
         password_gen
     elif [[ $menu == "0  Return to Insert Menu" ]]; then
-        insertPass2
+        insertPass
     elif [[ $menu == "*  Generate new Password" ]]; then
         password_gen
     elif [[ $menu == "2  Include Capitals"* ]]; then
@@ -285,7 +266,7 @@ password_gen () {
         symbols=$(echo -e "True\nFalse" | rofi -dmenu -p "Symbols? > ")
         password_gen
     else
-        insertPass2 "$menu"
+        insertPass "$menu"
     fi
 }
 
