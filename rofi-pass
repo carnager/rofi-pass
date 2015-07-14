@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # rofi-pass
 # (c) 2015 Rasmus Steinke <rasi@xssn.at>
@@ -24,10 +24,16 @@ if [[ -z $BROWSER ]]; then
     export BROWSER=xdg-open
 fi
 
+if [[ -n "$2" ]]; then
+    root="${basedir}/${2}"
+    clear
+    echo "$root"
+else
+    root="${basedir}"
+fi
 
 list_passwords() {
-	passwords=( ~/.password-store/**/*.gpg )
-    passwords=( ~/.password-store/"${root}"/**/*.gpg )
+ 	passwords=( "${root}"/**/*.gpg )
 
 	for password in "${passwords[@]}"; do
 		filename="${password#$basedir}"
@@ -43,11 +49,6 @@ xdotool_type() {
 }
 
 mainMenu () {
-    if [[ -n "$2" ]]; then
-        root="$2"
-    else
-        root=""
-    fi
     if [[ $1 == "manage" ]]; then
         HELP="<span color='$help_color'>${edit}: Edit Entry | ${move}: Move Entry | ${delete}: Delete Entry | ${show}: Show Entry</span>"
         selected_password="$(echo -e "0  Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -custom-kb-1 "${edit}" -custom-kb-2 "${move}" -custom-kb-3 "${delete}" -custom-kb-4 "${show}" -mesg "${HELP}" -dmenu -select "$entry" -p "rofi-pass > ")"
