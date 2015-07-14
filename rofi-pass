@@ -26,19 +26,22 @@ fi
 
 if [[ -n "$2" ]]; then
     root="$2"
+else
+    root=""
 fi
 
-get_root () {
-    if [[ -n "$2" ]]; then
-        root="$2"
-    else
-        if [[ $(find "$basedir" -maxdepth 1 \( ! -name '.*' \) -type d | wc -l) == "1" ]]; then
-            root="$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \;)"
-        else
-            root=$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \; | rofi -dmenu -p "Choose Database")
-        fi
-    fi
-}
+#get_root () {
+#    if [[ -n "$2" ]]; then
+#        root="$2"
+#    else
+#        if [[ $(find "$basedir" -maxdepth 1 \( ! -name '.*' \) -type d | wc -l) == "1" ]]; then
+#            root="$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \;)"
+#        else
+#            root=$(find "${basedir}" -maxdepth 1 \( ! -name '.*' \) -type d -exec basename {} \; | rofi -dmenu -p "Choose Database")
+#        fi
+#    root="${basedir}"
+#    fi
+#}
 
 list_passwords() {
 	passwords=( ~/.password-store/**/*.gpg )
@@ -58,12 +61,12 @@ xdotool_type() {
 }
 
 mainMenu () {
-    if [[ -z "$root" ]]; then
-        get_root
-    fi
-    if [[ -n "$2" ]]; then
-        root="$2"
-    fi
+#    if [[ -z "$root" ]]; then
+#        get_root
+#    fi
+#    if [[ -n "$2" ]]; then
+#        root="$2"
+#    fi
     if [[ $1 == "manage" ]]; then
         HELP="<span color='$help_color'>${edit}: Edit Entry | ${move}: Move Entry | ${delete}: Delete Entry | ${show}: Show Entry</span>"
         selected_password="$(echo -e "0  Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -custom-kb-1 "${edit}" -custom-kb-2 "${move}" -custom-kb-3 "${delete}" -custom-kb-4 "${show}" -mesg "${HELP}" -dmenu -select "$entry" -p "rofi-pass > ")"
