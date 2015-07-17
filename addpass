@@ -21,7 +21,6 @@ if [[ $1 == "--help" || $1 == "=h" ]]; then
     echo "                      Every field name has to start with \"-\""
     echo "                      Values should be quoted"
     echo ""
-    echo ""
     echo "Example:"
     echo "adduser --root private -user \"Richard\" -foo \"bar\" -CustomOrder \"foo :tab user :tab password\""
     exit
