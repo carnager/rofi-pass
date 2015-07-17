@@ -4,6 +4,7 @@ basedir=~/.password-store/
 # fields to be used
 URL_field='URL'
 USERNAME_field='UserName'
+AUTOTYPE_field='CustomOrder'
 
 ## Programs to be used
 # Editor
