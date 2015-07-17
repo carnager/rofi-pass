@@ -96,6 +96,7 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
         _val=$(echo "${LINE}" | awk -F': ' '{print $2}')
         stuff["${_id}"]=${_val}
     done < <(pass "${selected_password}" | tail -n+2 | grep ': ')
+    stuff["password"]=${password}
 
     if [[ $rofi_exit -eq 11 ]]; then
         xdotool_type "${stuff[${USERNAME_field}]}"
@@ -113,43 +114,26 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
         $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
         exit
     fi
-    if [[ $(echo "${password_temp}" | tail -1) == "NOTAB" ]]; then
-        if [[ -z "${stuff['CustomOrder']}" ]]; then
-            xdotool_type "${stuff[${USERNAME_field}]}"
-            xdotool_type "$password"
-            if [[ ${auto_enter} == "true" ]]; then
-                xdotool key Return
-            fi
-        else
-            for word in ${stuff['CustomOrder']}; do
-                xdotool_type "${stuff[${word}]}"
-            done
-            xdotool_type "$password"
-            if [[ ${auto_enter} == "true" ]]; then
-                xdotool key Return
-            fi
+    if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
+        xdotool_type "${stuff[${USERNAME_field}]}"
+        xdotool_type "$password"
+        sleep 1
+        if [[ ${auto_enter} == "true" ]]; then
+            xdotool key Return
         fi
-        exit
     else
-        if [[ -z "${stuff['CustomOrder']}" ]]; then
-            xdotool_type "${stuff[${USERNAME_field}]}"
-            xdotool key Tab
-            xdotool_type "$password"
-            sleep 1
-            if [[ ${auto_enter} == "true" ]]; then
-                xdotool key Return
-            fi
-        else
-            for word in ${stuff['CustomOrder']}; do
-                xdotool_type "${stuff[${word}]}"
+        for word in ${stuff["$AUTOTYPE_field"]}; do
+            if [[ $word == ":tab" ]]; then
                 xdotool key Tab
-            done
-            xdotool_type "$password"
-            if [[ ${auto_enter} == "true" ]]; then
-                xdotool key Return
+            else
+                xdotool_type "${stuff[${word}]}"
             fi
+            #xdotool key Tab
+        done
+        #xdotool_type "$password"
+        if [[ ${auto_enter} == "true" ]]; then
+            xdotool key Return
         fi
-        exit
     fi
 
 	# cleanup (for the paranoid)
