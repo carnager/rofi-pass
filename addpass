@@ -16,7 +16,7 @@ if [[ $1 == "--help" || $1 == "=h" ]]; then
     echo "                      Needs to be first option."
     echo "                      Leave empty to use top level)"
     echo ""
-    echo "-name \"foobar\"        Needed field - filename of password field"
+    echo "-name \"foobar\"        Needed field - filename of password file"
     echo ""
     echo "                      Every field name has to start with \"-\""
     echo "                      Values should be quoted"
