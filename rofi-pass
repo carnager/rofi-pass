@@ -104,6 +104,7 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
     fi
     if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
         xdotool_type "${stuff[${USERNAME_field}]}"
+        xdotool key Tab
         xdotool_type "$password"
         sleep 1
         if [[ ${auto_enter} == "true" ]]; then
