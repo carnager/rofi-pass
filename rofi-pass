@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # rofi-pass
 # (c) 2015 Rasmus Steinke <rasi@xssn.at>
@@ -285,6 +285,9 @@ case $1 in
         ;;
     --root)
         mainMenu $2
+        ;;
+    --manage)
+        manageEntry
         ;;
     --help)
         help_msg
