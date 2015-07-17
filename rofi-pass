@@ -96,7 +96,7 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
         _val=$(echo "${LINE}" | awk -F': ' '{print $2}')
         stuff["${_id}"]=${_val}
     done < <(pass "${selected_password}" | tail -n+2 | grep ': ')
-    stuff["password"]=${password}
+    stuff["pass"]=${password}
 
     if [[ $rofi_exit -eq 11 ]]; then
         xdotool_type "${stuff[${USERNAME_field}]}"
@@ -189,25 +189,16 @@ insertPass () {
     if [[ $menu == "0  Return to Main Menu" ]]; then mainMenu
     elif [[ $menu == "" ]]; then exit
     elif [[ $menu == "*  Accept Values and Add Password Entry" ]]; then
-        notab=$(echo -e "Yes\nNo" | rofi -dmenu -p "Page uses Auto Tab? > ")
         if [[ -n "$root" ]]; then
             cd "${basedir}/${root}"
         else
             cd "${basedir}"
         fi
         group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | rofi -dmenu -p "Choose Group > ")
-        if [[ "$notab" == "No" ]]; then
-            if [[ -n "$root" ]]; then
-                pass insert -m -f "${root}/${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}")
-            else
-                pass insert -m -f "${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}")
-            fi
-        elif [[ "$notab" == "Yes" ]]; then
-            if [[ -n "$root" ]]; then
-                pass insert -m -f "${root}"/"$group"/"$name" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}\nNOTAB")
-            else
-                pass insert -m -f "$group"/"$name" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}\nNOTAB")
-            fi
+        if [[ -n "$root" ]]; then
+            pass insert -m -f "${root}/${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}")
+        else
+            pass insert -m -f "${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\nURL: ${domain}")
         fi
     elif [[ $menu == "1  Name"* ]]; then
         name=$(echo "" | rofi -dmenu -p "Enter Name > ")
