@@ -94,7 +94,7 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
         echo -n "${stuff[${USERNAME_field}]}" | xclip
         exit
     elif [[ $rofi_exit -eq 16 ]]; then
-        showEntry
+        showEntry mainMenu
     elif [[ $rofi_exit -eq 15 ]]; then
         echo -n "$password" | xclip
         xclip -o | xclip -selection clipboard
@@ -138,7 +138,7 @@ manageMenu() {
     HELP="<span color='$help_color'>${edit}: Edit Entry | ${move}: Move Entry | ${delete}: Delete Entry</span>"
     selected_password="$(echo -e "0  Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | rofi -custom-kb-1 "${edit}" -custom-kb-2 "${move}" -custom-kb-3 "${delete}" -mesg "${HELP}" -dmenu -select "$entry" -p "rofi-pass > ")"
     rofi_exit=$?
-    if [[ "${rofi_exit}" -eq 0 && "${selected_password}" != "0  Return to Main Menu" ]]; then showEntry;
+    if [[ "${rofi_exit}" -eq 0 && "${selected_password}" != "0  Return to Main Menu" ]]; then showEntry manageMenu;
     elif [[ "${rofi_exit}" -eq 10 ]]; then manageEntry edit;
     elif [[ "${rofi_exit}" -eq 11 ]]; then manageEntry move;
     elif [[ "${rofi_exit}" -eq 1 ]]; then exit;
@@ -152,10 +152,9 @@ manageMenu() {
 }
 
 showEntry () {
-    menu=$(echo -e "0  Return to Main Menu\n0  Return to Manage Menu\n---\n$(pass "$selected_password")" | rofi -dmenu -p "> ")
-    if [[ $menu == "0  Return to Manage Menu" ]]; then manageMenu
-    elif [[ $menu == "0  Return to Main Menu" ]]; then mainMenu
-        elif [[ $menu == "" ]]; then exit
+    menu=$(echo -e "0  Return\n---\n$(pass "$selected_password")" | rofi -dmenu -p "> ")
+    if [[ $menu == "0  Return" ]]; then "$1"
+    elif [[ $menu == "" ]]; then exit
     else
         showEntry
     fi
