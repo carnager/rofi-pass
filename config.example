@@ -4,7 +4,7 @@ basedir=~/.password-store/
 # fields to be used
 URL_field='URL'
 USERNAME_field='UserName'
-AUTOTYPE_field='CustomOrder'
+AUTOTYPE_field='autotype'
 
 ## Programs to be used
 # Editor
@@ -28,4 +28,4 @@ copy_pass="Alt+Shift+c"
 edit="Alt+1"
 move="Alt+2"
 delete="Alt+3"
-show="Alt+4"
+show="Alt+5"
