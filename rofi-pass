@@ -152,8 +152,9 @@ manageMenu() {
 }
 
 showEntry () {
-    menu=$(echo -e "0  Return to Manage Menu\n---\n$(pass "$selected_password")" | rofi -dmenu -p "> ")
+    menu=$(echo -e "0  Return to Main Menu\n0  Return to Manage Menu\n---\n$(pass "$selected_password")" | rofi -dmenu -p "> ")
     if [[ $menu == "0  Return to Manage Menu" ]]; then manageMenu
+    elif [[ $menu == "0  Return to Main Menu" ]]; then mainMenu
         elif [[ $menu == "" ]]; then exit
     else
         showEntry
