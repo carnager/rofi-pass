@@ -40,7 +40,12 @@ The `:tab` field has a special meaning. this will hit the tab key, obviously.
 
 ## Extras
 rofi-pass comes with a tiny helper script, which makes it easier to create new pass entries.
-Just run it with `addpass -name "My new Site" -user "zeltak" -branch "branch" -custom "foobar" -CustomOrder "branch :tab user :tab pass"`.
+Just run it with 
+
+```
+addpass -name "My new Site" -user "zeltak" -branch "branch" -custom "foobar" -CustomOrder "branch :tab user :tab pass"`.
+```
+
 You can add as many fields as needed. fieldnames are defined with `-` and the actual value is defined inside the quotations.
 
 Also included is an import script for keepass2 databases. It's the same script that can be downloaded from the pass homepage, with some minor modifications to match rofi-pass structure.
