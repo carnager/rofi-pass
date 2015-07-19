@@ -60,7 +60,7 @@ mainMenu () {
 ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Password | ${show}: Show Entry</span>"
         selected_password="$(echo -e "[ Add Entry ]>\n[ Manage Database ]>\n---\n$(list_passwords 2>/dev/null)" | rofi -mesg "${HELP}" -dmenu -kb-custom-1 "${autotype}" -kb-custom-2 "${type_user}" -kb-custom-3 "${type_pass}" -kb-custom-4 "${open_url}" -kb-custom-5 "${copy_name}" -kb-custom-6 "${copy_pass}" -kb-custom-7 "${show}" -dmenu -select "$entry" -p "rofi-pass > ")"
     	rofi_exit=$?
-        if [[ "${rofi_exit}" -eq 13 ]]; then $BROWSER $(pass "$selected_password" | grep "URL: " | awk -F 'URL: ' '{ print $2 }'); exit;
+        if [[ "${rofi_exit}" -eq 13 ]]; then $BROWSER "$(pass "$selected_password" | grep "URL: " | awk -F 'URL: ' '{ print $2 }')"; exit;
         elif [[ "${rofi_exit}" -eq 1 ]]; then exit ${rofi_exit};
         elif [[ "${rofi_exit}" -eq 10 || "${rofi-exit}" -eq 0 ]]; then true
         fi
