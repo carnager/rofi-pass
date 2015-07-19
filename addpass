@@ -22,7 +22,7 @@ if [[ $1 == "--help" || $1 == "=h" ]]; then
     echo "                      Values should be quoted"
     echo ""
     echo "Example:"
-    echo "adduser --root private -user \"Richard\" -foo \"bar\" -autotype \"foo :tab user :tab pass\"
+    echo "adduser --root private -user \"Richard\" -foo \"bar\" -autotype \"foo :tab user :tab pass\""
     exit
 else
     if [[ $* != *"-name "* ]]; then
