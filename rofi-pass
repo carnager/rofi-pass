@@ -274,9 +274,8 @@ help_msg () {
     echo "--------------------------------------"
     echo -e "Usage\n"
     echo "--insert    insert new entry to password store"
-    echo -e "--root      set custom root directory\n"
-    echo "Running rofi-pass without arguments will ask for root to be used,"
-    echo "if multiple directories exist"
+    echo "--manage    edit/move/delete entries"
+    echo -e "--root      set custom root directory"
 }
 
 ##########################
