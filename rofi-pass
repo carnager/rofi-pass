@@ -65,13 +65,6 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
         elif [[ "${rofi_exit}" -eq 10 || "${rofi-exit}" -eq 0 ]]; then true
         fi
 
-        if [[ "$selected_password" == "[ Add Entry ]>" ]]; then
-            insertPass
-        elif [[ "$selected_password" == "[ Manage Database ]>" ]]; then
-            manageEntry
-        elif [[ "$selected_password" == "" ]]; then
-            exit
-        fi
 
     password_temp=$(pass "$selected_password")
     password=$(echo "${password_temp}" | head -1)
@@ -101,7 +94,17 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
         notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
         $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
         exit
+    elif [[ $rofi_exit -eq 17 || $rofi_exit -eq 18 || $rofi_exit -eq 19 ]]; then
+        mainMenu
     fi
+    if [[ "$selected_password" == "[ Add Entry ]>" ]]; then
+        insertPass
+    elif [[ "$selected_password" == "[ Manage Database ]>" ]]; then
+        manageEntry
+    elif [[ "$selected_password" == "" ]]; then
+        exit
+    fi
+
     if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
         xdotool_type "${stuff[${USERNAME_field}]}"
         xdotool key Tab
