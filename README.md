@@ -31,7 +31,7 @@ The `:tab` field has a special meaning. this will hit the tab key, obviously.
 ## Requirements
 * pass (https://github.com/zx2c4/password-store)
 * sed
-* rofi (https://github.com/DaveDavenport/rofi)
+* rofi (https://github.com/DaveDavenport/rofi) (always use latest git, my scripts tend to use rofi's latest feature set from git)
 * wmctrl
 * xprop
 * xdotool
