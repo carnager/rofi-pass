@@ -1,6 +1,9 @@
 # set path to password store
 basedir=~/.password-store/
 
+# optional rofi parameters:
+rofiopts="-no-levenshtein-sort"
+
 # fields to be used
 URL_field='URL'
 USERNAME_field='UserName'
