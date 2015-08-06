@@ -2,6 +2,9 @@
 basedir=~/.password-store/
 
 # optional rofi parameters:
+# keep in mind that 0.15.7 has different arguments compared to
+# latest git. for rofi-pass this means that "-i" will not work with
+# 0.15.7.
 rofiopts="-no-levenshtein-sort"
 
 # fields to be used
@@ -27,7 +30,7 @@ type_user="Alt+2"
 type_pass="Alt+3"
 open_url="Alt+4"
 copy_name="Alt+c"
-copy_pass="Alt+Shift+c"
+copy_pass="Alt+p"
 edit="Alt+9"
 move="Alt+2"
 delete="Alt+3"
