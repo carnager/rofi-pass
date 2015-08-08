@@ -341,6 +341,9 @@ case $1 in
     --last-used)
         entry="$(cat $HOME/.config/rofi-pass/last_used)" mainMenu
         ;;
+    --show-last)
+        selected_password="$(cat $HOME/.config/rofi-pass/last_used)" showEntry
+        ;;
     *)
         mainMenu
         ;;
