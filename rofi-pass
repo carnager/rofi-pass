@@ -167,7 +167,8 @@ manageMenu() {
 }
 
 showEntry () {
-    bla=$(echo -e "0  Return\n---\n$(pass "$selected_password")" | _rofi -dmenu -mesg "Alt+1: Copy Entry" -p "> ")
+    HELP="<span color='$help_color'>${copy_entry}: Copy Entry</span>"
+    bla=$(echo -e "0  Return\n---\n$(pass "$selected_password")" | _rofi -dmenu -mesg "${HELP}" -p "> ")
     rofi_exit=$?
     word=$(echo "$bla" | awk -F': ' '{print $1}')
     if [[ ${rofi_exit} -eq 0 ]]; then
