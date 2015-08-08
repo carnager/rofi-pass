@@ -93,7 +93,7 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
         echo -n "${stuff[${USERNAME_field}]}" | xclip
         exit
     elif [[ $rofi_exit -eq 16 ]]; then
-        showEntry mainMenu
+        showEntry "${selected_password}"
     elif [[ $rofi_exit -eq 15 ]]; then
         echo -n "$password" | xclip
         xclip -o | xclip -selection clipboard
@@ -167,12 +167,35 @@ manageMenu() {
 }
 
 showEntry () {
-    menu=$(echo -e "0  Return\n---\n$(pass "$selected_password")" | _rofi -dmenu -p "> ")
-    if [[ $menu == "0  Return" ]]; then "$1"
-    elif [[ $menu == "" ]]; then exit
-    else
-        showEntry
-    fi
+    bla=$(echo -e "0  Return\n---\n$(pass "$selected_password")" | _rofi -dmenu -mesg "Alt+1: Copy Entry" -p "> ")
+    rofi_exit=$?
+    word=$(echo "$bla" | awk -F': ' '{print $1}')
+    if [[ ${rofi_exit} -eq 0 ]]; then
+        if [[ $bla == "" ]]; then exit
+        elif [[ $bla == "0  Return" ]]; then
+            selected_password=""
+            mainMenu
+        elif [[ ${rofi_exit} -eq 1 ]]; then
+            exit
+        else
+            showEntry
+        fi
+    elif [[ ${rofi_exit} -eq 10 ]]; then
+        if [[ ${bla} == "0  Return" ]]; then
+            echo "not doing anything"
+        else
+            if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
+                echo -n "$word" | xclip
+            else
+                echo -n "${stuff[${word}]}" | xclip
+            fi
+        fi
+   elif [[ ${rofi_exit} -eq 1 ]]; then
+       exit
+   fi
+   selected_password=""
+   rofi_exit="0"
+   exit
 }
 
 manageEntry () {
