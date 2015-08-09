@@ -198,8 +198,8 @@ showEntry () {
             if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
                 xdotool type ${word}
         else
-            echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
-            xdotool click 1
+            echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --delay 100 --file -
+            xdotool key ctrl+alt
             fi
         fi
     elif [[ ${rofi_exit} -eq 1 ]]; then
