@@ -199,6 +199,7 @@ showEntry () {
                 xdotool type ${word}
         else
             echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
+            xdotool click 1
             fi
         fi
     elif [[ ${rofi_exit} -eq 1 ]]; then
