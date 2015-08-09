@@ -167,7 +167,7 @@ manageMenu() {
 }
 
 showEntry () {
-    HELP="<span color='$help_color'>${copy_entry}: Copy Entry</span>"
+    HELP="<span color='$help_color'>${type_entry}: Type Entry | ${copy_entry}: Copy Entry</span>"
     bla=$(echo -e "0  Return\n---\n$(pass "$selected_password")" | _rofi -dmenu -mesg "${HELP}" -p "> ")
     rofi_exit=$?
     word=$(echo "$bla" | awk -F': ' '{print $1}')
@@ -181,7 +181,7 @@ showEntry () {
         else
             showEntry
         fi
-    elif [[ ${rofi_exit} -eq 10 ]]; then
+    elif [[ ${rofi_exit} -eq 11 ]]; then
         if [[ ${bla} == "0  Return" ]]; then
             echo "not doing anything"
         else
@@ -191,12 +191,25 @@ showEntry () {
                 echo -n "${stuff[${word}]}" | xclip
             fi
         fi
-   elif [[ ${rofi_exit} -eq 1 ]]; then
-       exit
-   fi
-   selected_password=""
-   rofi_exit="0"
-   exit
+    elif  [[ ${rofi_exit} -eq 10 ]]; then
+        if [[ ${bla} == "0  Return" ]]; then
+            echo "not doing anything"
+        else
+            if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
+                xdotool type ${word}
+        else
+            echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
+            fi
+        fi
+    elif [[ ${rofi_exit} -eq 1 ]]; then
+        exit
+    fi
+	unset stuff
+	unset password
+	unset selected_password
+	unset password_temp
+	unset stuff
+    exit
 }
 
 manageEntry () {
