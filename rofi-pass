@@ -84,10 +84,10 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
     stuff["pass"]=${password}
 
     if [[ $rofi_exit -eq 11 ]]; then
-        echo -n "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
+        echo -n "${stuff[${USERNAME_field}]}" | xdotool type --delay 100 --clearmodifiers --file -
         exit
     elif [[ $rofi_exit -eq 12 ]]; then
-        echo -n "${password}" | xdotool type --clearmodifiers --file -
+        echo -n "${password}" | xdotool type --delay 100 --clearmodifiers --file -
         exit
     elif [[ $rofi_exit -eq 14 ]]; then
         echo -n "${stuff[${USERNAME_field}]}" | xclip
@@ -112,10 +112,10 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
     fi
 
     if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
-        echo -n "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
+        echo -n "${stuff[${USERNAME_field}]}" | xdotool type --delay 100 --clearmodifiers --file -
 
         xdotool key Tab
-        echo -n "${password}" | xdotool type --clearmodifiers --file -
+        echo -n "${password}" | xdotool type --delay 100 --clearmodifiers --file -
         #xdotool_type "$password"
         sleep 1
         if [[ ${auto_enter} == "true" ]]; then
@@ -126,9 +126,9 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
             if [[ $word == ":tab" ]]; then
                 xdotool key Tab
             elif [[ $word == "pass" ]]; then
-                echo -n "${password}" | xdotool type --clearmodifiers --file -
+                echo -n "${password}" | xdotool type --delay 100 --clearmodifiers --file -
             else
-                echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
+                echo -n "${stuff[${word}]}" | xdotool type --delay 100 --clearmodifiers --file -
 
             fi
             #xdotool key Tab
