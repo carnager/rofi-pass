@@ -92,7 +92,7 @@ mainMenu () {
         _id=$(echo -e "${LINE}" | awk -F ':[[:space:]]*' '{print $1}')
         _val=$(echo -e "${LINE}" | awk '{sub(/:/,"")}{print $2}1' | head -1)
         stuff["${_id}"]=${_val}
-    done < <(pass "${selected_password}" | tail -n+2 | grep -Ev ': |:\t' )
+    done < <(pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
     stuff["pass"]=${password}
 
     if [[ $rofi_exit -eq 11 ]]; then
