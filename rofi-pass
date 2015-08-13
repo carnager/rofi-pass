@@ -54,6 +54,18 @@ xdotool_type() {
 	done
 }
 
+doClip () {
+    if [[ $clip == "primary" ]]; then
+        xclip
+    elif [[ $clip == "clipboard" ]]; then
+        xclip -selection clipboard
+    elif [[ $clip == "both" ]]; then
+        xclip
+        xclip -o | xclip -selection clipboard
+    fi
+}
+
+
 # main Menu
 mainMenu () {
     HELP="<span color='$help_color'>${autotype}: Autotype | ${type_user}: Type User     | ${type_pass}: Type Password
@@ -90,13 +102,12 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
         echo -n "${password}" | xdotool type --clearmodifiers --file -
         exit
     elif [[ $rofi_exit -eq 14 ]]; then
-        echo -n "${stuff[${USERNAME_field}]}" | xclip
+        echo -n "${stuff[${USERNAME_field}]}" | doClip
         exit
     elif [[ $rofi_exit -eq 16 ]]; then
         showEntry "${selected_password}"
     elif [[ $rofi_exit -eq 15 ]]; then
-        echo -n "$password" | xclip
-        xclip -o | xclip -selection clipboard
+        echo -n "$password" | doClip
         notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
         $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
         exit
@@ -186,9 +197,9 @@ showEntry () {
             echo "not doing anything"
         else
             if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
-                echo -n "$word" | xclip
+                echo -n "$word" | doClip
             else
-                echo -n "${stuff[${word}]}" | xclip
+                echo -n "${stuff[${word}]}" | doClip
             fi
         fi
     elif  [[ ${rofi_exit} -eq 10 ]]; then

@@ -24,6 +24,10 @@ BROWSER='chromium'
 help_color='#0C73C2'
 auto_enter='false'
 
+# Clipboard settings
+# Possible options: primary, clipboard, both
+clip=primary
+
 # Custom Keybindings
 autotype="Alt+1"
 type_user="Alt+2"
