@@ -90,7 +90,7 @@ mainMenu () {
 
     while read LINE; do
         _id=$(echo -e "${LINE}" | awk -F ':[[:space:]]*' '{print $1}')
-        _val=$(echo -e "${LINE}" | awk '{sub(/:/,"")}{print $2}1' | head -1)
+        _val=$(echo -e "${LINE}" | awk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
         stuff["${_id}"]=${_val}
     done < <(pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
     stuff["pass"]=${password}
@@ -136,6 +136,7 @@ mainMenu () {
             xdotool key Return
         fi
     else
+        echo "${stuff["$AUTOTYPE_field"]}"
         for word in ${stuff["$AUTOTYPE_field"]}; do
             if [[ $word == ":tab" ]]; then
                 xdotool key Tab
