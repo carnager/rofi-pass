@@ -77,8 +77,8 @@ ${open_url}: Open URL | ${copy_name}: Copy Username | ${copy_pass}: Copy Passwor
     declare -A stuff
 
     while read LINE; do
-        _id=$(echo "${LINE}" | awk -F': ' '{print $1}')
-        _val=$(echo "${LINE}" | awk -F': ' '{print $2}')
+        _id=$(echo "${LINE}" | awk -F':[[:space:]]*' '{print $1}')
+        _val=$(echo "${LINE}" | awk -F':[[:space:]]*' '{print $2}')
         stuff["${_id}"]=${_val}
     done < <(pass "${selected_password}" | tail -n+2 | grep ': ')
     stuff["pass"]=${password}
