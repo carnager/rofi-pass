@@ -22,6 +22,7 @@ BROWSER='chromium'
 ## Misc settings
 
 help_color='#0C73C2'
+help_color2='#FF0000'
 auto_enter='false'
 
 # Clipboard settings
