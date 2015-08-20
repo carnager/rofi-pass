@@ -1,5 +1,5 @@
-# set path to password store
-basedir=~/.password-store/
+# permanently set alternative root dir
+root=/home/carnager/test-store
 
 # optional rofi parameters:
 # keep in mind that 0.15.7 has different arguments compared to
