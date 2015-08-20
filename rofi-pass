@@ -29,7 +29,11 @@ fi
 if [[ -n "$2" && "$1" == "--root" ]]; then
     root="${2}"
 else
-    root="${root}"
+    if [[ -n $root ]]; then
+        root="${basedir}"
+    else
+        root="$HOME/.password-store"
+    fi
 fi
 
 # get all password files and create an array
