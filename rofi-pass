@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # rofi-pass
 # (c) 2015 Rasmus Steinke <rasi@xssn.at>
@@ -29,19 +29,19 @@ fi
 if [[ -n "$2" && "$1" == "--root" ]]; then
     root="${2}"
 else
-    :
+    root="${root}"
 fi
 
 # get all password files and create an array
 list_passwords() {
-    if [[ -n "$root" ]]; then
-     	passwords=( "${basedir}/${root}"/**/*.gpg )
+    if [[ -z "$root" ]]; then
+     	passwords=( "$HOME/.password-store"/**/*.gpg )
     else
-        passwords=( "${basedir}"/**/*.gpg )
+        passwords=( "${root}"/**/*.gpg )
     fi
 
 	for password in "${passwords[@]}"; do
-		filename="${password#$basedir}"
+		filename="${password#$root}"
 		filename="${filename%.gpg}"
 		echo "$filename"
 	done
@@ -262,11 +262,7 @@ insertPass () {
     if [[ $menu == "0  Return to Main Menu" ]]; then mainMenu
     elif [[ $menu == "" ]]; then exit
     elif [[ $menu == "*  Accept Values and Add Password Entry" ]]; then
-        if [[ -n "$root" ]]; then
-            cd "${basedir}/${root}"
-        else
-            cd "${basedir}"
-        fi
+        cd "${root}"
         group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
         if [[ -n "$root" ]]; then
             pass insert -m -f "${root}/${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\n${URL_field}: ${domain}")
