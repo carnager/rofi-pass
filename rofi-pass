@@ -28,6 +28,8 @@ fi
 # check if alternative root directory was given on commandline
 if [[ -n "$2" && "$1" == "--root" ]]; then
     root="${2}"
+elif [[ $1 == "--last-used" ]]; then
+    root=$(awk -F '  ' '{ print $1 }' $HOME/.config/rofi-pass/last_used)
 else
     if [[ -n $root ]]; then
         root="${root}"
@@ -77,7 +79,7 @@ mainMenu () {
 
         if [[ -n $selected_password ]]; then
             rm -f "$HOME/.config/rofi-pass/last_used"
-            echo "$selected_password" > "$HOME/.config/rofi-pass/last_used"
+            echo "${root}  $selected_password" > "$HOME/.config/rofi-pass/last_used"
         fi
 
         if [[ "${rofi_exit}" -eq 13 ]]; then $BROWSER "$(pass "$selected_password" | grep "${URL_field}: " | awk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
@@ -367,10 +369,10 @@ case $1 in
         help_msg
         ;;
     --last-used)
-        entry="$(cat $HOME/.config/rofi-pass/last_used)" mainMenu
+        entry="$(awk -F '  ' '{ print $2 }' $HOME/.config/rofi-pass/last_used)" mainMenu
         ;;
     --show-last)
-        selected_password="$(cat $HOME/.config/rofi-pass/last_used)" showEntry
+        selected_password="$(awk -F '  ' '{ print $2 }' $HOME/.config/rofi-pass/last_used)" showEntry
         ;;
     *)
         mainMenu
