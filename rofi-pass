@@ -235,18 +235,18 @@ showEntry () {
 
 manageEntry () {
     if [[ "$1" == "edit" ]]; then
-        EDITOR=$EDITOR pass edit "${selected_password}"
+        EDITOR=$EDITOR PASSWORD_STORE_DIR="${root}" pass edit "${selected_password}"
         manageMenu
     elif [[ $1 == "move" ]]; then
         cd "$HOME"/.password-store/"${root}"
         selected_password2=$(basename "$selected_password" .gpg)
         group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
-        pass mv "$selected_password" "${root}"/"${group}"/"${selected_password2}"
+        PASSWORD_STORE_DIR="${root}" pass mv "$selected_password" "${root}"/"${group}"/"${selected_password2}"
         manageMenu
     elif [[ "$1" == "delete" ]]; then
         ask=$(echo -e "Yes\nNo" | _rofi -dmenu -p "Are You Sure? >")
         if [[ "$ask" == "Yes" ]]; then
-            pass rm --force "${selected_password}"
+            PASSWORD_STORE_DIR="${root}" pass rm --force "${selected_password}"
         elif [[ "$ask" == "no" ]]; then
             manageMenu
         fi
@@ -270,9 +270,9 @@ insertPass () {
         cd "${root}"
         group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
         if [[ -n "$root" ]]; then
-            pass insert -m -f "${root}/${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\n${URL_field}: ${domain}")
+            PASSWORD_STORE_DIR="${root}" pass insert -m -f "${root}/${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\n${URL_field}: ${domain}")
         else
-            pass insert -m -f "${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\n${URL_field}: ${domain}")
+            PASSWORD_STORE_DIR="${root}" pass insert -m -f "${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\n${URL_field}: ${domain}")
         fi
     elif [[ $menu == "1  Name"* ]]; then
         name=$(echo "" | _rofi -dmenu -p "Enter Name > ")
