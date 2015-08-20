@@ -1,5 +1,5 @@
 # permanently set alternative root dir
-root=/home/carnager/test-store
+# root=/path/to/root
 
 # optional rofi parameters:
 # keep in mind that 0.15.7 has different arguments compared to

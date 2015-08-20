@@ -30,7 +30,7 @@ if [[ -n "$2" && "$1" == "--root" ]]; then
     root="${2}"
 else
     if [[ -n $root ]]; then
-        root="${basedir}"
+        root="${root}"
     else
         root="$HOME/.password-store"
     fi
@@ -39,14 +39,11 @@ PASSWORD_STORE_DIR="${root}"
 
 # get all password files and create an array
 list_passwords() {
-    if [[ -z "$root" ]]; then
-     	passwords=( "$HOME/.password-store"/**/*.gpg )
-    else
-        passwords=( "${root}"/**/*.gpg )
-    fi
+    cd "${root}"
+    passwords=( **/*.gpg )
 
 	for password in "${passwords[@]}"; do
-		filename="${password#$root}"
+		filename="${password}"
 		filename="${filename%.gpg}"
 		echo "$filename"
 	done
