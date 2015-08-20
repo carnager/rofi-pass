@@ -35,6 +35,7 @@ else
         root="$HOME/.password-store"
     fi
 fi
+PASSWORD_STORE_DIR="${root}"
 
 # get all password files and create an array
 list_passwords() {
@@ -88,7 +89,7 @@ mainMenu () {
         fi
 
 
-    password_temp=$(pass "$selected_password")
+    password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password=$(echo "${password_temp}" | head -1)
     declare -A stuff
 
@@ -96,7 +97,7 @@ mainMenu () {
         _id=$(echo -e "${LINE}" | awk -F ':[[:space:]]*' '{print $1}')
         _val=$(echo -e "${LINE}" | awk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
         stuff["${_id}"]=${_val}
-    done < <(pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
+    done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
     stuff["pass"]=${password}
 
     if [[ $rofi_exit -eq 11 ]]; then
@@ -187,7 +188,7 @@ manageMenu() {
 
 showEntry () {
     HELP="<span color='$help_color'>${type_entry}: Type Entry | ${copy_entry}: Copy Entry</span>"
-    bla=$(echo -e "0  Return\n---\n$(pass "$selected_password")" | _rofi -dmenu -mesg "${HELP}" -p "> ")
+    bla=$(echo -e "0  Return\n---\n$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")" | _rofi -dmenu -mesg "${HELP}" -p "> ")
     rofi_exit=$?
     word=$(echo "$bla" | awk -F': ' '{print $1}')
     if [[ ${rofi_exit} -eq 0 ]]; then
