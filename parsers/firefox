@@ -1,5 +1,0 @@
-# firefox - needs Add URL to Window Title extension
-# https://addons.mozilla.org/en-US/firefox/addon/add-url-to-window-title/
-# set delimiter to "::"
-
-wmctrl -l | grep Firefox | grep "::" | awk '{print $(NF-3)}'

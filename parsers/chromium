@@ -1,8 +1,0 @@
-# get active URL from browser
-# Chose the one for your browser or create your own.
-
-# chromium - needs url in title extension
-# https://chrome.google.com/webstore/detail/url-in-title/ignpacbgnbnkaiooknalneoeladjnfgb
-# set string to "{protocol}://{hostname}{port}/{path}/{args}"
-
-wmctrl -l | grep Chromium | awk '{ print $4 }'
