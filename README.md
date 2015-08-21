@@ -28,6 +28,9 @@ autotype: SomeField :tab UserName :tab AnotherField :tab pass
 ```
 The `:tab` field has a special meaning. this will hit the tab key, obviously.
 
+* All Hotkeys are configurable in config file
+* Username, URL and autotype field names are also configurable
+
 ## Requirements
 * pass (https://github.com/zx2c4/password-store)
 * sed
