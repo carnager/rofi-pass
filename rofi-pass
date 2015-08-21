@@ -20,7 +20,7 @@ if [[ -z $BROWSER ]]; then
 fi
 
 # check if alternative root directory was given on commandline
-if [[ $1 == "--last-used" ]]; then
+if [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
     root=$(awk -F ': ' '{ print $1 }' $HOME/.config/rofi-pass/last_used)
 elif [[ -n "$2" && "$1" == "--root" ]]; then
     root="${2}"
@@ -338,6 +338,8 @@ help_msg () {
     echo "--insert    insert new entry to password store"
     echo "--manage    edit/move/delete entries"
     echo -e "--root      set custom root directory"
+    echo "--last-used highlight last used item"
+    echo "--show-last show details of last used Entry"
 }
 
 ##########################
