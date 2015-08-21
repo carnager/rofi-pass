@@ -12,8 +12,6 @@ else
     root="$HOME/.password-store"
 fi
 
-Name="$2"
-
 if [[ $1 == "--help" || $1 == "=h" ]]; then
     echo "add pass files for rofi-pass"
     echo "(C) 2015 Rasmus Steinke <rasi at xssn dot at>"
@@ -28,9 +26,12 @@ if [[ $1 == "--help" || $1 == "=h" ]]; then
     echo "addpass --name \"my password file\" --root \"$HOME/passwords\" +user \"Richard\" +foo \"bar\" +autotype \"foo :tab user :tab pass\""
     exit
 else
-    if [[ $* != *"--name "* ]]; then
+    echo "$1"
+    if [[ $1 != "--name" ]]; then
         echo "Missing --name option. Try --help"
         exit
+    elif [[ $1 == "--name" ]]; then
+        Name="$2"
     fi
 fi
 
