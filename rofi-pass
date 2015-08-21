@@ -26,16 +26,16 @@ if [[ -z $BROWSER ]]; then
 fi
 
 # check if alternative root directory was given on commandline
-if [[ -n "$2" && "$1" == "--root" ]]; then
-    root="${2}"
-elif [[ $1 == "--last-used" ]]; then
+if [[ $1 == "--last-used" ]]; then
     root=$(awk -F ': ' '{ print $1 }' $HOME/.config/rofi-pass/last_used)
+elif [[ -n "$2" && "$1" == "--root" ]]; then
+    root="${2}"
+elif [[ -n $root ]]; then
+    root="${root}"
+elif [[ -n ${PASSWORD_STORE_DIR} ]]; then
+    root=${PASSWORD_STORE_DIR}
 else
-    if [[ -n $root ]]; then
-        root="${root}"
-    else
-        root="$HOME/.password-store"
-    fi
+    root="$HOME/.password-store"
 fi
 PASSWORD_STORE_DIR="${root}"
 
