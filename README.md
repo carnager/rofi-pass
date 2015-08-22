@@ -26,7 +26,8 @@ AnotherField: barfoo
 URL: http://my.url.foo
 autotype: SomeField :tab UserName :tab AnotherField :tab pass
 ```
-The `:tab` field has a special meaning. this will hit the tab key, obviously.
+The `:tab` field has a special meaning. this will hit the tab key, obviously.< /br>
+Same for `:space`, which will hit the space key, can be used to activate checkboxes.
 
 * All Hotkeys are configurable in config file
 * Username, URL and autotype field names are also configurable
