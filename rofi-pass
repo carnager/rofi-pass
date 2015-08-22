@@ -141,6 +141,8 @@ ${line2}</span>"
         for word in ${stuff["$AUTOTYPE_field"]}; do
             if [[ $word == ":tab" ]]; then
                 xdotool key Tab
+            elif [[ $word == ":space" ]]; then
+                xdotool key space
             elif [[ $word == "pass" ]]; then
                 echo -n "${password}" | xdotool type --clearmodifiers --file -
             else
