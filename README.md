@@ -35,7 +35,6 @@ The `:tab` field has a special meaning. this will hit the tab key, obviously.
 * pass (https://github.com/zx2c4/password-store)
 * sed
 * rofi (https://github.com/DaveDavenport/rofi)
-* xprop
 * xdotool
 * awk
 * bash
