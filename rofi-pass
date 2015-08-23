@@ -297,7 +297,8 @@ manageEntry () {
         PASSWORD_STORE_DIR="${root}" pass mv "$selected_password" "${root}"/"${group}"/"${selected_password2}"
         manageMenu
     elif [[ "$1" == "delete" ]]; then
-        ask=$(echo -e "Yes\nNo" | _rofi -dmenu -p "Are You Sure? >")
+        HELP="<span color='$help_color'>Selected entry: ${selected_password}</span>"
+        ask=$(echo -e "Yes\nNo" | _rofi -mesg "${HELP}" -dmenu -p "Are You Sure? > ")
         if [[ "$ask" == "Yes" ]]; then
             PASSWORD_STORE_DIR="${root}" pass rm --force "${selected_password}"
         elif [[ "$ask" == "no" ]]; then
