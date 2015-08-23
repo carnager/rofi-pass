@@ -49,7 +49,7 @@ rofi-pass comes with a tiny helper script, which makes it easier to create new p
 Just run it with 
 
 ```
-addpass --name "My new Site" +user "zeltak" +branch "branch" +custom "foobar" +autotype "branch :tab user :tab pass".
+addpass --name "My new Site" +user "zeltak" +branch "branch" +custom "foobar" +autotype "branch :tab user :tab pass"
 ```
 
 * First argument `--name` is mandatory. This will be the filename of the new password entry.
