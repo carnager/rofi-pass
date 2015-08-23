@@ -98,6 +98,13 @@ ${line2}</span>"
     done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
     stuff["pass"]=${password}
 
+    if [[ "$selected_password" == "[ Add Entry ]>" ]]; then
+        insertPass
+    elif [[ "$selected_password" == "[ Manage Database ]>" ]]; then
+        manageEntry
+    elif [[ "$selected_password" == "" ]]; then
+        exit
+    fi
     if [[ $rofi_exit -eq 11 ]]; then
         echo -n "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
         exit
@@ -119,13 +126,6 @@ ${line2}</span>"
         exit
     elif [[ $rofi_exit -eq 18 || $rofi_exit -eq 19 ]]; then
         mainMenu
-    fi
-    if [[ "$selected_password" == "[ Add Entry ]>" ]]; then
-        insertPass
-    elif [[ "$selected_password" == "[ Manage Database ]>" ]]; then
-        manageEntry
-    elif [[ "$selected_password" == "" ]]; then
-        exit
     fi
 
     if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
