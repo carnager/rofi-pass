@@ -253,6 +253,10 @@ showEntry () {
             else
                 echo -n "${stuff[${word}]}" | doClip
             fi
+            notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
+            $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+        exit
+
         fi
     elif  [[ ${rofi_exit} -eq 10 ]]; then
         if [[ ${bla} == "0  Return" ]]; then
