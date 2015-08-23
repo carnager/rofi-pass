@@ -6,8 +6,10 @@
 # enable extended globbing
 shopt -s nullglob globstar
 
-# read global config file
-source /etc/rofi-pass.conf
+# check if global config exists and load it
+if [[ -f /etc/rofi-pass.conf ]]; then
+    source /etc/rofi-pass.conf
+fi
 
 # check if local config exists and load it
 if [[ -f $HOME/.config/rofi-pass/config ]]; then
