@@ -86,11 +86,18 @@ ${line2}</span>"
     	rofi_exit=$?
         
         if [[ -n $selected_password ]]; then
-            if [[ $selected_password != "[ Add Entry ]>" || $selected_password != "[ Manage Database ]>" ]]; then
+            if [[ $selected_password == "[ Add Entry ]>" ]]; then
+                :
+            elif [[ $selected_password == "[ Manage Database ]>" ]]; then
+                :
+            elif [[ $selected_password == "---" ]]; then
+                :
+            else
                 rm -f "$HOME/.config/rofi-pass/last_used"
                 echo "${root}: $selected_password" > "$HOME/.config/rofi-pass/last_used"
             fi
         fi
+
         if [[ "${rofi_exit}" -eq 0 ]]; then
             if [[ ${selected_password} == "[ Add Entry ]>" ]]; then
                 insertPass
@@ -212,17 +219,27 @@ showEntry () {
     HELP="<span color='$help_color'>${type_entry}: Type Entry | ${copy_entry}: Copy Entry</span>"
     bla=$(echo -e "0  Return\n---\n$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")" | _rofi -dmenu -mesg "${HELP}" -p "> ")
     rofi_exit=$?
+    password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
+    password=$(echo "${password_temp}" | head -1)
+    declare -A stuff
+
+    while read LINE; do
+        _id=$(echo -e "${LINE}" | awk -F ':[[:space:]]*' '{print $1}')
+        _val=$(echo -e "${LINE}" | awk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
+        stuff["${_id}"]=${_val}
+
+    done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
+    stuff["pass"]=${password}
+
     word=$(echo "$bla" | awk -F': ' '{print $1}')
     if [[ ${rofi_exit} -eq 0 ]]; then
         if [[ $bla == "" ]]; then exit
         elif [[ $bla == "0  Return" ]]; then
             selected_password=""
             mainMenu
-        elif [[ ${rofi_exit} -eq 1 ]]; then
-            exit
-        else
-            showEntry
         fi
+    elif [[ ${rofi_exit} -eq 1 ]]; then
+        exit
     elif [[ ${rofi_exit} -eq 11 ]]; then
         if [[ ${bla} == "0  Return" ]]; then
             echo "not doing anything"
