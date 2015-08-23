@@ -4,11 +4,14 @@
 
 ![rofi-pass](screenshot.png "rofi-pass in action")
 
-## rofi-pass has the following features:
+## Features:
 
 * Open URLs of entries with hotkey
 * Add new Entries to Password Storage
 * Edit existing Entries
+* Inline view of complete password entry with ability to
+  + Copy individual fields to clipboard
+  + Autotype single fields
 * Support for multiple roots for password-store (e.g. separate work from private passwords)
 * Auto Type User and Password. Format of password files are expected to be like:
 ```
@@ -16,7 +19,7 @@ foobarmysecurepassword
 UserName: MyUser
 URL: http://my.url.foo
 ```
-* Auto Typing of more than one field. This expects a autotype field in password file. (name of the field can be changed in config file - same for URL and Username)
+* Auto Typing of more than one field. This expects a autotype field in password file.
 ```
 foobarmysecurepassword
 ---
