@@ -65,6 +65,13 @@ doClip () {
     fi
 }
 
+checkIfPass () {
+    if [[ $selected_password == "[ Add Entry ]>" ]]; then
+            mainMenu
+    elif [[ $selected_password == "[ Manage Database ]>" ]]; then
+            mainMenu
+    fi
+}
 
 # main Menu
 mainMenu () {
@@ -75,15 +82,27 @@ HELP="<span color='$help_color'>${line1}
 ${line2}</span>"
         selected_password="$(echo -e "[ Add Entry ]>\n[ Manage Database ]>\n---\n$(list_passwords 2>/dev/null)" | _rofi -mesg "${HELP}" -dmenu -kb-custom-1 "${autotype}" -kb-custom-2 "${type_user}" -kb-custom-3 "${type_pass}" -kb-custom-4 "${open_url}" -kb-custom-5 "${copy_name}" -kb-custom-6 "${copy_pass}" -kb-custom-7 "${show}" -kb-custom-8 "${copy_url}" -dmenu -select "$entry" -p "rofi-pass > ")"
     	rofi_exit=$?
-
+        
         if [[ -n $selected_password ]]; then
-            rm -f "$HOME/.config/rofi-pass/last_used"
-            echo "${root}: $selected_password" > "$HOME/.config/rofi-pass/last_used"
+            if [[ $selected_password != "[ Add Entry ]>" || $selected_password != "[ Manage Database ]>" ]]; then
+                rm -f "$HOME/.config/rofi-pass/last_used"
+                echo "${root}: $selected_password" > "$HOME/.config/rofi-pass/last_used"
+            fi
         fi
-
-        if [[ "${rofi_exit}" -eq 13 ]]; then $BROWSER "$(pass "$selected_password" | grep "${URL_field}: " | awk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
+        if [[ "${rofi_exit}" -eq 0 ]]; then
+            if [[ ${selected_password} == "[ Add Entry ]>" ]]; then
+                insertPass
+            elif [[ ${selected_password} == "[ Manage Database ]>" ]]; then
+                manageMenu
+            else
+                true
+            fi
+        elif [[ "${rofi_exit}" -eq 13 ]]; then
+            checkIfPass
+            $BROWSER "$(pass "$selected_password" | grep "${URL_field}: " | awk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
         elif [[ "${rofi_exit}" -eq 1 ]]; then exit ${rofi_exit};
-        elif [[ "${rofi_exit}" -eq 10 || "${rofi-exit}" -eq 0 ]]; then true
+        elif [[ "${rofi_exit}" -eq 10 ]]; then
+            checkIfPass
         fi
 
 
@@ -98,28 +117,27 @@ ${line2}</span>"
     done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
     stuff["pass"]=${password}
 
-    if [[ "$selected_password" == "[ Add Entry ]>" ]]; then
-        insertPass
-    elif [[ "$selected_password" == "[ Manage Database ]>" ]]; then
-        manageEntry
-    elif [[ "$selected_password" == "" ]]; then
-        exit
-    fi
     if [[ $rofi_exit -eq 11 ]]; then
+        checkIfPass
         echo -n "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
         exit
     elif [[ $rofi_exit -eq 12 ]]; then
+        checkIfPass
         echo -n "${password}" | xdotool type --clearmodifiers --file -
         exit
     elif [[ $rofi_exit -eq 14 ]]; then
+        checkIfPass
         echo -n "${stuff[${USERNAME_field}]}" | doClip
         exit
     elif [[ $rofi_exit -eq 17 ]]; then
+        checkIfPass
         echo -n "${stuff[${URL_field}]}" | doClip
         exit
     elif [[ $rofi_exit -eq 16 ]]; then
+        checkIfPass
         showEntry "${selected_password}"
     elif [[ $rofi_exit -eq 15 ]]; then
+        checkIfPass
         echo -n "$password" | doClip
         notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
         $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
