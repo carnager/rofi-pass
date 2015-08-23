@@ -385,17 +385,15 @@ function _rofi () {
 }
 
 help_msg () {
-    echo "rofi-pass - a _rofi driven frontend to pass"
-    echo "--------------------------------------"
-    echo "(C) 2015 Rasmus Steinke <rasi@xssn.at>"
-    echo "(C) 2015 Thore Bödecker <me@foxxx0.de>"
-    echo "--------------------------------------"
-    echo -e "Usage\n"
-    echo "--insert    insert new entry to password store"
-    echo "--manage    edit/move/delete entries"
-    echo -e "--root      set custom root directory"
-    echo "--last-used highlight last used item"
-    echo "--show-last show details of last used Entry"
+    echo "rofi-pass (Version: 1.2)"
+    echo ""
+    echo -e "Usage:\n"
+    echo "--insert         insert new entry to password store"
+    echo "--manage         edit/move/delete entries"
+    echo -e "--root           set custom root directory"
+    echo "--last-used      highlight last used item"
+    echo "--show-last      show details of last used Entry"
+    echo ""
 }
 
 ##########################
