@@ -21,6 +21,10 @@ if [[ -z $BROWSER ]]; then
     export BROWSER=xdg-open
 fi
 
+if [[ -z ${count} ]]; then
+    count=2
+fi
+
 # check if alternative root directory was given on commandline
 if [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
     root=$(awk -F ': ' '{ print $1 }' $HOME/.config/rofi-pass/last_used)
@@ -261,6 +265,12 @@ showEntry () {
             xdotool key ctrl+alt
             fi
         fi
+        if [[ ${count} == "off" ]]; then
+            exit
+        else
+            sleep ${count}
+        fi
+        showEntry
     elif [[ ${rofi_exit} -eq 1 ]]; then
         exit
     fi

@@ -24,6 +24,10 @@ BROWSER='chromium'
 help_color='#0C73C2'
 auto_enter='false'
 
+# seconds to wait before re-opening showEntry-menu
+# after autotyping an entry. Set to "off" to disable
+count=2
+
 # Clipboard settings
 # Possible options: primary, clipboard, both
 clip=primary
