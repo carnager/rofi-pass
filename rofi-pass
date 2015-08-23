@@ -261,7 +261,7 @@ showEntry () {
             if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
                 xdotool type ${word}
         else
-            echo -n "${stuff[${word}]}" | xdotool type --delay 100 --clearmodifiers --file -
+            echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
             xdotool key ctrl+alt
             fi
         fi
