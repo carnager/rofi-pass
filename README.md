@@ -40,6 +40,10 @@ Same for `:space`, which will hit the space key, can be used to activate checkbo
 * awk
 * bash
 
+## Configuration
+rofi-pass may read its configuration values from `/etc/rofi-pass` and/or `$HOME/.config/rofi-pass/config`.
+For an example configuration please take a look at the included `config.example` file.
+
 ## Extras
 rofi-pass comes with a tiny helper script, which makes it easier to create new pass entries.
 Just run it with 
