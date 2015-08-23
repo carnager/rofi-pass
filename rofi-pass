@@ -67,9 +67,11 @@ doClip () {
 
 checkIfPass () {
     if [[ $selected_password == "[ Add Entry ]>" ]]; then
-            mainMenu
+        mainMenu
     elif [[ $selected_password == "[ Manage Database ]>" ]]; then
-            mainMenu
+        mainMenu
+    elif [[ $selected_password == "---" ]]; then
+        mainMenu
     fi
 }
 
@@ -94,6 +96,8 @@ ${line2}</span>"
                 insertPass
             elif [[ ${selected_password} == "[ Manage Database ]>" ]]; then
                 manageMenu
+            elif [[ ${selected_password} == "---" ]]; then
+                mainMenu
             else
                 true
             fi
