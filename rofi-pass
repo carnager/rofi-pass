@@ -401,12 +401,6 @@ help_msg () {
     echo ""
 }
 
-##########################
-##						##
-##	script entry point	##
-##						##
-##########################
-
 case $1 in
     --insert)
         insertPass
