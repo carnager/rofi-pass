@@ -3,41 +3,6 @@
 # rofi-pass
 # (c) 2015 Rasmus Steinke <rasi@xssn.at>
 
-# enable extended globbing
-shopt -s nullglob globstar
-
-# check if global config exists and load it
-if [[ -f /etc/rofi-pass.conf ]]; then
-    source /etc/rofi-pass.conf
-fi
-
-# check if local config exists and load it
-if [[ -f $HOME/.config/rofi-pass/config ]]; then
-    source $HOME/.config/rofi-pass/config
-fi
-
-# check for BROWSER variable, use xdg-open as fallback
-if [[ -z $BROWSER ]]; then
-    export BROWSER=xdg-open
-fi
-
-if [[ -z ${count} ]]; then
-    count=2
-fi
-
-# check if alternative root directory was given on commandline
-if [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
-    root=$(awk -F ': ' '{ print $1 }' $HOME/.config/rofi-pass/last_used)
-elif [[ -n "$2" && "$1" == "--root" ]]; then
-    root="${2}"
-elif [[ -n $root ]]; then
-    root="${root}"
-elif [[ -n ${PASSWORD_STORE_DIR} ]]; then
-    root=${PASSWORD_STORE_DIR}
-else
-    root="$HOME/.password-store"
-fi
-PASSWORD_STORE_DIR="${root}"
 
 # get all password files and create an array
 list_passwords() {
@@ -401,7 +366,43 @@ help_msg () {
     echo ""
 }
 
-case $1 in
+main () {
+# enable extended globbing
+shopt -s nullglob globstar
+
+# check if global config exists and load it
+if [[ -f /etc/rofi-pass.conf ]]; then
+    source /etc/rofi-pass.conf
+fi
+
+# check if local config exists and load it
+if [[ -f $HOME/.config/rofi-pass/config ]]; then
+    source $HOME/.config/rofi-pass/config
+fi
+
+# check for BROWSER variable, use xdg-open as fallback
+if [[ -z $BROWSER ]]; then
+    export BROWSER=xdg-open
+fi
+
+if [[ -z ${count} ]]; then
+    count=2
+fi
+
+# check if alternative root directory was given on commandline
+if [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
+    root=$(awk -F ': ' '{ print $1 }' $HOME/.config/rofi-pass/last_used)
+elif [[ -n "$2" && "$1" == "--root" ]]; then
+    root="${2}"
+elif [[ -n $root ]]; then
+    root="${root}"
+elif [[ -n ${PASSWORD_STORE_DIR} ]]; then
+    root=${PASSWORD_STORE_DIR}
+else
+    root="$HOME/.password-store"
+fi
+PASSWORD_STORE_DIR="${root}"
+    case $1 in
     --insert)
         insertPass
         ;;
@@ -424,4 +425,5 @@ case $1 in
         mainMenu
         ;;
 esac
-
+}
+main "$@"
