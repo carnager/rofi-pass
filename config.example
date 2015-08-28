@@ -44,5 +44,4 @@ edit="Alt+9"
 move="Alt+2"
 delete="Alt+3"
 copy_entry="Alt+c"
-clip=primary
 show="Control+Return"
