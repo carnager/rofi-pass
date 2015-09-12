@@ -39,12 +39,30 @@ checkIfPass () {
 
 # main Menu
 mainMenu () {
-    help_text=$(echo -e "${autotype}: Autotype - ${type_user}: Type User - ${type_pass}: Type Password - ${open_url}: Open URL\n${copy_name}: Copy Username - ${copy_pass}: Copy Password - ${copy_url}: Copy URL - ${show}: Show Entry" | column -s '-' -t)
+    help_text=$(echo -e "${autotype}: Autotype - ${copy_name}: Copy User - ${edit}: Edit\n${type_user}: Type User - ${copy_pass}: Copy Pass - ${move}: Move\n${type_pass}: Type Pass - ${copy_url}: Copy URL - ${delete}: Delete" | column -s '-' -t)
     line1=$(echo "${help_text}" | head -1)
-    line2=$(echo "${help_text}" | tail -1)
+    line2=$(echo "${help_text}" | tail -2 | head -1)
+    line3=$(echo "${help_text}" | tail -1)
 HELP="<span color='$help_color'>${line1}
-${line2}</span>"
-        selected_password="$(echo -e "[ Add Entry ]>\n[ Manage Database ]>\n---\n$(list_passwords 2>/dev/null)" | _rofi -mesg "${HELP}" -dmenu -kb-custom-1 "${autotype}" -kb-custom-2 "${type_user}" -kb-custom-3 "${type_pass}" -kb-custom-4 "${open_url}" -kb-custom-5 "${copy_name}" -kb-custom-6 "${copy_pass}" -kb-custom-7 "${show}" -kb-custom-8 "${copy_url}" -dmenu -select "$entry" -p "rofi-pass > ")"
+${line2}
+${line3}</span>"
+        selected_password="$(echo -e "[ Add Entry ]>\n---\n$(list_passwords 2>/dev/null)" \
+            | _rofi -mesg "${HELP}" \
+            -dmenu -kb-custom-1 "${autotype}" \
+            -kb-custom-2 "${type_user}" \
+            -kb-custom-3 "${type_pass}" \
+            -kb-custom-4 "${open_url}" \
+            -kb-custom-5 "${copy_name}" \
+            -kb-custom-6 "${copy_pass}" \
+            -kb-custom-7 "${show}" \
+            -kb-custom-8 "${copy_url}" \
+            -kb-custom-9 "${edit}" \
+            -kb-custom-10 "${move}" \
+            -kb-custom-11 "${delete}" \
+            -dmenu \
+            -select "$entry" \
+            -p "rofi-pass > ")"
+
     	rofi_exit=$?
         
         if [[ -n $selected_password ]]; then
@@ -94,29 +112,41 @@ ${line2}</span>"
         checkIfPass
         echo -n "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
         exit
+
+    elif [[ "${rofi_exit}" -eq 18 ]]; then
+        manageEntry edit;
+
+    elif [[ "${rofi_exit}" -eq 19 ]]; then
+        manageEntry move;
+
+    elif [[ "${rofi_exit}" -eq 20 ]]; then
+        manageEntry delete;
+
     elif [[ $rofi_exit -eq 12 ]]; then
         checkIfPass
         echo -n "${password}" | xdotool type --clearmodifiers --file -
         exit
+
     elif [[ $rofi_exit -eq 14 ]]; then
         checkIfPass
         echo -n "${stuff[${USERNAME_field}]}" | doClip
         exit
+
     elif [[ $rofi_exit -eq 17 ]]; then
         checkIfPass
         echo -n "${stuff[${URL_field}]}" | doClip
         exit
+
     elif [[ $rofi_exit -eq 16 ]]; then
         checkIfPass
         showEntry "${selected_password}"
+
     elif [[ $rofi_exit -eq 15 ]]; then
         checkIfPass
         echo -n "$password" | doClip
         notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
         $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
         exit
-    elif [[ $rofi_exit -eq 18 || $rofi_exit -eq 19 ]]; then
-        mainMenu
     fi
 
     if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
@@ -135,6 +165,10 @@ ${line2}</span>"
                 xdotool key Tab
             elif [[ $word == ":space" ]]; then
                 xdotool key space
+            elif [[ $word == ":delay" ]]; then
+                sleep ${delay}
+            elif [[ $word == ":enter" ]]; then
+                xdotool key Return
             elif [[ $word == "pass" ]]; then
                 echo -n "${password}" | xdotool type --clearmodifiers --file -
             else
@@ -156,23 +190,6 @@ ${line2}</span>"
 	unset selected_password
 	unset password_temp
 	unset stuff
-}
-
-manageMenu() {
-    HELP="<span color='$help_color'>${edit}: Edit Entry | ${move}: Move Entry | ${delete}: Delete Entry</span>"
-    selected_password="$(echo -e "0  Return to Main Menu\n---\n$(list_passwords 2>/dev/null)" | _rofi -custom-kb-1 "${edit}" -custom-kb-2 "${move}" -custom-kb-3 "${delete}" -mesg "${HELP}" -dmenu -select "$entry" -p "rofi-pass > ")"
-    rofi_exit=$?
-    if [[ "${rofi_exit}" -eq 0 && "${selected_password}" != "0  Return to Main Menu" ]]; then showEntry manageMenu;
-    elif [[ "${rofi_exit}" -eq 10 ]]; then manageEntry edit;
-    elif [[ "${rofi_exit}" -eq 11 ]]; then manageEntry move;
-    elif [[ "${rofi_exit}" -eq 1 ]]; then exit;
-    elif [[ "${rofi_exit}" -eq 12 ]]; then manageEntry delete;
-    fi
-    if [[ "$selected_password" == "0  Return to Main Menu" ]]; then
-        mainMenu
-    else
-        manageMenu
-    fi
 }
 
 showEntry () {
@@ -245,23 +262,25 @@ showEntry () {
 manageEntry () {
     if [[ "$1" == "edit" ]]; then
         EDITOR=$EDITOR PASSWORD_STORE_DIR="${root}" pass edit "${selected_password}"
-        manageMenu
+        mainMenu
+
     elif [[ $1 == "move" ]]; then
-        cd "$HOME"/.password-store/"${root}"
+        cd "${root}"
         selected_password2=$(basename "$selected_password" .gpg)
         group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
-        PASSWORD_STORE_DIR="${root}" pass mv "$selected_password" "${root}"/"${group}"/"${selected_password2}"
-        manageMenu
+        PASSWORD_STORE_DIR="${root}" pass mv "$selected_password" "${group}"
+        mainMenu
+
     elif [[ "$1" == "delete" ]]; then
         HELP="<span color='$help_color'>Selected entry: ${selected_password}</span>"
         ask=$(echo -e "Yes\nNo" | _rofi -mesg "${HELP}" -dmenu -p "Are You Sure? > ")
         if [[ "$ask" == "Yes" ]]; then
             PASSWORD_STORE_DIR="${root}" pass rm --force "${selected_password}"
         elif [[ "$ask" == "no" ]]; then
-            manageMenu
+            mainMenu
         fi
     else
-        manageMenu
+        mainMenu
     fi
 }
 
