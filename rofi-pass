@@ -276,8 +276,10 @@ manageEntry () {
         ask=$(echo -e "Yes\nNo" | _rofi -mesg "${HELP}" -dmenu -p "Are You Sure? > ")
         if [[ "$ask" == "Yes" ]]; then
             PASSWORD_STORE_DIR="${root}" pass rm --force "${selected_password}"
-        elif [[ "$ask" == "no" ]]; then
+        elif [[ "$ask" == "No" ]]; then
             mainMenu
+        elif [[ -z "$ask" ]]; then
+            exit
         fi
     else
         mainMenu
