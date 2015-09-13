@@ -62,3 +62,8 @@ addpass --name "My new Site" +user "zeltak" +branch "branch" +custom "foobar" +a
 * Fieldnames are defined with `+` and the actual value is defined inside the quotations. You can add as many fields as you like
 
 Also included is an import script for keepass2 databases. It's the same script that can be downloaded from the pass homepage, with some minor modifications to match rofi-pass structure.
+
+## Alternative
+
+jreinert has written a roughly compatible tool to rofi-pass. It has less features, but definately saner code.
+Also he provided a nice little script called `passed` to change your fieldnames. [autopass](https://github.com/jreinert/autopass)
