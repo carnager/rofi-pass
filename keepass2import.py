@@ -60,8 +60,8 @@ def password_data(element, path=''):
     username = get_value(element, 'UserName')
     url = get_value(element, 'URL')
     notes = get_value(element, 'Notes')
-    data = "%sUserName: %s\n" % (data, username)
-    data = "%sURL: %s\n" % (data, url)
+    data = "%suser: %s\n" % (data, username)
+    data = "%surl: %s\n" % (data, url)
     data = "%s%s\n" % (data, notes)
     return data
 

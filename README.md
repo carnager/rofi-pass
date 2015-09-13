@@ -16,24 +16,25 @@
 * Auto Type User and Password. Format of password files are expected to be like:
 ```
 foobarmysecurepassword
-UserName: MyUser
-URL: http://my.url.foo
+user: MyUser
+url: http://my.url.foo
 ```
 * Auto Typing of more than one field. This expects a autotype field in password file.
 ```
 foobarmysecurepassword
 ---
-UserName: MyUser
+user: MyUser
 SomeField: foobar
 AnotherField: barfoo
-URL: http://my.url.foo
+url: http://my.url.foo
 autotype: SomeField :tab UserName :tab AnotherField :tab pass
 ```
 The `:tab` field has a special meaning. this will hit the tab key, obviously.<br>
 Same for `:space`, which will hit the space key, can be used to activate checkboxes.
+In addition to those `:enter` and `:delay` are available.
 
 * All Hotkeys are configurable in config file
-* Username, URL and autotype field names are also configurable
+* user, url and autotype field names are also configurable
 
 ## Requirements
 * pass (https://github.com/zx2c4/password-store)

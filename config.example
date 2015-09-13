@@ -5,12 +5,15 @@
 # keep in mind that 0.15.7 has different arguments compared to
 # latest git. for rofi-pass this means that "-i" will not work with
 # 0.15.7.
-rofiopts="-no-levenshtein-sort"
+rofiopts="-i -width 1000 -no-levenshtein-sort"
 
 # fields to be used
-URL_field='URL'
-USERNAME_field='UserName'
+URL_field='url'
+USERNAME_field='user'
 AUTOTYPE_field='autotype'
+
+# delay to be used for :delay keyword
+delay=2
 
 ## Programs to be used
 # Editor
