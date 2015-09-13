@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+# written by jreiner, mirror from
+# https://github.com/jreinert/autopass/blob/master/passed
+
 abort("usage: #{$PROGRAM_NAME} <sed options>") if ARGV.empty?
 
 sed_command = ['sed', *ARGV]
