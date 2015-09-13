@@ -5,7 +5,7 @@
 # keep in mind that 0.15.7 has different arguments compared to
 # latest git. for rofi-pass this means that "-i" will not work with
 # 0.15.7.
-rofiopts="-i -width 1000 -no-levenshtein-sort"
+rofiopts="-i -width 700 -no-levenshtein-sort"
 
 # fields to be used
 URL_field='url'
