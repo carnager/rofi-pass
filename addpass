@@ -45,7 +45,7 @@ fieldsArray=($fields);
 read -p "Enter password for entry \"${Name}\" > " -s pass
 
 cd "${root}"
-group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | rofi -dmenu -p "Choose Group > ")
+group=$(echo -e "No Group\n---\n$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)" | rofi -dmenu -p "Choose Group > ")
 
 echo -e "\n\nStoring file ${Name} in group ${group}"
 
@@ -58,5 +58,9 @@ printEntry () {
     done
 }
 
-printEntry | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${Name}"
+if [[ $group == "No Group" ]]; then
+    printEntry | PASSWORD_STORE_DIR="${root}" pass insert -m "${Name}"
+else
+    printEntry | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${Name}"
+fi
 

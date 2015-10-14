@@ -39,7 +39,7 @@ checkIfPass () {
 
 # main Menu
 mainMenu () {
-    help_text=$(echo -e "${autotype}: Autotype - ${copy_name}: Copy User - ${edit}: Edit\n${type_user}: Type User - ${copy_pass}: Copy Pass - ${move}: Move\n${type_pass}: Type Pass - ${copy_url}: Copy URL - ${delete}: Delete" | column -s '-' -t)
+    help_text=$(echo -e "${autotype}: Autotype - ${copy_name}: Copy User - ${edit}: Edit - ${show}: Show Entry\n${type_user}: Type User - ${copy_pass}: Copy Pass - ${move}: Move\n${type_pass}: Type Pass - ${copy_url}: Copy URL - ${delete}: Delete" | column -s '-' -t)
     line1=$(echo "${help_text}" | head -1)
     line2=$(echo "${help_text}" | tail -2 | head -1)
     line3=$(echo "${help_text}" | tail -1)
@@ -182,7 +182,6 @@ ${line3}</span>"
         fi
     fi
 
-	# cleanup (for the paranoid)
 	password=''
 	selected_password=''
 	unset stuff
@@ -288,28 +287,34 @@ manageEntry () {
 
 insertPass () {
     if [[ -z "$pass" ]]; then
-        if [[ -n "$1" ]]; then pass="$1" pass2="***"; else pass2="Empty"; fi
+        if [[ -n "$1" ]]; then
+            pass="$1"
+            pass2="***"
+        else
+            pass2="Empty"
+        fi
     fi
     if [[ -z "$user" ]]; then user="Empty"; fi
     if [[ -z "$domain" ]]; then domain="Empty"; fi
     if [[ -z "$name" ]]; then name="Empty"; fi
 
-    menu=$(echo -e "0  Return to Main Menu\n*  Accept Values and Add Password Entry\n---\n1  Name ($name)\n2  URL ($domain)\n3  User ($user)\n4  Password ($pass2)" | _rofi -dmenu -mesg "<span color='$help_color'>For faster adding use the addpass command</span>" -p "Add Entry > ")
-    if [[ $menu == "0  Return to Main Menu" ]]; then mainMenu
-    elif [[ $menu == "" ]]; then exit
-    elif [[ $menu == "*  Accept Values and Add Password Entry" ]]; then
+    insertmenu=$(echo -e "0  Return to Main Menu\n*  Accept Values and Add Password Entry\n---\n1  Name ($name)\n2  URL ($domain)\n3  User ($user)\n4  Password ($pass2)" | _rofi -dmenu -mesg "<span color='$help_color'>For faster adding use the addpass command</span>" -p "Add Entry > ")
+    if [[ $insertmenu == "0  Return to Main Menu" ]]; then mainMenu
+    elif [[ $insertmenu == "" ]]; then exit
+    elif [[ $insertmenu == "*  Accept Values and Add Password Entry" ]]; then
         cd "${root}"
-        group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
-        if [[ -n "$root" ]]; then
-            PASSWORD_STORE_DIR="${root}" pass insert -m -f "${root}/${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\n${URL_field}: ${domain}")
+        group=$(echo -e "No Group\n---\n$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)" | _rofi -dmenu -p "Choose Group > ")
+        if [[ "$group" == "No Group" ]]; then
+            PASSWORD_STORE_DIR="${root}" pass insert -m -f "${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\n${URL_field}: ${domain}")
         else
             PASSWORD_STORE_DIR="${root}" pass insert -m -f "${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\n${URL_field}: ${domain}")
         fi
-    elif [[ $menu == "1  Name"* ]]; then
+        exit
+    elif [[ $insertmenu == "1  Name"* ]]; then
         name=$(echo "" | _rofi -dmenu -p "Enter Name > ")
         insertPass
 
-    elif [[ $menu == "2  URL"* ]]; then
+    elif [[ $insertmenu == "2  URL"* ]]; then
         HELP="<span color='$help_color'>Enter Domain Name</span>"
         domain=$(echo -e "< Return" | _rofi -dmenu -mesg "${HELP}" -p "URL > ")
         if [[ $domain == "< Return" ]]; then
@@ -319,11 +324,11 @@ insertPass () {
         else
             insertPass
         fi
-    elif [[ $menu == "3  User"* ]]; then
+    elif [[ $insertmenu == "3  User"* ]]; then
         HELP="<span color='$help_color'>Enter Username</span>"
         user=$(echo -e "" | _rofi -dmenu -mesg "${HELP}" -p "Username > ")
         insertPass
-    elif [[ $menu == "4  Password"* ]]; then
+    elif [[ $insertmenu == "4  Password"* ]]; then
         password_length=12
         symbols="False"
         numerals="True"
