@@ -300,11 +300,7 @@ insertPass () {
     elif [[ $menu == "*  Accept Values and Add Password Entry" ]]; then
         cd "${root}"
         group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
-        if [[ -n "$root" ]]; then
-            PASSWORD_STORE_DIR="${root}" pass insert -m -f "${root}/${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\n${URL_field}: ${domain}")
-        else
-            PASSWORD_STORE_DIR="${root}" pass insert -m -f "${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\n${URL_field}: ${domain}")
-        fi
+        PASSWORD_STORE_DIR="${root}" pass insert -m -f "${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\n${URL_field}: ${domain}")
     elif [[ $menu == "1  Name"* ]]; then
         name=$(echo "" | _rofi -dmenu -p "Enter Name > ")
         insertPass
