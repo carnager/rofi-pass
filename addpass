@@ -58,7 +58,7 @@ printEntry () {
     done
 }
 
-if [[ $group == "No Group" ]]; then
+if [[ "$group" == "No Group" || "$group" == "" ]]; then
     printEntry | PASSWORD_STORE_DIR="${root}" pass insert -m "${Name}"
 else
     printEntry | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${Name}"
