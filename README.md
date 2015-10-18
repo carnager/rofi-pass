@@ -37,7 +37,7 @@ In addition to those `:enter` and `:delay` are available.
 * user, url and autotype field names are also configurable
 
 ## Requirements
-* pass (https://github.com/zx2c4/password-store)
+* pass (http://www.passwordstore.org/)
 * sed
 * rofi (https://github.com/DaveDavenport/rofi)
 * xdotool
