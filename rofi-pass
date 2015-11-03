@@ -39,7 +39,7 @@ checkIfPass () {
 
 # main Menu
 mainMenu () {
-    help_text=$(echo -e "${autotype}: Autotype - ${copy_name}: Copy User - ${edit}: Edit - ${show}: Show Entry\n${type_user}: Type User - ${copy_pass}: Copy Pass - ${move}: Move\n${type_pass}: Type Pass - ${copy_url}: Copy URL - ${delete}: Delete" | column -s '-' -t)
+    help_text=$(echo -e "${autotype}: Autotype - ${copy_name}: Copy User - ${edit}: Edit - ${show}: Show Entry\n${type_user}: Type User - ${copy_pass}: Copy Pass - ${move}: Move\n${type_pass}: Type Pass - ${copy_url}: Copy URL - ${delete}: Delete - ${get_2fa}: Type 2FA code" | column -s '-' -t)
     line1=$(echo "${help_text}" | head -1)
     line2=$(echo "${help_text}" | tail -2 | head -1)
     line3=$(echo "${help_text}" | tail -1)
@@ -59,6 +59,7 @@ ${line3}</span>"
             -kb-custom-9 "${edit}" \
             -kb-custom-10 "${move}" \
             -kb-custom-11 "${delete}" \
+            -kb-custom-12 "${get_2fa}" \
             -dmenu \
             -select "$entry" \
             -p "rofi-pass > ")"
@@ -146,6 +147,12 @@ ${line3}</span>"
         echo -n "$password" | doClip
         notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
         $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+        exit
+
+    elif [[ $rofi_exit -eq 21 ]]; then
+        checkIfPass
+        notify-send "rofi-pass" "Generating 2FA token for ${selected_password}"
+        echo -n "${password}" | get_2fa.py | xdotool type --clearmodifiers --file -
         exit
     fi
 
