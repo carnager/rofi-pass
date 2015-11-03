@@ -153,7 +153,6 @@ ${line3}</span>"
         checkIfPass
         notify-send "rofi-pass" "Generating 2FA token for ${selected_password}"
         echo -n "${password}" | get_2fa.py | xdotool type --clearmodifiers --file -
-
         exit
     fi
 
