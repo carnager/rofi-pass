@@ -125,6 +125,9 @@ ${line3}</span>"
     elif [[ $rofi_exit -eq 12 ]]; then
         checkIfPass
         echo -n "${password}" | xdotool type --clearmodifiers --file -
+        if [[ "${stuff[notify]}" == "true" ]]; then
+            notify-send "rofi-pass" "finished typing password"
+        fi
         exit
 
     elif [[ $rofi_exit -eq 14 ]]; then
