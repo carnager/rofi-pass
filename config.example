@@ -26,6 +26,7 @@ BROWSER='chromium'
 
 help_color='#0C73C2'
 auto_enter='false'
+notify='false'
 
 # seconds to wait before re-opening showEntry-menu
 # after autotyping an entry. Set to "off" to disable
