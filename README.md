@@ -9,6 +9,7 @@
 * Open URLs of entries with hotkey
 * Add new Entries to Password Storage
 * Edit existing Entries
+* Only generate new passwords for Entries
 * Inline view of complete password entry with ability to
   + Copy individual fields to clipboard
   + Autotype single fields
