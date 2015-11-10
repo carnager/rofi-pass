@@ -82,8 +82,6 @@ ${line3}</span>"
         if [[ "${rofi_exit}" -eq 0 ]]; then
             if [[ ${selected_password} == "[ Add Entry ]>" ]]; then
                 insertPass
-            elif [[ ${selected_password} == "[ Manage Database ]>" ]]; then
-                manageMenu
             elif [[ ${selected_password} == "---" ]]; then
                 mainMenu
             else
