@@ -39,7 +39,7 @@ checkIfPass () {
 
 # main Menu
 mainMenu () {
-    help_text=$(echo -e "${autotype}: Autotype - ${copy_name}: Copy User - ${edit}: Edit - ${show}: Show Entry\n${type_user}: Type User - ${copy_pass}: Copy Pass - ${move}: Move\n${type_pass}: Type Pass - ${copy_url}: Copy URL - ${delete}: Delete" | column -s '-' -t)
+    help_text=$(echo -e "${autotype}: Autotype - ${copy_name}: Copy User - ${edit}: Edit - ${show}: Show Entry\n${type_user}: Type User - ${copy_pass}: Copy Pass - ${move}: Move - ${generate}: Generate Pass\n${type_pass}: Type Pass - ${copy_url}: Copy URL - ${delete}: Delete" | column -s '-' -t)
     line1=$(echo "${help_text}" | head -1)
     line2=$(echo "${help_text}" | tail -2 | head -1)
     line3=$(echo "${help_text}" | tail -1)
@@ -59,6 +59,7 @@ ${line3}</span>"
             -kb-custom-9 "${edit}" \
             -kb-custom-10 "${move}" \
             -kb-custom-11 "${delete}" \
+            -kb-custom-12 "${generate}" \
             -dmenu \
             -select "$entry" \
             -p "rofi-pass > ")"
@@ -121,6 +122,25 @@ ${line3}</span>"
 
     elif [[ "${rofi_exit}" -eq 20 ]]; then
         manageEntry delete;
+
+    elif [[ "${rofi_exit}" -eq 21 ]]; then
+        checkIfPass
+        symbols=$(echo -e "0  Cancel\n---\n1  Yes\n2  No" | rofi -dmenu -p "Use Symbols? > ")
+        if [[ $symbols == "0  Cancel" ]]; then
+            mainMenu
+        elif [[ $symbols == "1  Yes" ]]; then
+            symbols=""
+        elif [[ $symbols == "2  No" ]]; then
+            symbols="-n"
+        fi
+        HELP="<span color='$help_color'>Enter Number or hit Enter to use default length</span>"
+        length=$(echo -e "" | rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${passlength}) > ")
+        if [[ $length == "" ]]; then
+            pass generate ${symbols} -i "$selected_password" "${passlength}" > /dev/null
+        else
+            pass generate ${symbols} -i "$selected_password" "${length}" > /dev/null
+        fi
+        exit
 
     elif [[ $rofi_exit -eq 12 ]]; then
         checkIfPass
