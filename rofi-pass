@@ -215,15 +215,19 @@ else unset help; mainMenu; fi
 }
 
 typeMenu () {
-    typefield=$(pass "${selected_password}" | awk -F ':' '{ print $1 }' | grep -Ev '\-\-\-' | tail -n +2 | rofi -dmenu -p "Choose Field to type > ")
-    if [[ $typefield == "" ]]; then exit; fi
-    typeField
+    typefield=$(echo -e "password\n$(pass ${selected_password} | awk -F ':' '{ print $1 }' | grep -Ev '\-\-\-' | tail -n +2)" | rofi -dmenu -p "Choose Field to type > ")
+    if [[ $typefield == "" ]]; then exit;
+    elif [[ $typefield == "password" ]]; then typePass;
+    else typeField
+    fi
 }
 
 copyMenu () {
-    copyfield=$(pass "${selected_password}" | awk -F ':' '{ print $1 }' | grep -Ev '\-\-\-' | tail -n +2 | rofi -dmenu -p "Choose Field to type > ")
-    if [[ $copyfield == "" ]]; then exit; fi
-    copyField
+    copyfield=$(echo -e "password\n$(pass ${selected_password} | awk -F ':' '{ print $1 }' | grep -Ev '\-\-\-' | tail -n +2)" | rofi -dmenu -p "Choose Field to type > ")
+    if [[ $copyfield == "" ]]; then exit;
+    elif [[ $copyfield == "password" ]]; then copyPass;
+    else copyField
+    fi
 }
 
 actionMenu () {
