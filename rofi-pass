@@ -210,15 +210,19 @@ ${copy_menu}: Copy Custom Field
 ---
 ${action_menu}: Edit, Move, Delete, Re-generate Submenu
 ${show}: Show Password File" | rofi -dmenu -p "Help > ")
+if [[ $help == "" ]]; then exit;
+else unset help; mainMenu; fi
 }
 
 typeMenu () {
     typefield=$(pass "${selected_password}" | awk -F ':' '{ print $1 }' | grep -Ev '\-\-\-' | tail -n +2 | rofi -dmenu -p "Choose Field to type > ")
+    if [[ $typefield == "" ]]; then exit; fi
     typeField
 }
 
 copyMenu () {
     copyfield=$(pass "${selected_password}" | awk -F ':' '{ print $1 }' | grep -Ev '\-\-\-' | tail -n +2 | rofi -dmenu -p "Choose Field to type > ")
+    if [[ $copyfield == "" ]]; then exit; fi
     copyField
 }
 
@@ -227,6 +231,7 @@ actionMenu () {
     if [[ ${action} == "1 Move Password File" ]]; then manageEntry move;
     elif [[ ${action} == "2 Delete Password File" ]]; then manageEntry delete;
     elif [[ ${action} == "3 Generate New Password" ]]; then generatePass;
+    elif [[ ${action} == "" ]]; then exit
     fi
 }
 
