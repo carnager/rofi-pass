@@ -143,9 +143,9 @@ generatePass () {
 
 # main Menu
 mainMenu () {
+    unset selected_password
     help_text=$(echo -e "${autotype}: Autotype - ${action_menu}: Actions - ${show}: View\n${type_menu}: Type Field - ${copy_menu}: Copy Field - ${help}: Help" | column -s '-' -t)
     line1=$(echo "${help_text}" | head -1)
-    line2=$(echo "${help_text}" | head -2 | tail -1)
     line3=$(echo "${help_text}" | tail -1)
 HELP="<span color='$help_color'>${line1}
 ${line3}</span>"
@@ -206,7 +206,7 @@ ${line3}</span>"
 }
 
 helpMenu () {
-    help=$(echo -e "${type_user}: Type User
+    helptext=$(echo -e "${type_user}: Type User
 ${autotype}: Autotype
 ${type_user}: Type Username
 ${type_pass}: Type Password
@@ -220,7 +220,7 @@ ${copy_menu}: Copy Custom Field
 ${action_menu}: Edit, Move, Delete, Re-generate Submenu
 ${show}: Show Password File" | rofi -dmenu -p "Help > ")
 if [[ $help == "" ]]; then exit;
-else unset help; mainMenu; fi
+else unset helptext; mainMenu; fi
 }
 
 typeMenu () {
