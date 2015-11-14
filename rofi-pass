@@ -225,29 +225,32 @@ else unset help; mainMenu; fi
 
 typeMenu () {
     checkIfPass
-    typefield=$(echo -e "password\n$(pass ${selected_password} | awk -F ':' '{ print $1 }' | grep -Ev '\-\-\-' | tail -n +2)" | rofi -dmenu -p "Choose Field to type > ")
+    typefield=$(echo -e "< Return\n---\npassword\n$(pass ${selected_password} | awk -F ':' '{ print $1 }' | grep -Ev '\-\-\-' | tail -n +2)" | rofi -dmenu -p "Choose Field to type > ")
     if [[ $typefield == "" ]]; then exit;
     elif [[ $typefield == "password" ]]; then typePass;
+    elif [[ $typefield == "< Return" ]]; then mainMenu;
     else typeField
     fi
 }
 
 copyMenu () {
     checkIfPass
-    copyfield=$(echo -e "password\n$(pass ${selected_password} | awk -F ':' '{ print $1 }' | grep -Ev '\-\-\-' | tail -n +2)" | rofi -dmenu -p "Choose Field to type > ")
+    copyfield=$(echo -e "< Return\n---\npassword\n$(pass ${selected_password} | awk -F ':' '{ print $1 }' | grep -Ev '\-\-\-' | tail -n +2)" | rofi -dmenu -p "Choose Field to type > ")
     if [[ $copyfield == "" ]]; then exit;
     elif [[ $copyfield == "password" ]]; then copyPass;
+    elif [[ $copyfield == "< Return" ]]; then mainMenu;
     else copyField
     fi
 }
 
 actionMenu () {
     checkIfPass
-    action=$(echo -e "1 Move Password File\n2 Delete Password File\\n3 Edit Password File\n4 Generate New Password" | rofi -dmenu -p "Choose Action > ")
+    action=$(echo -e "< Return\n---\n1 Move Password File\n2 Delete Password File\\n3 Edit Password File\n4 Generate New Password" | rofi -dmenu -p "Choose Action > ")
     if [[ ${action} == "1 Move Password File" ]]; then manageEntry move;
     elif [[ ${action} == "2 Delete Password File" ]]; then manageEntry delete;
     elif [[ ${action} == "3 Edit Password File" ]]; then manageEntry edit;
     elif [[ ${action} == "4 Generate New Password" ]]; then generatePass;
+    elif [[ ${action} == "< Return" ]]; then mainMenu;
     elif [[ ${action} == "" ]]; then exit
     fi
 }
