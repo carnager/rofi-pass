@@ -169,16 +169,20 @@ ${line3}</span>"
 
   	rofi_exit=$?
 
-    # generate Array of fields
-    password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
-    password=$(echo "${password_temp}" | head -1)
-    declare -A stuff
-    while read LINE; do
-        _id=$(echo -e "${LINE}" | awk -F ':[[:space:]]*' '{print $1}')
-        _val=$(echo -e "${LINE}" | awk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
-        stuff["${_id}"]=${_val}
-    done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
-    stuff["pass"]=${password}
+    if [[ ${selected_password} == "[ Add Entry ]>" ]]; then
+        :
+    else
+        # generate Array of fields
+        password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
+        password=$(echo "${password_temp}" | head -1)
+        declare -A stuff
+        while read LINE; do
+            _id=$(echo -e "${LINE}" | awk -F ':[[:space:]]*' '{print $1}')
+            _val=$(echo -e "${LINE}" | awk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
+            stuff["${_id}"]=${_val}
+        done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
+        stuff["pass"]=${password}
+    fi
 
     # actions based on keypresses
     if [[ "${rofi_exit}" -eq 0 ]]; then autopass;
@@ -193,7 +197,7 @@ ${line3}</span>"
     elif [[ "${rofi_exit}" -eq 15 ]]; then copyPass;
     elif [[ "${rofi_exit}" -eq 22 ]]; then typeMenu;
     elif [[ "${rofi_exit}" -eq 23 ]]; then actionMenu;
-    elif [[ "${rofi_exit}" -eq 25 ]]; then helpMenu;
+    elif [[ "${rofi_exit}" -eq 25 ]]; then unset selected_password; helpMenu;
     elif [[ "${rofi_exit}" -eq 24 ]]; then copyMenu;
     fi
 	password=''
@@ -206,8 +210,7 @@ ${line3}</span>"
 }
 
 helpMenu () {
-    helptext=$(echo -e "${type_user}: Type User
-${autotype}: Autotype
+    helptext=$(echo -e "${autotype}: Autotype
 ${type_user}: Type Username
 ${type_pass}: Type Password
 ${type_menu}: Type Custom Field
