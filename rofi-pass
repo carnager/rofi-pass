@@ -228,7 +228,7 @@ else unset helptext; mainMenu; fi
 
 typeMenu () {
     checkIfPass
-    typefield=$(echo -e "< Return\n---\npassword\n$(pass ${selected_password} | grep ': ' | awk -F ':' '{ print $1 }')" | _rofi -dmenu -p "Choose Field to type > ")
+    typefield=$(echo -e "< Return\n---\npassword\n$(pass ${selected_password} | grep -P ':[\t ]' | awk -F ':' '{ print $1 }')" | _rofi -dmenu -p "Choose Field to type > ")
     if [[ $typefield == "" ]]; then exit;
     elif [[ $typefield == "password" ]]; then typePass;
     elif [[ $typefield == "< Return" ]]; then mainMenu;
@@ -238,7 +238,7 @@ typeMenu () {
 
 copyMenu () {
     checkIfPass
-    copyfield=$(echo -e "< Return\n---\npassword\n$(pass ${selected_password} | grep ': ' | awk -F ':' '{ print $1 }')" | _rofi -dmenu -p "Choose Field to type > ")
+    copyfield=$(echo -e "< Return\n---\npassword\n$(pass ${selected_password} | grep -P ':[\t ]' | awk -F ':' '{ print $1 }')" | _rofi -dmenu -p "Choose Field to type > ")
     if [[ $copyfield == "" ]]; then exit;
     elif [[ $copyfield == "password" ]]; then copyPass;
     elif [[ $copyfield == "< Return" ]]; then mainMenu;
