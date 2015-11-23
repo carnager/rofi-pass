@@ -37,6 +37,8 @@ autopass () {
     if [[ ${selected_password} == "[ Add Entry ]>" ]]; then insertPass;
     elif [[ ${selected_password} == "---" ]]; then mainMenu;
     else
+        rm -f "$HOME/.config/rofi-pass/last_used"                                 
+        echo "${root}: $selected_password" > "$HOME/.config/rofi-pass/last_used"
         if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
             echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
             xdotool key Tab
