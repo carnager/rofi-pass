@@ -12,7 +12,7 @@ else
     root="$HOME/.password-store"
 fi
 
-if [[ $1 == "--help" || $1 == "=h" ]]; then
+if [[ $1 == "--help" || $1 == "-h" ]]; then
     echo "add pass files for rofi-pass"
     echo "(C) 2015 Rasmus Steinke <rasi at xssn dot at>"
     echo ""
