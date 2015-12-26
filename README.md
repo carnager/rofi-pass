@@ -9,11 +9,9 @@
 * Open URLs of entries with hotkey
 * Add new Entries to Password Storage
 * Edit existing Entries
-* Only generate new passwords for Entries
-* Inline view of complete password entry with ability to
-  + Copy individual fields to clipboard
-  + Autotype single fields
+* Generate new passwords for entries
 * Support for multiple roots for password-store (e.g. separate work from private passwords)
+* Type any field from entry
 * Auto Type User and Password. Format of password files are expected to be like:
 ```
 foobarmysecurepassword
