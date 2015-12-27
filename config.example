@@ -33,6 +33,10 @@ passlength='20'
 # after autotyping an entry. Set to "off" to disable
 count=2
 
+# color of the help messages
+# leave empty for autodetection
+help_color=""
+
 # Clipboard settings
 # Possible options: primary, clipboard, both
 clip=primary

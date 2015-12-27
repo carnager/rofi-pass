@@ -4,6 +4,7 @@
 # (c) 2015 Rasmus Steinke <rasi@xssn.at>
 basecommand=$(echo "$0" | awk '{ print $1 }')
 
+
 # get all password files and create an array
 list_passwords() {
     cd "${root}"
@@ -489,6 +490,12 @@ fi
 # check if local config exists and load it
 if [[ -f $HOME/.config/rofi-pass/config ]]; then
     source $HOME/.config/rofi-pass/config
+fi
+
+# set help color                                                                                            
+if [[ $help_color == "" ]]; then
+    help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | awk -F ', ' '{ print $2 }')
+    help_separator_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | awk -F ', ' '{ print $2 }')
 fi
 
 # check for BROWSER variable, use xdg-open as fallback
