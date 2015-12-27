@@ -475,6 +475,7 @@ help_msg () {
     echo -e "--root           set custom root directory"
     echo "--last-used      highlight last used item"
     echo "--show-last      show details of last used Entry"
+    echo "--bmarks         run bookmarks Mode"
     echo ""
 }
 
