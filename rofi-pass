@@ -263,7 +263,7 @@ typeMenu () {
 
 copyMenu () {
     checkIfPass
-    copyfield=$(echo -e "< Return\n---\npassword\n$(pass ${selected_password} | grep -P ':[\t ]' | awk -F ':' '{ print $1 }')" | _rofi -dmenu -p "Choose Field to type > ")
+    copyfield=$(echo -e "< Return\n---\npassword\n$(pass ${selected_password} | grep -P ':[\t ]' | awk -F ':' '{ print $1 }')" | _rofi -dmenu -p "Choose Field to copy > ")
     if [[ $copyfield == "" ]]; then exit;
     elif [[ $copyfield == "password" ]]; then copyPass;
     elif [[ $copyfield == "< Return" ]]; then mainMenu;
