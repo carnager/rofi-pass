@@ -207,7 +207,7 @@ ${line3}</span>"
         fi
 
         # actions based on keypresses
-        if [[ "${rofi_exit}" -eq 0 ]]; then autopass;
+        if [[ "${rofi_exit}" -eq 0 ]]; then ${default_do};
         elif [[ "${rofi_exit}" -eq 13 ]]; then openURL;
         elif [[ "${rofi_exit}" -eq 1 ]]; then exit ${rofi_exit};
         elif [[ "${rofi_exit}" -eq 10 ]]; then autopass;
