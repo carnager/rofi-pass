@@ -246,7 +246,7 @@ ${copy_menu}: Copy Custom Field
 ---
 ${action_menu}: Edit, Move, Delete, Re-generate Submenu
 ${show}: Show Password File
-Alt+x: Switch Pass/Bookmark Mode" | _rofi -dmenu -p "Help > ")
+${switch}: Switch Pass/Bookmark Mode" | _rofi -dmenu -p "Help > ")
 if [[ $help == "" ]]; then exit;
 else unset helptext; mainMenu; fi
 }
