@@ -28,8 +28,8 @@ checkIfPass () {
     if [[ $selected_password == "[ Add Entry ]>" ]]; then mainMenu;
     elif [[ $selected_password == "---" ]]; then mainMenu;
     else
-        rm -f "$HOME/.config/rofi-pass/last_used"
-        echo "${root}: $selected_password" > "$HOME/.config/rofi-pass/last_used"
+        rm -f "/tmp/$USER-rofi-pass/last_used"
+        echo "${root}: $selected_password" > "/tmp/$USER-rofi-pass/last_used"
     fi
 }
 
@@ -38,8 +38,8 @@ autopass () {
     if [[ ${selected_password} == "[ Add Entry ]>" ]]; then insertPass;
     elif [[ ${selected_password} == "---" ]]; then mainMenu;
     else
-        rm -f "$HOME/.config/rofi-pass/last_used"                                 
-        echo "${root}: $selected_password" > "$HOME/.config/rofi-pass/last_used"
+        rm -f "/tmp/$USER-rofi-pass/last_used"                                 
+        echo "${root}: $selected_password" > "/tmp/$USER-rofi-pass/last_used"
         if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
             echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
             xdotool key Tab
@@ -493,6 +493,11 @@ if [[ -f $HOME/.config/rofi-pass/config ]]; then
     source $HOME/.config/rofi-pass/config
 fi
 
+# create tmp dir
+if [[ ! -d /tmp/$USER-rofi-pass ]]; then
+    mkdir /tmp/$USER-rofi-pass
+fi
+
 # set help color                                                                                            
 if [[ $help_color == "" ]]; then
     help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | awk -F ', ' '{ print $2 }')
@@ -510,7 +515,7 @@ fi
 
 # check if alternative root directory was given on commandline
 if [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
-    export root=$(awk -F ': ' '{ print $1 }' $HOME/.config/rofi-pass/last_used)
+    export root=$(awk -F ': ' '{ print $1 }' /tmp/$USER-rofi-pass/last_used)
 elif [[ -n "$2" && "$1" == "--root" ]]; then
     export root="${2}"
 elif [[ -n $root ]]; then
@@ -535,10 +540,10 @@ export PASSWORD_STORE_DIR="${root}"
         help_msg
         ;;
     --last-used)
-        entry="$(awk -F ': ' '{ print $2 }' $HOME/.config/rofi-pass/last_used)" mainMenu
+        entry="$(awk -F ': ' '{ print $2 }' /tmp/$USER-rofi-pass/last_used)" mainMenu
         ;;
     --show-last)
-        selected_password="$(awk -F ': ' '{ print $2 }' $HOME/.config/rofi-pass/last_used)" showEntry
+        selected_password="$(awk -F ': ' '{ print $2 }' /tmp/$USER-rofi-pass/last_used)" showEntry
         ;;
     --bmarks)
         mainMenu --bmarks;
