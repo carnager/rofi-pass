@@ -65,4 +65,3 @@ elif [[ "$group" == "" ]]; then
 else
     printEntry | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${Name}"
 fi
-
