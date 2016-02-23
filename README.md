@@ -66,5 +66,5 @@ Also included is an import script for keepass2 databases. It's the same script t
 
 ## Alternative
 
-jreinert has written a roughly compatible tool to rofi-pass. It has less features, but definately saner code.
-Also he provided a nice little script called `passed` to change your fieldnames. [autopass](https://github.com/jreinert/passed)
+jreinert has written the roughly compatible tool [autopass](https://github.com/jreinert/autopass). It has less features, but definately saner code.
+Also he provided a nice little script called `passed` to change your fieldnames. [link](https://github.com/jreinert/passed)
