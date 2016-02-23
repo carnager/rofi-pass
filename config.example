@@ -25,7 +25,6 @@ BROWSER='chromium'
 ## Misc settings
 
 default_do='autopass' # copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
-help_color='#0C73C2'
 auto_enter='false'
 notify='false'
 passlength='20'
