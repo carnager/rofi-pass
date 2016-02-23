@@ -501,7 +501,6 @@ fi
 # set help color                                                                                            
 if [[ $help_color == "" ]]; then
     help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | awk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
-    help_separator_color=${help_color}
 fi
 
 # check for BROWSER variable, use xdg-open as fallback
