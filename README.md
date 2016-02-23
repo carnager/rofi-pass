@@ -15,6 +15,7 @@
 * Support for multiple roots for password-store (e.g. separate work from private passwords)
 * Type any field from entry
 * Auto Type User and Password. Format of password files are expected to be like:
+* Bookmarks mode (default: Alt+x)
 ```
 foobarmysecurepassword
 user: MyUser
