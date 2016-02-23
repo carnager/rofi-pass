@@ -10,11 +10,11 @@ list_passwords() {
     cd "${root}"
     passwords=( **/*.gpg )
 
-	for password in "${passwords[@]}"; do
-		filename="${password}"
-		filename="${filename%.gpg}"
-		echo "$filename"
-	done
+    for password in "${passwords[@]}"; do
+        filename="${password}"
+        filename="${filename%.gpg}"
+        echo "$filename"
+    done
 }
 
 doClip () {
@@ -38,7 +38,7 @@ autopass () {
     if [[ ${selected_password} == "[ Add Entry ]>" ]]; then insertPass;
     elif [[ ${selected_password} == "---" ]]; then mainMenu;
     else
-        rm -f "/tmp/$USER-rofi-pass/last_used"                                 
+        rm -f "/tmp/$USER-rofi-pass/last_used"
         echo "${root}: $selected_password" > "/tmp/$USER-rofi-pass/last_used"
         if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
             echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
@@ -155,7 +155,7 @@ mainMenu () {
             -p "rofi-pass > ")"
 
         rofi_exit=$?
-        
+
         if [[ $rofi_exit -eq 1 ]]; then
             exit
         elif [[ $rofi_exit -eq 10 ]]; then
@@ -189,7 +189,7 @@ ${line3}</span>"
             -select "$entry" \
             -p "rofi-pass > ")"
 
-      	rofi_exit=$?
+        rofi_exit=$?
 
         if [[ ${selected_password} == "[ Add Entry ]>" ]]; then
             :
@@ -223,13 +223,13 @@ ${line3}</span>"
         elif [[ "${rofi_exit}" -eq 24 ]]; then copyMenu;
         elif [[ "${rofi_exit}" -eq 26 ]]; then $(${basecommand} --bmarks);
         fi
-    	password=''
-    	selected_password=''
-    	unset stuff
-    	unset password
-    	unset selected_password
-    	unset password_temp
-    	unset stuff
+        password=''
+        selected_password=''
+        unset stuff
+        unset password
+        unset selected_password
+        unset password_temp
+        unset stuff
     fi
 }
 
@@ -342,11 +342,11 @@ showEntry () {
     elif [[ ${rofi_exit} -eq 1 ]]; then
         exit
     fi
-	unset stuff
-	unset password
-	unset selected_password
-	unset password_temp
-	unset stuff
+    unset stuff
+    unset password
+    unset selected_password
+    unset password_temp
+    unset stuff
     exit
 }
 
@@ -498,7 +498,7 @@ if [[ ! -d /tmp/$USER-rofi-pass ]]; then
     mkdir /tmp/$USER-rofi-pass
 fi
 
-# set help color                                                                                            
+# set help color
 if [[ $help_color == "" ]]; then
     help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | awk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
 fi

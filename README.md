@@ -52,7 +52,7 @@ For an example configuration please take a look at the included `config.example`
 
 ## Extras
 rofi-pass comes with a tiny helper script, which makes it easier to create new pass entries.
-Just run it with 
+Just run it with
 
 ```
 addpass --name "My new Site" +user "zeltak" +branch "branch" +custom "foobar" +autotype "branch :tab user :tab pass"
