@@ -398,11 +398,11 @@ insertPass () {
         cd "${root}"
         group=$(echo -e "No Group\n---\n$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)" | _rofi -dmenu -p "Choose Group > ")
         if [[ "$group" == "No Group" ]]; then
-            PASSWORD_STORE_DIR="${root}" pass insert -m -f "${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\n${URL_field}: ${domain}")
+            PASSWORD_STORE_DIR="${root}" pass insert -m -f "${name}" < <(echo -e "${pass}\n${USERNAME_field}: ${user}\n---\n${URL_field}: ${domain}")
         elif [[ "$group" == "" ]]; then
             exit
         else
-            PASSWORD_STORE_DIR="${root}" pass insert -m -f "${group}/${name}" < <(echo -e "${pass}\nUserName: ${user}\n---\n${URL_field}: ${domain}")
+            PASSWORD_STORE_DIR="${root}" pass insert -m -f "${group}/${name}" < <(echo -e "${pass}\nU${USERNAME_field}: ${user}\n---\n${URL_field}: ${domain}")
         fi
         exit
     elif [[ $insertmenu == "1  Name"* ]]; then
