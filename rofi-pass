@@ -463,7 +463,7 @@ password_gen () {
 }
 
 function _rofi () {
-    rofi -dmenu -z $(echo "${rofiopts}") "$@"
+    rofi -dmenu -z "${rofiopts}" "$@"
 }
 
 help_msg () {
