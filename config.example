@@ -1,11 +1,11 @@
 # permanently set alternative root dir
 # root=/path/to/root
 
-# optional rofi parameters:
-# keep in mind that 0.15.7 has different arguments compared to
-# latest git. for rofi-pass this means that "-i" will not work with
-# 0.15.7.
-rofiopts="-i -width 700 -no-levenshtein-sort"
+# rofi command. Make sure to have "$@" as last argument
+_rofi () {
+    rofi -z -i -width 700 -no-levenshtein-sort "$@"
+}
+
 
 # fields to be used
 URL_field='url'

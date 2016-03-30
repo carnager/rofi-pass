@@ -462,9 +462,9 @@ password_gen () {
     fi
 }
 
-function _rofi () {
-    rofi -dmenu -z "${rofiopts}" "$@"
-}
+#function _rofi () {
+#    rofi -dmenu -z ${rofiopts} "$@"
+#}
 
 help_msg () {
     echo "rofi-pass (Version: 1.2)"
