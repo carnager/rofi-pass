@@ -513,7 +513,7 @@ if [[ -z ${count} ]]; then
 fi
 
 # check if alternative root directory was given on commandline
-if [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
+if [[ -r "/tmp/$USER-rofi-pass/last_used" ]] && [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
     export root=$(awk -F ': ' '{ print $1 }' /tmp/$USER-rofi-pass/last_used)
 elif [[ -n "$2" && "$1" == "--root" ]]; then
     export root="${2}"
@@ -539,10 +539,17 @@ export PASSWORD_STORE_DIR="${root}"
         help_msg
         ;;
     --last-used)
-        entry="$(awk -F ': ' '{ print $2 }' /tmp/$USER-rofi-pass/last_used)" mainMenu
+        if [[ -r "/tmp/$USER-rofi-pass/last_used" ]]; then
+            entry="$(awk -F ': ' '{ print $2 }' /tmp/$USER-rofi-pass/last_used)"
+        fi
+        mainMenu
         ;;
     --show-last)
-        selected_password="$(awk -F ': ' '{ print $2 }' /tmp/$USER-rofi-pass/last_used)" showEntry
+        if [[ -r "/tmp/$USER-rofi-pass/last_used" ]]; then
+            selected_password="$(awk -F ': ' '{ print $2 }' /tmp/$USER-rofi-pass/last_used)" showEntry
+        else
+            mainMenu
+        fi
         ;;
     --bmarks)
         mainMenu --bmarks;
