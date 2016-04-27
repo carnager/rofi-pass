@@ -43,7 +43,7 @@ In addition to those `:enter` and `:delay` are available.
 * sed
 * rofi (https://github.com/DaveDavenport/rofi)
 * xdotool
-* awk
+* gawk
 * bash
 
 ## Configuration
