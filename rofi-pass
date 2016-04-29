@@ -2,7 +2,7 @@
 
 # rofi-pass
 # (c) 2015 Rasmus Steinke <rasi@xssn.at>
-basecommand=$(echo "$0" | awk '{ print $1 }')
+basecommand=$(echo "$0" | gawk '{ print $1 }')
 
 
 # get all password files and create an array
@@ -64,7 +64,7 @@ autopass () {
 
 openURL () {
     checkIfPass
-    $BROWSER "$(pass "$selected_password" | grep "${URL_field}: " | awk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
+    $BROWSER "$(pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
 }
 
 typeUser () {
@@ -199,8 +199,8 @@ ${line3}</span>"
             password=$(echo "${password_temp}" | head -1)
             declare -A stuff
             while read LINE; do
-                _id=$(echo -e "${LINE}" | awk -F ':[[:space:]]*' '{print $1}')
-                _val=$(echo -e "${LINE}" | awk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
+                _id=$(echo -e "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
+                _val=$(echo -e "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
                 stuff["${_id}"]=${_val}
             done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
             stuff["pass"]=${password}
@@ -253,7 +253,7 @@ else unset helptext; mainMenu; fi
 
 typeMenu () {
     checkIfPass
-    typefield=$(echo -e "< Return\n---\npassword\n$(pass "${selected_password}" | grep -P ':[\t ]' | awk -F ':' '{ print $1 }')" | _rofi -dmenu -p "Choose Field to type > ")
+    typefield=$(echo -e "< Return\n---\npassword\n$(pass "${selected_password}" | grep -P ':[\t ]' | gawk -F ':' '{ print $1 }')" | _rofi -dmenu -p "Choose Field to type > ")
     if [[ $typefield == "" ]]; then exit;
     elif [[ $typefield == "password" ]]; then typePass;
     elif [[ $typefield == "< Return" ]]; then mainMenu;
@@ -263,7 +263,7 @@ typeMenu () {
 
 copyMenu () {
     checkIfPass
-    copyfield=$(echo -e "< Return\n---\npassword\n$(pass "${selected_password}" | grep -P ':[\t ]' | awk -F ':' '{ print $1 }')" | _rofi -dmenu -p "Choose Field to copy > ")
+    copyfield=$(echo -e "< Return\n---\npassword\n$(pass "${selected_password}" | grep -P ':[\t ]' | gawk -F ':' '{ print $1 }')" | _rofi -dmenu -p "Choose Field to copy > ")
     if [[ $copyfield == "" ]]; then exit;
     elif [[ $copyfield == "password" ]]; then copyPass;
     elif [[ $copyfield == "< Return" ]]; then mainMenu;
@@ -292,14 +292,14 @@ showEntry () {
     declare -A stuff
 
     while read LINE; do
-        _id=$(echo -e "${LINE}" | awk -F ':[[:space:]]*' '{print $1}')
-        _val=$(echo -e "${LINE}" | awk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
+        _id=$(echo -e "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
+        _val=$(echo -e "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
         stuff["${_id}"]=${_val}
 
     done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
     stuff["pass"]=${password}
 
-    word=$(echo "$bla" | awk -F': ' '{print $1}')
+    word=$(echo "$bla" | gawk -F': ' '{print $1}')
     if [[ ${rofi_exit} -eq 0 ]]; then
         if [[ $bla == "" ]]; then exit
         elif [[ $bla == "0  Return" ]]; then
@@ -500,7 +500,7 @@ fi
 
 # set help color
 if [[ $help_color == "" ]]; then
-    help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | awk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
+    help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | gawk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
 fi
 
 # check for BROWSER variable, use xdg-open as fallback
