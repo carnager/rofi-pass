@@ -41,8 +41,10 @@ autopass () {
         rm -f "/tmp/$USER-rofi-pass/last_used"
         echo "${root}: $selected_password" > "/tmp/$USER-rofi-pass/last_used"
         if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
-            echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
-            xdotool key Tab
+            if [[ "${stuff["${USERNAME_field}"]}" ]]; then
+                echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
+                xdotool key Tab
+            fi
             echo -n "${password}" | xdotool type --clearmodifiers --file -
             sleep 1
             if [[ ${auto_enter} == "true" ]]; then xdotool key Return; fi
