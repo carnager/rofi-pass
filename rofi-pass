@@ -291,7 +291,7 @@ actionMenu () {
 
 showEntry () {
     HELP="<span color='$help_color'>${type_entry}: Type Entry | ${copy_entry}: Copy Entry</span>"
-    bla=$(echo -e "0  Return\n---\n$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")" | _rofi -dmenu -mesg "${HELP}" -p "> ")
+    bla=$({ echo -e "0  Return\n---"; PASSWORD_STORE_DIR="${root}" pass "$selected_password";} | _rofi -dmenu -mesg "${HELP}" -p "> ")
     rofi_exit=$?
     password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password=$(echo "${password_temp}" | head -1)
