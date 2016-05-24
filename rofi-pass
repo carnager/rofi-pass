@@ -398,6 +398,9 @@ insertPass () {
     if [[ -z "$name" ]]; then name="Empty"; fi
 
     insertmenu=$(echo -e "0  Return to Main Menu\n*  Accept Values and Add Password Entry\n---\n1  Name ($name)\n2  URL ($domain)\n3  User ($user)\n4  Password ($pass2)" | _rofi -dmenu -mesg "<span color='$help_color'>For faster adding use the addpass command</span>" -p "Add Entry > ")
+    insert_val=$?
+    if [[ $insert_val -eq 1 ]]; then exit
+    else
     if [[ $insertmenu == "0  Return to Main Menu" ]]; then mainMenu
     elif [[ $insertmenu == "" ]]; then exit
     elif [[ $insertmenu == "*  Accept Values and Add Password Entry" ]]; then
@@ -437,6 +440,7 @@ insertPass () {
         password_gen
     else
         insertPass
+    fi
     fi
 }
 
