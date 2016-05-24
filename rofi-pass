@@ -398,10 +398,10 @@ insertPass () {
 
     if [[ "$group" == "No Group" ]]; then
         echo $EDITOR
-        echo -e "PASS\n---\nuser: $user" | pass insert -m "${name}" > /dev/null && pass generate -ni "${name}" "${password_length}" >/dev/null && pass edit "${name}"
+        echo -e "PASS\n---\nuser: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
     else
         echo $EDITOR
-        echo -e "PASS\n---\nuser: $user" | pass insert -m "${group}/${name}" > /dev/null && pass generate -ni "${group}/${name}" "${password_length}" >/dev/null && pass edit "${group}/${name}"
+        echo -e "PASS\n---\nuser: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${group}/${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
     fi
 }
 
