@@ -149,7 +149,7 @@ generatePass () {
 # main Menu
 mainMenu () {
     if [[ $1 == "--bmarks" ]]; then
-        selected_password="$(echo -e "$(list_passwords 2>/dev/null)" \
+        selected_password="$(list_passwords 2>/dev/null \
             | _rofi -mesg "Bookmarks Mode. ${switch} to switch" \
             -dmenu \
             -kb-custom-1 "Alt+x" \
@@ -167,12 +167,12 @@ mainMenu () {
         fi
     else
         unset selected_password
-        help_text=$(echo -e "Enter: Autotype - ${action_menu}: Actions - ${show}: View\n${type_menu}: Type Field - ${copy_menu}: Copy Field - ${help}: Help" | column -s '-' -t)
+        help_text=$({ echo -e "Enter: Autotype - ${action_menu}: Actions - ${show}: View"; echo "${type_menu}: Type Field - ${copy_menu}: Copy Field - ${help}: Help";} | column -s '-' -t)
         line1=$(echo "${help_text}" | head -1)
         line3=$(echo "${help_text}" | tail -1)
 HELP="<span color='$help_color'>${line1}
 ${line3}</span>"
-        selected_password="$(echo -e "[ Add Entry ]>\n---\n$(list_passwords 2>/dev/null)" \
+        selected_password="$({ echo -e "[ Add Entry ]>\n---"; list_passwords 2>/dev/null;} \
             | _rofi -mesg "${HELP}" \
             -dmenu -kb-custom-1 "${autotype}" \
             -kb-custom-2 "${type_user}" \
@@ -202,8 +202,8 @@ ${line3}</span>"
             password=$(echo "${password_temp}" | head -1)
             declare -A stuff
             while read -r LINE; do
-                _id=$(echo -e "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
-                _val=$(echo -e "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
+                _id=$(echo "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
+                _val=$(echo "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
                 stuff["${_id}"]=${_val}
             done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
             stuff["pass"]=${password}
@@ -259,7 +259,7 @@ else unset helptext; mainMenu; fi
 
 typeMenu () {
     checkIfPass
-    typefield=$(echo -e "< Return\n---\npassword\n$(pass "${selected_password}" | grep -P ':[\t ]' | gawk -F ':' '{ print $1 }')" | _rofi -dmenu -p "Choose Field to type > ")
+    typefield=$({ echo -e "< Return\n---\npassword"; pass "${selected_password}" | grep -P ':[\t ]' | gawk -F ':' '{ print $1 }';} | _rofi -dmenu -p "Choose Field to type > ")
     if [[ $typefield == "" ]]; then exit;
     elif [[ $typefield == "password" ]]; then typePass;
     elif [[ $typefield == "< Return" ]]; then mainMenu;
@@ -269,7 +269,7 @@ typeMenu () {
 
 copyMenu () {
     checkIfPass
-    copyfield=$(echo -e "< Return\n---\npassword\n$(pass "${selected_password}" | grep -P ':[\t ]' | gawk -F ':' '{ print $1 }')" | _rofi -dmenu -p "Choose Field to copy > ")
+    copyfield=$({ echo -e "< Return\n---\npassword"; pass "${selected_password}" | grep -P ':[\t ]' | gawk -F ':' '{ print $1 }';} | _rofi -dmenu -p "Choose Field to copy > ")
     if [[ $copyfield == "" ]]; then exit;
     elif [[ $copyfield == "password" ]]; then copyPass;
     elif [[ $copyfield == "< Return" ]]; then mainMenu;
@@ -291,15 +291,15 @@ actionMenu () {
 
 showEntry () {
     HELP="<span color='$help_color'>${type_entry}: Type Entry | ${copy_entry}: Copy Entry</span>"
-    bla=$(echo -e "0  Return\n---\n$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")" | _rofi -dmenu -mesg "${HELP}" -p "> ")
+    bla=$({ echo -e "0  Return\n---"; PASSWORD_STORE_DIR="${root}" pass "$selected_password";} | _rofi -dmenu -mesg "${HELP}" -p "> ")
     rofi_exit=$?
     password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password=$(echo "${password_temp}" | head -1)
     declare -A stuff
 
     while read -r LINE; do
-        _id=$(echo -e "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
-        _val=$(echo -e "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
+        _id=$(echo "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
+        _val=$(echo "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
         stuff["${_id}"]=${_val}
 
     done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
