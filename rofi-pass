@@ -187,6 +187,7 @@ ${line3}</span>"
             -kb-custom-15 "${copy_menu}" \
             -kb-custom-16 "${help}" \
             -kb-custom-17 "${switch}" \
+            -kb-custom-18 "${insert_pass}" \
             -dmenu \
             -select "$entry" \
             -p "rofi-pass > ")"
@@ -224,6 +225,7 @@ ${line3}</span>"
         elif [[ "${rofi_exit}" -eq 25 ]]; then unset selected_password; helpMenu;
         elif [[ "${rofi_exit}" -eq 24 ]]; then copyMenu;
         elif [[ "${rofi_exit}" -eq 26 ]]; then $(${basecommand} --bmarks);
+        elif [[ "${rofi_exit}" -eq 27 ]]; then insertPass;
         fi
         password=''
         selected_password=''
@@ -248,8 +250,10 @@ ${copy_menu}: Copy Custom Field
 ---
 ${action_menu}: Edit, Move, Delete, Re-generate Submenu
 ${show}: Show Password File
+${insert_pass}: Insert new Pass Entry
 ${switch}: Switch Pass/Bookmark Mode" | _rofi -dmenu -p "Help > ")
-if [[ $help == "" ]]; then exit;
+help_val=$?
+if [[ $help_val -eq 1 ]]; then exit;
 else unset helptext; mainMenu; fi
 }
 
