@@ -201,7 +201,7 @@ ${line3}</span>"
             password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
             password=$(echo "${password_temp}" | head -1)
             declare -A stuff
-            while read LINE; do
+            while read -r LINE; do
                 _id=$(echo -e "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
                 _val=$(echo -e "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
                 stuff["${_id}"]=${_val}
@@ -297,7 +297,7 @@ showEntry () {
     password=$(echo "${password_temp}" | head -1)
     declare -A stuff
 
-    while read LINE; do
+    while read -r LINE; do
         _id=$(echo -e "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
         _val=$(echo -e "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
         stuff["${_id}"]=${_val}
