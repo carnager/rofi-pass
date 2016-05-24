@@ -384,9 +384,14 @@ manageEntry () {
     fi
 }
 
+listgpg () {
+    find . -name \*.gpg -print | xargs -d '\n' -n 1 | cut -c 3- | while read line; do echo -e "$(basename "${line}")\t(In: "$(dirname "${line}")")"; done | column -s $'\t' -t
+}
+
 insertPass () {
     cd "${root}"
-    name="$(echo -e "$(list_passwords 2>/dev/null)" | rofi -dmenu -mesg "Type name, make sure it is unique" -p "> ")"
+    name="$(listgpg | rofi -dmenu -mesg "Type name, make sure it is unique" -p "> ")"
+#    name="$(echo -e "$(list_passwords 2>/dev/null)" | rofi -dmenu -mesg "Type name, make sure it is unique" -p "> ")"
     val=$?
     if [[ $val -eq 1 ]]; then exit; fi
     user=$(echo -e "${default_user2}\n$USER\n${default_user}" | rofi -dmenu -mesg "Chose Username or type" -p "> ")
