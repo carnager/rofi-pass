@@ -385,7 +385,7 @@ manageEntry () {
 }
 
 listgpg () {
-    find . -name \*.gpg -print | xargs -d '\n' -n 1 | cut -c 3- | while read line; do echo -e "$(basename "${line}")\t(In: "$(dirname "${line}")")"; done | column -s $'\t' -t
+    find . -name \*.gpg -print | xargs -d '\n' -n 1 | cut -c 3- | while read line; do echo -e "$(basename "${line%*.gpg}")\t(In: "$(dirname "${line}")")"; done | column -s $'\t' -t
 }
 
 insertPass () {
