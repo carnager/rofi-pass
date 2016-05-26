@@ -150,7 +150,7 @@ generatePass () {
 mainMenu () {
     if [[ $1 == "--bmarks" ]]; then
         selected_password="$(list_passwords 2>/dev/null \
-            | _rofi -mesg "Bookmarks Mode. ${switch} to switch" \
+            | _rofi -kb-accept-entry !Return -mesg "Bookmarks Mode. ${switch} to switch" \
             -dmenu \
             -kb-custom-1 "Alt+x" \
             -select "$entry" \
@@ -174,7 +174,7 @@ HELP="<span color='$help_color'>${line1}
 ${line3}</span>"
         selected_password="$({ echo -e "[ Add Entry ]>\n---"; list_passwords 2>/dev/null;} \
             | _rofi -mesg "${HELP}" \
-            -dmenu -kb-custom-1 "${autotype}" \
+            -dmenu -kb-accept-entry !Return -kb-custom-1 "${autotype}" \
             -kb-custom-2 "${type_user}" \
             -kb-custom-3 "${type_pass}" \
             -kb-custom-4 "${open_url}" \
@@ -259,7 +259,7 @@ else unset helptext; mainMenu; fi
 
 typeMenu () {
     checkIfPass
-    typefield=$({ echo -e "< Return\n---\npassword"; pass "${selected_password}" | grep -P ':[\t ]' | gawk -F ':' '{ print $1 }';} | _rofi -dmenu -p "Choose Field to type > ")
+    typefield=$({ echo -e "< Return\n---\npassword"; pass "${selected_password}" | grep -P ':[\t ]' | gawk -F ':' '{ print $1 }';} | _rofi -kb-accept-entry !Return -dmenu -p "Choose Field to type > ")
     if [[ $typefield == "" ]]; then exit;
     elif [[ $typefield == "password" ]]; then typePass;
     elif [[ $typefield == "< Return" ]]; then mainMenu;
@@ -269,7 +269,7 @@ typeMenu () {
 
 copyMenu () {
     checkIfPass
-    copyfield=$({ echo -e "< Return\n---\npassword"; pass "${selected_password}" | grep -P ':[\t ]' | gawk -F ':' '{ print $1 }';} | _rofi -dmenu -p "Choose Field to copy > ")
+    copyfield=$({ echo -e "< Return\n---\npassword"; pass "${selected_password}" | grep -P ':[\t ]' | gawk -F ':' '{ print $1 }';} | _rofi -kb-accept-entry !Return -dmenu -p "Choose Field to copy > ")
     if [[ $copyfield == "" ]]; then exit;
     elif [[ $copyfield == "password" ]]; then copyPass;
     elif [[ $copyfield == "< Return" ]]; then mainMenu;
@@ -279,7 +279,7 @@ copyMenu () {
 
 actionMenu () {
     checkIfPass
-    action=$(echo -e "< Return\n---\n1 Move Password File\n2 Delete Password File\\n3 Edit Password File\n4 Generate New Password" | _rofi -dmenu -p "Choose Action > ")
+    action=$(echo -e "< Return\n---\n1 Move Password File\n2 Delete Password File\\n3 Edit Password File\n4 Generate New Password" | _rofi -kb-accept-entry !Return -dmenu -p "Choose Action > ")
     if [[ ${action} == "1 Move Password File" ]]; then manageEntry move;
     elif [[ ${action} == "2 Delete Password File" ]]; then manageEntry delete;
     elif [[ ${action} == "3 Edit Password File" ]]; then manageEntry edit;
@@ -291,7 +291,7 @@ actionMenu () {
 
 showEntry () {
     HELP="<span color='$help_color'>${type_entry}: Type Entry | ${copy_entry}: Copy Entry</span>"
-    bla=$({ echo -e "0  Return\n---"; PASSWORD_STORE_DIR="${root}" pass "$selected_password";} | _rofi -dmenu -mesg "${HELP}" -p "> ")
+    bla=$({ echo -e "0  Return\n---"; PASSWORD_STORE_DIR="${root}" pass "$selected_password";} | _rofi -kb-accept-entry !Return -dmenu -mesg "${HELP}" -p "> ")
     rofi_exit=$?
     password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password=$(echo "${password_temp}" | head -1)
