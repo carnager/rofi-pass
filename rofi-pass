@@ -385,7 +385,7 @@ manageEntry () {
 }
 
 listgpg () {
-    find . -name \*.gpg -print | xargs -d '\n' -n 1 | cut -c 3- | while read line; do echo -e "$(basename "${line%*.gpg}")\t(In: "$(dirname "${line}")")"; done | column -s $'\t' -t
+    find . -name \*.gpg -print | cut -c 3- | while read line; do echo -e "$(basename "${line%*.gpg}")\t(In: "$(dirname "${line}")")"; done | column -s $'\t' -t
 }
 
 insertPass () {
@@ -403,10 +403,10 @@ insertPass () {
 
     if [[ "$group" == "No Group" ]]; then
         echo $EDITOR
-        echo -e "PASS\n---\nuser: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
+        echo -e "PASS\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
     else
         echo $EDITOR
-        echo -e "PASS\n---\nuser: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${group}/${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
+        echo -e "PASS\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${group}/${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
     fi
 }
 
