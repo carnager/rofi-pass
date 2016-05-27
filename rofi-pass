@@ -385,7 +385,7 @@ manageEntry () {
 }
 
 listgpg () {
-    find . -name \*.gpg -print | cut -c 3- | while read line; do echo -e "${line##*/}\t(In: ${line%%/*})"; done | sed 's/(.*.gpg)$//g' | sed 's/.gpg\t/\t/g' | column -s $'\t' -t
+    find . -name \*.gpg -print | cut -c 3- | while read line; do echo -e "${line##*/}\t(In: ${line%%/*})"; done | sed 's/(.*.gpg)$//g; s/.gpg\t/\t/g' | column -s $'\t' -t
 }
 
 insertPass () {
