@@ -259,21 +259,41 @@ else unset helptext; mainMenu; fi
 
 typeMenu () {
     checkIfPass
-    typefield=$({ echo -e "< Return\n---\npassword"; pass "${selected_password}" | grep -P ':[\t ]' | gawk -F ':' '{ print $1 }';} | _rofi -kb-accept-entry '!Return' -dmenu -p "Choose Field to type > ")
-    if [[ $typefield == "" ]]; then exit;
-    elif [[ $typefield == "password" ]]; then typePass;
-    elif [[ $typefield == "< Return" ]]; then mainMenu;
-    else typeField
+    typefield=$({ echo -e "< Return\n---\npassword"; \
+      pass "${selected_password}" \
+      | grep -P ':[\t ]' \
+      | gawk -F ':' '{ print $1 }';} \
+      | _rofi -kb-accept-entry '!Return' \
+      -dmenu \
+      -p "Choose Field to type > ")
+    if [[ $typefield == "" ]]; then
+      exit;
+    elif [[ $typefield == "password" ]]; then
+      typePass;
+    elif [[ $typefield == "< Return" ]]; then
+      mainMenu;
+    else
+      typeField
     fi
 }
 
 copyMenu () {
     checkIfPass
-    copyfield=$({ echo -e "< Return\n---\npassword"; pass "${selected_password}" | grep -P ':[\t ]' | gawk -F ':' '{ print $1 }';} | _rofi -kb-accept-entry '!Return' -dmenu -p "Choose Field to copy > ")
-    if [[ $copyfield == "" ]]; then exit;
-    elif [[ $copyfield == "password" ]]; then copyPass;
-    elif [[ $copyfield == "< Return" ]]; then mainMenu;
-    else copyField
+    copyfield=$({ echo -e "< Return\n---\npassword"; \
+      pass "${selected_password}" \
+      | grep -P ':[\t ]' \
+      | gawk -F ':' '{ print $1 }';} \
+      | _rofi -kb-accept-entry '!Return' \
+      -dmenu \
+      -p "Choose Field to copy > ")
+    if [[ $copyfield == "" ]]; then
+      exit;
+    elif [[ $copyfield == "password" ]]; then
+      copyPass;
+    elif [[ $copyfield == "< Return" ]]; then
+      mainMenu;
+    else
+      copyField
     fi
 }
 
@@ -389,6 +409,7 @@ listgpg () {
 }
 
 insertPass () {
+    url=$(xclip -o)
     cd "${root}"
     name="$(listgpg | rofi -dmenu -format 'f' -mesg "Type name, make sure it is unique" -p "> ")"
 #    name="$(echo -e "$(list_passwords 2>/dev/null)" | rofi -dmenu -mesg "Type name, make sure it is unique" -p "> ")"
@@ -402,11 +423,17 @@ insertPass () {
     if [[ $val -eq 1 ]]; then exit; fi
 
     if [[ "$group" == "No Group" ]]; then
-        echo $EDITOR
+      if [[ $url == http* ]]; then
+        echo -e "PASS\n---\n${USERNAME_field}: $user\n${URL_field}: $url" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
+      else
         echo -e "PASS\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
+      fi
     else
-        echo $EDITOR
+      if [[ $url == http* ]]; then
+        echo -e "PASS\n---\n${USERNAME_field}: $user\n${URL_field}: $url" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${group}/${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
+      else
         echo -e "PASS\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${group}/${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
+      fi
     fi
 }
 
