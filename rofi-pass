@@ -7,238 +7,259 @@ basecommand=$(echo "$0" | gawk '{ print $1 }')
 
 # get all password files and create an array
 list_passwords() {
-    cd "${root}" || exit
+  cd "${root}" || exit
     passwords=( **/*.gpg )
 
-    for password in "${passwords[@]}"; do
-        filename="${password}"
-        filename="${filename%.gpg}"
-        echo "$filename"
-    done
+  for password in "${passwords[@]}"; do
+    filename="${password}"
+    filename="${filename%.gpg}"
+    echo "$filename"
+  done
 }
 
 doClip () {
-    if [[ $clip == "primary" ]]; then xclip;
-    elif [[ $clip == "clipboard" ]]; then xclip -selection clipboard;
-    elif [[ $clip == "both" ]]; then xclip; xclip -o | xclip -selection clipboard;
-    fi
+  if [[ $clip == "primary" ]]; then
+    xclip
+  elif [[ $clip == "clipboard" ]]; then
+    xclip -selection clipboard;
+  elif [[ $clip == "both" ]]; then
+    xclip; xclip -o | xclip -selection clipboard;
+  fi
 }
 
 checkIfPass () {
-    if [[ $selected_password == "[ Add Entry ]>" ]]; then mainMenu;
-    elif [[ $selected_password == "---" ]]; then mainMenu;
-    else
-        rm -f "/tmp/$USER-rofi-pass/last_used"
-        echo "${root}: $selected_password" > "/tmp/$USER-rofi-pass/last_used"
-    fi
+  if [[ $selected_password == "[ Add Entry ]>" ]]; then
+    mainMenu;
+  elif [[ $selected_password == "---" ]]; then
+    mainMenu;
+  else
+    rm -f "/tmp/$USER-rofi-pass/last_used"
+    echo "${root}: $selected_password" > "/tmp/$USER-rofi-pass/last_used"
+  fi
 }
 
 
 autopass () {
-    if [[ ${selected_password} == "[ Add Entry ]>" ]]; then insertPass;
-    elif [[ ${selected_password} == "---" ]]; then mainMenu;
+  if [[ ${selected_password} == "[ Add Entry ]>" ]]; then
+    insertPass;
+  elif [[ ${selected_password} == "---" ]]; then
+    mainMenu;
+  else
+    rm -f "/tmp/$USER-rofi-pass/last_used"
+    echo "${root}: $selected_password" > "/tmp/$USER-rofi-pass/last_used"
+    if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
+      if [[ "${stuff["${USERNAME_field}"]}" ]]; then
+        echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
+        xdotool key Tab
+      fi
+      echo -n "${password}" | xdotool type --clearmodifiers --file -
+      sleep 1
+      if [[ ${auto_enter} == "true" ]]; then
+        xdotool key Return
+      fi
     else
-        rm -f "/tmp/$USER-rofi-pass/last_used"
-        echo "${root}: $selected_password" > "/tmp/$USER-rofi-pass/last_used"
-        if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
-            if [[ "${stuff["${USERNAME_field}"]}" ]]; then
-                echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
-                xdotool key Tab
-            fi
-            echo -n "${password}" | xdotool type --clearmodifiers --file -
-            sleep 1
-            if [[ ${auto_enter} == "true" ]]; then xdotool key Return; fi
+      echo "${stuff["$AUTOTYPE_field"]}"
+      for word in ${stuff["$AUTOTYPE_field"]}; do
+        if [[ $word == ":tab" ]]; then
+          xdotool key Tab;
+        elif [[ $word == ":space" ]]; then
+          xdotool key space
+        elif [[ $word == ":delay" ]]; then
+          sleep "${delay}";
+        elif [[ $word == ":enter" ]]; then
+          xdotool key Return;
+        elif [[ $word == "pass" ]]; then
+          echo -n "${password}" | xdotool type --clearmodifiers --file -;
         else
-            echo "${stuff["$AUTOTYPE_field"]}"
-            for word in ${stuff["$AUTOTYPE_field"]}; do
-                if [[ $word == ":tab" ]]; then xdotool key Tab;
-                elif [[ $word == ":space" ]]; then xdotool key space;
-                elif [[ $word == ":delay" ]]; then sleep "${delay}";
-                elif [[ $word == ":enter" ]]; then xdotool key Return;
-                elif [[ $word == "pass" ]]; then echo -n "${password}" | xdotool type --clearmodifiers --file -;
-                else echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
-                fi
-            done
-            if [[ ${auto_enter} == "true" ]]; then xdotool key Return; fi
+          echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
         fi
+      done
+      if [[ ${auto_enter} == "true" ]]; then
+        xdotool key Return
+      fi
     fi
+  fi
 }
 
 openURL () {
-    checkIfPass
-    $BROWSER "$(pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
+  checkIfPass
+  $BROWSER "$(pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
 }
 
 typeUser () {
-    checkIfPass
-    echo -n "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
+  checkIfPass
+  echo -n "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
 }
 
 typePass () {
-    checkIfPass
-    echo -n "${password}" | xdotool type --clearmodifiers --file -
-    if [[ $notify == "true" ]]; then
-        if [[ "${stuff[notify]}" == "false" ]]; then
-            :
-        else notify-send "rofi-pass" "finished typing password";
-        fi
-    elif [[ $notify == "false" ]]; then
-        if [[ "${stuff[notify]}" == "true" ]]; then notify-send "rofi-pass" "finished typing password";
-        else
-           :
-        fi
+  checkIfPass
+  echo -n "${password}" | xdotool type --clearmodifiers --file -
+  if [[ $notify == "true" ]]; then
+    if [[ "${stuff[notify]}" == "false" ]]; then
+      :
+    else
+      notify-send "rofi-pass" "finished typing password";
     fi
+  elif [[ $notify == "false" ]]; then
+    if [[ "${stuff[notify]}" == "true" ]]; then
+      notify-send "rofi-pass" "finished typing password";
+    else
+      :
+    fi
+  fi
 }
 
 typeField () {
-    checkIfPass
-    echo -n "${stuff[${typefield}]}" | xdotool type --clearmodifiers --file -
+  checkIfPass
+  echo -n "${stuff[${typefield}]}" | xdotool type --clearmodifiers --file -
 }
 
 copyUser () {
-    checkIfPass
-    echo -n "${stuff[${USERNAME_field}]}" | doClip
+  checkIfPass
+  echo -n "${stuff[${USERNAME_field}]}" | doClip
 }
 
 copyField () {
-    checkIfPass
-    echo -n "${stuff[${copyfield}]}" | doClip
+  checkIfPass
+  echo -n "${stuff[${copyfield}]}" | doClip
 }
 
 copyURL () {
-    checkIfPass
-    echo -n "${stuff[${URL_field}]}" | doClip
+  checkIfPass
+  echo -n "${stuff[${URL_field}]}" | doClip
 }
 
 copyPass () {
-    checkIfPass
-    echo -n "$password" | doClip
-    notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
-    $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+  checkIfPass
+  echo -n "$password" | doClip
+  notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
+  $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
 }
 
 viewEntry () {
-    checkIfPass
-    showEntry "${selected_password}"
+  checkIfPass
+  showEntry "${selected_password}"
 }
 
 generatePass () {
-    askGen () {
-        askGenMenu=$(echo -e "Yes\nNo" | rofi -dmenu -p "Generate new Password for ${selected_password}? > ")
-        if [[ $askGenMenu == "Yes" ]]; then
-            true
-        elif [[ $askGenMenu == "No" ]]; then
-            generatePass
-        fi
-    }
+  askGen () {
+    askGenMenu=$(echo -e "Yes\nNo" | rofi -dmenu -p "Generate new Password for ${selected_password}? > ")
+    if [[ $askGenMenu == "Yes" ]]; then
+      true
+    elif [[ $askGenMenu == "No" ]]; then
+      generatePass
+    fi
+  }
 
-    checkIfPass
-    symbols=$(echo -e "0  Cancel\n---\n1  Yes\n2  No" | rofi -dmenu -p "Use Symbols? > ")
-    if [[ $symbols == "0  Cancel" ]]; then mainMenu;
-    elif [[ $symbols == "1  Yes" ]]; then symbols="";
-    elif [[ $symbols == "2  No" ]]; then symbols="-n";
-    fi
-    HELP="<span color='$help_color'>Enter Number or hit Enter to use default length</span>"
-    length=$(echo -e "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${passlength}) > ")
-    askGen
-    if [[ $length == "" ]]; then pass generate ${symbols} -i "$selected_password" "${passlength}" > /dev/null;
-    else pass generate ${symbols} -i "$selected_password" "${length}" > /dev/null;
-    fi
+  checkIfPass
+  symbols=$(echo -e "0  Cancel\n---\n1  Yes\n2  No" | rofi -dmenu -p "Use Symbols? > ")
+  if [[ $symbols == "0  Cancel" ]]; then
+    mainMenu;
+  elif [[ $symbols == "1  Yes" ]]; then
+    symbols="";
+  elif [[ $symbols == "2  No" ]]; then
+    symbols="-n";
+  fi
+  HELP="<span color='$help_color'>Enter Number or hit Enter to use default length</span>"
+  length=$(echo -e "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${passlength}) > ")
+  askGen
+  if [[ $length == "" ]]; then
+    pass generate ${symbols} -i "$selected_password" "${passlength}" > /dev/null;
+  else
+    pass generate ${symbols} -i "$selected_password" "${length}" > /dev/null;
+  fi
 }
 
 # main Menu
 mainMenu () {
-    if [[ $1 == "--bmarks" ]]; then
-        selected_password="$(list_passwords 2>/dev/null \
-            | _rofi -kb-accept-entry '!Return' -mesg "Bookmarks Mode. ${switch} to switch" \
-            -dmenu \
-            -kb-custom-1 "Alt+x" \
-            -select "$entry" \
-            -p "rofi-pass > ")"
+  if [[ $1 == "--bmarks" ]]; then
+    selected_password="$(list_passwords 2>/dev/null \
+      | _rofi -kb-accept-entry '!Return' -mesg "Bookmarks Mode. ${switch} to switch" \
+      -dmenu \
+      -kb-custom-1 "Alt+x" \
+      -select "$entry" \
+      -p "rofi-pass > ")"
 
-        rofi_exit=$?
+    rofi_exit=$?
 
-        if [[ $rofi_exit -eq 1 ]]; then
-            exit
-        elif [[ $rofi_exit -eq 10 ]]; then
-            $(${basecommand})
-        elif [[ $rofi_exit -eq 0 ]]; then
-            openURL
-        fi
-    else
-        unset selected_password
-        help_text=$({ echo -e "Enter: Autotype - ${action_menu}: Actions - ${show}: View"; echo "${type_menu}: Type Field - ${copy_menu}: Copy Field - ${help}: Help";} | column -s '-' -t)
-        line1=$(echo "${help_text}" | head -1)
-        line3=$(echo "${help_text}" | tail -1)
-HELP="<span color='$help_color'>${line1}
-${line3}</span>"
-        selected_password="$({ echo -e "[ Add Entry ]>\n---"; list_passwords 2>/dev/null;} \
-            | _rofi -mesg "${HELP}" \
-            -dmenu -kb-accept-entry '!Return' -kb-custom-1 "${autotype}" \
-            -kb-custom-2 "${type_user}" \
-            -kb-custom-3 "${type_pass}" \
-            -kb-custom-4 "${open_url}" \
-            -kb-custom-5 "${copy_name}" \
-            -kb-custom-6 "${copy_pass}" \
-            -kb-custom-7 "${show}" \
-            -kb-custom-8 "${copy_url}" \
-            -kb-custom-13 "${type_menu}" \
-            -kb-custom-14 "${action_menu}" \
-            -kb-custom-15 "${copy_menu}" \
-            -kb-custom-16 "${help}" \
-            -kb-custom-17 "${switch}" \
-            -kb-custom-18 "${insert_pass}" \
-            -dmenu \
-            -select "$entry" \
-            -p "rofi-pass > ")"
-
-        rofi_exit=$?
-
-        if [[ ${selected_password} == "[ Add Entry ]>" ]]; then
-            :
-        else
-            # generate Array of fields
-            password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
-            password=$(echo "${password_temp}" | head -1)
-            declare -A stuff
-            while read -r LINE; do
-                _id=$(echo "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
-                _val=$(echo "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
-                stuff["${_id}"]=${_val}
-            done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
-            stuff["pass"]=${password}
-        fi
-
-        # actions based on keypresses
-        if [[ "${rofi_exit}" -eq 0 ]]; then ${default_do};
-        elif [[ "${rofi_exit}" -eq 13 ]]; then openURL;
-        elif [[ "${rofi_exit}" -eq 1 ]]; then exit ${rofi_exit};
-        elif [[ "${rofi_exit}" -eq 10 ]]; then autopass;
-        elif [[ "${rofi_exit}" -eq 11 ]]; then typeUser;
-        elif [[ "${rofi_exit}" -eq 12 ]]; then typePass;
-        elif [[ "${rofi_exit}" -eq 14 ]]; then copyUser;
-        elif [[ "${rofi_exit}" -eq 17 ]]; then copyURL;
-        elif [[ "${rofi_exit}" -eq 16 ]]; then viewEntry;
-        elif [[ "${rofi_exit}" -eq 15 ]]; then copyPass;
-        elif [[ "${rofi_exit}" -eq 22 ]]; then typeMenu;
-        elif [[ "${rofi_exit}" -eq 23 ]]; then actionMenu;
-        elif [[ "${rofi_exit}" -eq 25 ]]; then unset selected_password; helpMenu;
-        elif [[ "${rofi_exit}" -eq 24 ]]; then copyMenu;
-        elif [[ "${rofi_exit}" -eq 26 ]]; then $(${basecommand} --bmarks);
-        elif [[ "${rofi_exit}" -eq 27 ]]; then insertPass;
-        fi
-        password=''
-        selected_password=''
-        unset stuff
-        unset password
-        unset selected_password
-        unset password_temp
-        unset stuff
+    if [[ $rofi_exit -eq 1 ]]; then
+      exit
+    elif [[ $rofi_exit -eq 10 ]]; then
+      $(${basecommand})
+    elif [[ $rofi_exit -eq 0 ]]; then
+      openURL
     fi
+  else
+    unset selected_password
+    HELP="Welcome to rofi-pass. Use <span color='$help_color'>${insert_pass}</span> to create a new pass entry.
+To type User/Pass use <span color='$help_color'>Enter</span>. For more help hit <span color='$help_color'>${help}</span>."
+    selected_password="$(list_passwords 2>/dev/null \
+      | _rofi -mesg "${HELP}" \
+      -dmenu -kb-accept-entry '!Return' -kb-custom-1 "${autotype}" \
+      -kb-custom-2 "${type_user}" \
+      -kb-custom-3 "${type_pass}" \
+      -kb-custom-4 "${open_url}" \
+      -kb-custom-5 "${copy_name}" \
+      -kb-custom-6 "${copy_pass}" \
+      -kb-custom-7 "${show}" \
+      -kb-custom-8 "${copy_url}" \
+      -kb-custom-13 "${type_menu}" \
+      -kb-custom-14 "${action_menu}" \
+      -kb-custom-15 "${copy_menu}" \
+      -kb-custom-16 "${help}" \
+      -kb-custom-17 "${switch}" \
+      -kb-custom-18 "${insert_pass}" \
+      -dmenu \
+      -select "$entry" \
+      -p "rofi-pass > ")"
+
+    rofi_exit=$?
+
+    if [[ ${selected_password} == "[ Add Entry ]>" ]]; then
+      :
+    else
+      # generate Array of fields
+      password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
+      password=$(echo "${password_temp}" | head -1)
+      declare -A stuff
+      while read -r LINE; do
+        _id=$(echo "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
+        _val=$(echo "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
+        stuff["${_id}"]=${_val}
+      done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
+      stuff["pass"]=${password}
+    fi
+
+    # actions based on keypresses
+    if [[ "${rofi_exit}" -eq 0 ]]; then ${default_do};
+    elif [[ "${rofi_exit}" -eq 13 ]]; then openURL;
+    elif [[ "${rofi_exit}" -eq 1 ]]; then exit ${rofi_exit};
+    elif [[ "${rofi_exit}" -eq 10 ]]; then autopass;
+    elif [[ "${rofi_exit}" -eq 11 ]]; then typeUser;
+    elif [[ "${rofi_exit}" -eq 12 ]]; then typePass;
+    elif [[ "${rofi_exit}" -eq 14 ]]; then copyUser;
+    elif [[ "${rofi_exit}" -eq 17 ]]; then copyURL;
+    elif [[ "${rofi_exit}" -eq 16 ]]; then viewEntry;
+    elif [[ "${rofi_exit}" -eq 15 ]]; then copyPass;
+    elif [[ "${rofi_exit}" -eq 22 ]]; then typeMenu;
+    elif [[ "${rofi_exit}" -eq 23 ]]; then actionMenu;
+    elif [[ "${rofi_exit}" -eq 25 ]]; then unset selected_password; helpMenu;
+    elif [[ "${rofi_exit}" -eq 24 ]]; then copyMenu;
+    elif [[ "${rofi_exit}" -eq 26 ]]; then $(${basecommand} --bmarks);
+    elif [[ "${rofi_exit}" -eq 27 ]]; then insertPass;
+    fi
+    password=''
+    selected_password=''
+    unset stuff
+    unset password
+    unset selected_password
+    unset password_temp
+    unset stuff
+  fi
 }
 
 helpMenu () {
-    helptext=$(echo -e "${autotype}: Autotype
+  helptext=$(echo -e "${autotype}: Autotype
 ${type_user}: Type Username
 ${type_pass}: Type Password
 ${type_menu}: Type Custom Field
@@ -246,208 +267,220 @@ ${type_menu}: Type Custom Field
 ${copy_name}: Copy Username
 ${copy_pass}: Copy Password
 ${copy_url}: Copy URL
+${open_url}: Open URL
 ${copy_menu}: Copy Custom Field
 ---
 ${action_menu}: Edit, Move, Delete, Re-generate Submenu
 ${show}: Show Password File
 ${insert_pass}: Insert new Pass Entry
-${switch}: Switch Pass/Bookmark Mode" | _rofi -dmenu -p "Help > ")
+${switch}: Switch Pass/Bookmark Mode" | _rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > ")
 help_val=$?
 if [[ $help_val -eq 1 ]]; then exit;
 else unset helptext; mainMenu; fi
 }
 
 typeMenu () {
-    checkIfPass
-    typefield=$({ echo -e "< Return\n---\npassword"; \
-      pass "${selected_password}" \
-      | grep -P ':[\t ]' \
-      | gawk -F ':' '{ print $1 }';} \
-      | _rofi -kb-accept-entry '!Return' \
-      -dmenu \
-      -p "Choose Field to type > ")
-    if [[ $typefield == "" ]]; then
-      exit;
-    elif [[ $typefield == "password" ]]; then
-      typePass;
-    elif [[ $typefield == "< Return" ]]; then
-      mainMenu;
-    else
-      typeField
-    fi
+  checkIfPass
+  typefield=$({ echo -e "< Return\n---\npassword"; \
+    pass "${selected_password}" \
+    | grep -P ':[\t ]' \
+    | gawk -F ':' '{ print $1 }';} \
+    | _rofi -kb-accept-entry '!Return' \
+    -dmenu \
+    -p "Choose Field to type > ")
+  if [[ $typefield == "" ]]; then
+    exit;
+  elif [[ $typefield == "password" ]]; then
+    typePass;
+  elif [[ $typefield == "< Return" ]]; then
+    mainMenu;
+  else
+    typeField
+  fi
 }
 
 copyMenu () {
-    checkIfPass
-    copyfield=$({ echo -e "< Return\n---\npassword"; \
-      pass "${selected_password}" \
-      | grep -P ':[\t ]' \
-      | gawk -F ':' '{ print $1 }';} \
-      | _rofi -kb-accept-entry '!Return' \
-      -dmenu \
-      -p "Choose Field to copy > ")
-    if [[ $copyfield == "" ]]; then
-      exit;
-    elif [[ $copyfield == "password" ]]; then
-      copyPass;
-    elif [[ $copyfield == "< Return" ]]; then
-      mainMenu;
-    else
-      copyField
-    fi
+  checkIfPass
+  copyfield=$({ echo -e "< Return\n---\npassword"; \
+    pass "${selected_password}" \
+    | grep -P ':[\t ]' \
+    | gawk -F ':' '{ print $1 }';} \
+    | _rofi -kb-accept-entry '!Return' \
+    -dmenu \
+    -p "Choose Field to copy > ")
+  if [[ $copyfield == "" ]]; then
+    exit;
+  elif [[ $copyfield == "password" ]]; then
+    copyPass;
+  elif [[ $copyfield == "< Return" ]]; then
+    mainMenu;
+  else
+    copyField
+  fi
 }
 
 actionMenu () {
-    checkIfPass
-    action=$(echo -e "< Return\n---\n1 Move Password File\n2 Delete Password File\\n3 Edit Password File\n4 Generate New Password" | _rofi -kb-accept-entry '!Return' -dmenu -p "Choose Action > ")
-    if [[ ${action} == "1 Move Password File" ]]; then manageEntry move;
-    elif [[ ${action} == "2 Delete Password File" ]]; then manageEntry delete;
-    elif [[ ${action} == "3 Edit Password File" ]]; then manageEntry edit;
-    elif [[ ${action} == "4 Generate New Password" ]]; then generatePass;
-    elif [[ ${action} == "< Return" ]]; then mainMenu;
-    elif [[ ${action} == "" ]]; then exit
-    fi
+  checkIfPass
+  action=$(echo -e "< Return\n---\n1 Move Password File\n2 Delete Password File\\n3 Edit Password File\n4 Generate New Password" | _rofi -kb-accept-entry '!Return' -dmenu -p "Choose Action > ")
+  if [[ ${action} == "1 Move Password File" ]]; then
+    manageEntry move;
+  elif [[ ${action} == "2 Delete Password File" ]]; then
+    manageEntry delete;
+  elif [[ ${action} == "3 Edit Password File" ]]; then
+    manageEntry edit;
+  elif [[ ${action} == "4 Generate New Password" ]]; then
+    generatePass;
+  elif [[ ${action} == "< Return" ]]; then
+    mainMenu;
+  elif [[ ${action} == "" ]]; then
+    exit
+  fi
 }
 
 showEntry () {
-    HELP="<span color='$help_color'>${type_entry}: Type Entry | ${copy_entry}: Copy Entry</span>"
-    bla=$({ echo -e "0  Return\n---"; PASSWORD_STORE_DIR="${root}" pass "$selected_password";} | _rofi -kb-accept-entry '!Return' -dmenu -mesg "${HELP}" -p "> ")
-    rofi_exit=$?
-    password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
-    password=$(echo "${password_temp}" | head -1)
-    declare -A stuff
+  HELP="<span color='$help_color'>${type_entry}: Type Entry | ${copy_entry}: Copy Entry</span>"
+  bla=$({ echo -e "< Return\n---"; PASSWORD_STORE_DIR="${root}" pass "$selected_password";} | _rofi -kb-accept-entry '!Return' -dmenu -mesg "${HELP}" -p "> ")
+  rofi_exit=$?
+  password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
+  password=$(echo "${password_temp}" | head -1)
+  declare -A stuff
 
-    while read -r LINE; do
-        _id=$(echo "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
-        _val=$(echo "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
-        stuff["${_id}"]=${_val}
+  while read -r LINE; do
+    _id=$(echo "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
+    _val=$(echo "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
+    stuff["${_id}"]=${_val}
+  done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
+  stuff["pass"]=${password}
 
-    done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
-    stuff["pass"]=${password}
-
-    word=$(echo "$bla" | gawk -F': ' '{print $1}')
-    if [[ ${rofi_exit} -eq 0 ]]; then
-        if [[ $bla == "" ]]; then exit
-        elif [[ $bla == "0  Return" ]]; then
-            selected_password=""
-            mainMenu
-        fi
-    elif [[ ${rofi_exit} -eq 1 ]]; then
-        exit
-    elif [[ ${rofi_exit} -eq 11 ]]; then
-        if [[ ${bla} == "0  Return" ]]; then
-            echo "not doing anything"
-        else
-            if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
-                echo -n "$word" | doClip
-            else
-                echo -n "${stuff[${word}]}" | doClip
-            fi
-            notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
-            $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
-        exit
-
-        fi
-    elif  [[ ${rofi_exit} -eq 10 ]]; then
-        if [[ ${bla} == "0  Return" ]]; then
-            echo "not doing anything"
-        else
-            if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
-                xdotool type "${word}"
-        else
-            echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
-            xdotool key ctrl+alt
-            fi
-        fi
-        if [[ ${count} == "off" ]]; then
-            exit
-        else
-            sleep "${count}"
-        fi
-        showEntry
-    elif [[ ${rofi_exit} -eq 1 ]]; then
-        exit
+  word=$(echo "$bla" | gawk -F': ' '{print $1}')
+  if [[ ${rofi_exit} -eq 0 ]]; then
+    if [[ $bla == "" ]]; then
+      exit
+    elif [[ $bla == "< Return" ]]; then
+      selected_password=""
+      mainMenu
     fi
-    unset stuff
-    unset password
-    unset selected_password
-    unset password_temp
-    unset stuff
+  elif [[ ${rofi_exit} -eq 1 ]]; then
     exit
+  elif [[ ${rofi_exit} -eq 11 ]]; then
+    if [[ ${bla} == "< Return" ]]; then
+      echo "not doing anything"
+    else
+      if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
+        echo -n "$word" | doClip
+      else
+        echo -n "${stuff[${word}]}" | doClip
+      fi
+      notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
+      $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+      exit
+    fi
+  elif  [[ ${rofi_exit} -eq 10 ]]; then
+    if [[ ${bla} == "< Return" ]]; then
+      echo "not doing anything"
+    else
+      if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
+        xdotool type "${word}"
+      else
+        echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
+        xdotool key ctrl+alt
+      fi
+    fi
+    if [[ ${count} == "off" ]]; then
+      exit
+    else
+      sleep "${count}"
+    fi
+    showEntry
+  elif [[ ${rofi_exit} -eq 1 ]]; then
+    exit
+  fi
+  unset stuff
+  unset password
+  unset selected_password
+  unset password_temp
+  unset stuff
+  exit
 }
 
 manageEntry () {
-    if [[ "$1" == "edit" ]]; then
-        EDITOR=$EDITOR PASSWORD_STORE_DIR="${root}" pass edit "${selected_password}"
-        mainMenu
-
-    elif [[ $1 == "move" ]]; then
-        cd "${root}" || exit
-        selected_password2=$(basename "$selected_password" .gpg)
-        group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
-        if [[ $group == "" ]]; then exit; fi
-        PASSWORD_STORE_DIR="${root}" pass mv "$selected_password" "${group}"
-        mainMenu
-
-    elif [[ "$1" == "delete" ]]; then
-        HELP="<span color='$help_color'>Selected entry: ${selected_password}</span>"
-        ask=$(echo -e "Yes\nNo" | _rofi -mesg "${HELP}" -dmenu -p "Are You Sure? > ")
-        if [[ "$ask" == "Yes" ]]; then
-            PASSWORD_STORE_DIR="${root}" pass rm --force "${selected_password}"
-        elif [[ "$ask" == "No" ]]; then
-            mainMenu
-        elif [[ -z "$ask" ]]; then
-            exit
-        fi
-    else
-        mainMenu
+  if [[ "$1" == "edit" ]]; then
+    EDITOR=$EDITOR PASSWORD_STORE_DIR="${root}" pass edit "${selected_password}"
+    mainMenu
+  elif [[ $1 == "move" ]]; then
+    cd "${root}" || exit
+    selected_password2=$(basename "$selected_password" .gpg)
+    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
+    if [[ $group == "" ]]; then
+      exit
     fi
+    PASSWORD_STORE_DIR="${root}" pass mv "$selected_password" "${group}"
+      mainMenu
+  elif [[ "$1" == "delete" ]]; then
+    HELP="<span color='$help_color'>Selected entry: ${selected_password}</span>"
+    ask=$(echo -e "Yes\nNo" | _rofi -mesg "${HELP}" -dmenu -p "Are You Sure? > ")
+    if [[ "$ask" == "Yes" ]]; then
+      PASSWORD_STORE_DIR="${root}" pass rm --force "${selected_password}"
+    elif [[ "$ask" == "No" ]]; then
+      mainMenu
+    elif [[ -z "$ask" ]]; then
+      exit
+    fi
+  else
+    mainMenu
+  fi
 }
 
 listgpg () {
-    find . -name \*.gpg -print | cut -c 3- | while read line; do echo -e "${line##*/}\t(In: ${line%%/*})"; done | sed 's/(.*.gpg)$//g; s/.gpg\t/\t/g' | column -s $'\t' -t
+  find . -name \*.gpg -print | cut -c 3- | while read line; do echo -e "${line##*/}\t(In: ${line%%/*})"; done | sed 's/(.*.gpg)$//g; s/.gpg\t/\t/g' | column -s $'\t' -t
 }
 
 insertPass () {
-    url=$(xclip -o)
-    cd "${root}"
-    name="$(listgpg | rofi -dmenu -format 'f' -mesg "Type name, make sure it is unique" -p "> ")"
-#    name="$(echo -e "$(list_passwords 2>/dev/null)" | rofi -dmenu -mesg "Type name, make sure it is unique" -p "> ")"
-    val=$?
-    if [[ $val -eq 1 ]]; then exit; fi
-    user=$(echo -e "${default_user2}\n$USER\n${default_user}" | rofi -dmenu -mesg "Chose Username or type" -p "> ")
-    val=$?
-    if [[ $val -eq 1 ]]; then exit; fi
-    group=$(echo -e "No Group\n---\n$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)" | rofi -dmenu -p "Choose Group > ")
-    val=$?
-    if [[ $val -eq 1 ]]; then exit; fi
+  url=$(xclip -o)
+  cd "${root}"
+  name="$(listgpg | rofi -dmenu -format 'f' -mesg "Type name, make sure it is unique" -p "> ")"
+#  name="$(echo -e "$(list_passwords 2>/dev/null)" | rofi -dmenu -mesg "Type name, make sure it is unique" -p "> ")"
+  val=$?
+  if [[ $val -eq 1 ]]; then
+    exit
+  fi
+  user=$(echo -e "${default_user2}\n$USER\n${default_user}" | rofi -dmenu -mesg "Chose Username or type" -p "> ")
+  val=$?
+  if [[ $val -eq 1 ]]; then
+    exit
+  fi
+  group=$(echo -e "No Group\n---\n$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)" | rofi -dmenu -p "Choose Group > ")
+  val=$?
+  if [[ $val -eq 1 ]]; then
+    exit
+  fi
 
-    if [[ "$group" == "No Group" ]]; then
-      if [[ $url == http* ]]; then
-        echo -e "PASS\n---\n${USERNAME_field}: $user\n${URL_field}: $url" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
-      else
-        echo -e "PASS\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
-      fi
+  if [[ "$group" == "No Group" ]]; then
+    if [[ $url == http* ]]; then
+      echo -e "PASS\n---\n${USERNAME_field}: $user\n${URL_field}: $url" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
     else
-      if [[ $url == http* ]]; then
-        echo -e "PASS\n---\n${USERNAME_field}: $user\n${URL_field}: $url" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${group}/${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
-      else
-        echo -e "PASS\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${group}/${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
-      fi
+      echo -e "PASS\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
     fi
+  else
+    if [[ $url == http* ]]; then
+      echo -e "PASS\n---\n${USERNAME_field}: $user\n${URL_field}: $url" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${group}/${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
+    else
+      echo -e "PASS\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${group}/${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
+    fi
+  fi
 }
 
 help_msg () {
-    echo "rofi-pass (Version: 1.2)"
-    echo ""
-    echo -e "Usage:\n"
-    echo "--insert         insert new entry to password store"
-    echo "--manage         edit/move/delete entries"
-    echo -e "--root           set custom root directory"
-    echo "--last-used      highlight last used item"
-    echo "--show-last      show details of last used Entry"
-    echo "--bmarks         run bookmarks Mode"
-    echo ""
+  echo "rofi-pass (Version: 1.2)"
+  echo ""
+  echo -e "Usage:\n"
+  echo "--insert         insert new entry to password store"
+  echo "--manage         edit/move/delete entries"
+  echo -e "--root           set custom root directory"
+  echo "--last-used      highlight last used item"
+  echo "--show-last      show details of last used Entry"
+  echo "--bmarks         run bookmarks Mode"
+  echo ""
 }
 
 main () {
@@ -456,78 +489,78 @@ shopt -s nullglob globstar
 
 # check if global config exists and load it
 if [[ -f /etc/rofi-pass.conf ]]; then
-    source /etc/rofi-pass.conf
+  source /etc/rofi-pass.conf
 fi
 
 # check if local config exists and load it
 if [[ -f "$HOME/.config/rofi-pass/config" ]]; then
-    source "$HOME/.config/rofi-pass/config"
+  source "$HOME/.config/rofi-pass/config"
 fi
 
 # create tmp dir
 if [[ ! -d /tmp/$USER-rofi-pass ]]; then
-    mkdir "/tmp/$USER-rofi-pass"
+  mkdir "/tmp/$USER-rofi-pass"
 fi
 
 # set help color
 if [[ $help_color == "" ]]; then
-    help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | gawk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
+  help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | gawk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
 fi
 
 # check for BROWSER variable, use xdg-open as fallback
 if [[ -z $BROWSER ]]; then
-    export BROWSER=xdg-open
+  export BROWSER=xdg-open
 fi
 
 if [[ -z ${count} ]]; then
-    count=2
+  count=2
 fi
 
 # check if alternative root directory was given on commandline
 if [[ -r "/tmp/$USER-rofi-pass/last_used" ]] && [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
-    export root; root=$(awk -F ': ' '{ print $1 }' "/tmp/$USER-rofi-pass/last_used")
+  export root; root=$(awk -F ': ' '{ print $1 }' "/tmp/$USER-rofi-pass/last_used")
 elif [[ -n "$2" && "$1" == "--root" ]]; then
-    export root="${2}"
+  export root="${2}"
 elif [[ -n $root ]]; then
-    export root="${root}"
+  export root="${root}"
 elif [[ -n ${PASSWORD_STORE_DIR} ]]; then
-    export root=${PASSWORD_STORE_DIR}
+  export root=${PASSWORD_STORE_DIR}
 else
-    export root="$HOME/.password-store"
+  export root="$HOME/.password-store"
 fi
 export PASSWORD_STORE_DIR="${root}"
-    case $1 in
+  case $1 in
     --insert)
-        insertPass
-        ;;
+      insertPass
+      ;;
     --root)
-        mainMenu
-        ;;
+      mainMenu
+      ;;
     --manage)
-        manageEntry
-        ;;
+      manageEntry
+      ;;
     --help)
-        help_msg
-        ;;
+      help_msg
+      ;;
     --last-used)
-        if [[ -r "/tmp/$USER-rofi-pass/last_used" ]]; then
-            entry="$(awk -F ': ' '{ print $2 }' "/tmp/$USER-rofi-pass/last_used")"
-        fi
-        mainMenu
-        ;;
+      if [[ -r "/tmp/$USER-rofi-pass/last_used" ]]; then
+        entry="$(awk -F ': ' '{ print $2 }' "/tmp/$USER-rofi-pass/last_used")"
+      fi
+      mainMenu
+      ;;
     --show-last)
-        if [[ -r "/tmp/$USER-rofi-pass/last_used" ]]; then
-            selected_password="$(awk -F ': ' '{ print $2 }' "/tmp/$USER-rofi-pass/last_used")" showEntry
-        else
-            mainMenu
-        fi
-        ;;
-    --bmarks)
-        mainMenu --bmarks;
-        ;;
-    *)
+      if [[ -r "/tmp/$USER-rofi-pass/last_used" ]]; then
+        selected_password="$(awk -F ': ' '{ print $2 }' "/tmp/$USER-rofi-pass/last_used")" showEntry
+      else
         mainMenu
-        ;;
+      fi
+      ;;
+    --bmarks)
+      mainMenu --bmarks;
+      ;;
+    *)
+      mainMenu
+      ;;
 esac
 }
 main "$@"
