@@ -500,7 +500,7 @@ if [[ -f "$HOME/.config/rofi-pass/config" ]]; then
 fi
 
 # create tmp dir
-if [[ ! -d $HOME/.cache/rofi-pass ]]; then
+if [[ ! -d "$HOME/.cache/rofi-pass" ]]; then
   mkdir "$HOME/.cache/rofi-pass"
 fi
 
