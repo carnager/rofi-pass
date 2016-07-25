@@ -41,44 +41,38 @@ checkIfPass () {
 
 
 autopass () {
-  if [[ ${selected_password} == "[ Add Entry ]>" ]]; then
-    insertPass;
-  elif [[ ${selected_password} == "---" ]]; then
-    mainMenu;
+  rm -f "$HOME/.cache/rofi-pass/last_used"
+  echo "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
+  chmod 600 "$HOME/.cache/rofi-pass/last_used"
+  if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
+    if [[ "${stuff["${USERNAME_field}"]}" ]]; then
+      echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
+      xdotool key Tab
+    fi
+    echo -n "${password}" | xdotool type --clearmodifiers --file -
+    sleep 1
+    if [[ ${auto_enter} == "true" ]]; then
+      xdotool key Return
+    fi
   else
-    rm -f "$HOME/.cache/rofi-pass/last_used"
-    echo "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
-    chmod 600 "$HOME/.cache/rofi-pass/last_used"
-    if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
-      if [[ "${stuff["${USERNAME_field}"]}" ]]; then
-        echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
-        xdotool key Tab
+    echo "${stuff["$AUTOTYPE_field"]}"
+    for word in ${stuff["$AUTOTYPE_field"]}; do
+      if [[ $word == ":tab" ]]; then
+        xdotool key Tab;
+      elif [[ $word == ":space" ]]; then
+        xdotool key space
+      elif [[ $word == ":delay" ]]; then
+        sleep "${delay}";
+      elif [[ $word == ":enter" ]]; then
+        xdotool key Return;
+      elif [[ $word == "pass" ]]; then
+        echo -n "${password}" | xdotool type --clearmodifiers --file -;
+      else
+        echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
       fi
-      echo -n "${password}" | xdotool type --clearmodifiers --file -
-      sleep 1
-      if [[ ${auto_enter} == "true" ]]; then
-        xdotool key Return
-      fi
-    else
-      echo "${stuff["$AUTOTYPE_field"]}"
-      for word in ${stuff["$AUTOTYPE_field"]}; do
-        if [[ $word == ":tab" ]]; then
-          xdotool key Tab;
-        elif [[ $word == ":space" ]]; then
-          xdotool key space
-        elif [[ $word == ":delay" ]]; then
-          sleep "${delay}";
-        elif [[ $word == ":enter" ]]; then
-          xdotool key Return;
-        elif [[ $word == "pass" ]]; then
-          echo -n "${password}" | xdotool type --clearmodifiers --file -;
-        else
-          echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
-        fi
-      done
-      if [[ ${auto_enter} == "true" ]]; then
-        xdotool key Return
-      fi
+    done
+    if [[ ${auto_enter} == "true" ]]; then
+      xdotool key Return
     fi
   fi
 }
@@ -217,47 +211,49 @@ To perform default action use <span color='$help_color'>Enter</span>. For more h
 
     rofi_exit=$?
 
-    if [[ ${selected_password} == "[ Add Entry ]>" ]]; then
-      :
-    else
-      # generate Array of fields
-      password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
-      password=$(echo "${password_temp}" | head -1)
-      declare -A stuff
-      while read -r LINE; do
-        _id=$(echo "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
-        _val=$(echo "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
-        stuff["${_id}"]=${_val}
-      done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
-      stuff["pass"]=${password}
-    fi
-
-    # actions based on keypresses
-    if [[ "${rofi_exit}" -eq 0 ]]; then ${default_do};
-    elif [[ "${rofi_exit}" -eq 13 ]]; then openURL;
-    elif [[ "${rofi_exit}" -eq 1 ]]; then exit ${rofi_exit};
-    elif [[ "${rofi_exit}" -eq 10 ]]; then autopass;
-    elif [[ "${rofi_exit}" -eq 11 ]]; then typeUser;
-    elif [[ "${rofi_exit}" -eq 12 ]]; then typePass;
-    elif [[ "${rofi_exit}" -eq 14 ]]; then copyUser;
-    elif [[ "${rofi_exit}" -eq 17 ]]; then copyURL;
-    elif [[ "${rofi_exit}" -eq 16 ]]; then viewEntry;
-    elif [[ "${rofi_exit}" -eq 15 ]]; then copyPass;
-    elif [[ "${rofi_exit}" -eq 22 ]]; then typeMenu;
-    elif [[ "${rofi_exit}" -eq 23 ]]; then actionMenu;
-    elif [[ "${rofi_exit}" -eq 25 ]]; then unset selected_password; helpMenu;
-    elif [[ "${rofi_exit}" -eq 24 ]]; then copyMenu;
-    elif [[ "${rofi_exit}" -eq 26 ]]; then $(${basecommand} --bmarks);
-    elif [[ "${rofi_exit}" -eq 27 ]]; then insertPass;
-    fi
-    password=''
-    selected_password=''
-    unset stuff
-    unset password
-    unset selected_password
-    unset password_temp
-    unset stuff
+    # generate Array of fields
+    password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
+    password=$(echo "${password_temp}" | head -1)
+    declare -A stuff
+    while read -r LINE; do
+      _id=$(echo "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
+      _val=$(echo "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
+      stuff["${_id}"]=${_val}
+    done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
+    stuff["pass"]=${password}
   fi
+  if test "${stuff['autotype']+autotype}"
+    then
+        :
+    else
+        stuff["autotype"]="user :tab pass"
+  fi;
+
+  # actions based on keypresses
+  if [[ "${rofi_exit}" -eq 0 ]]; then typeMenu;
+  elif [[ "${rofi_exit}" -eq 13 ]]; then openURL;
+  elif [[ "${rofi_exit}" -eq 1 ]]; then exit ${rofi_exit};
+  elif [[ "${rofi_exit}" -eq 10 ]]; then autopass;
+  elif [[ "${rofi_exit}" -eq 14 ]]; then copyMenu;
+  elif [[ "${rofi_exit}" -eq 11 ]]; then typeUser;
+  elif [[ "${rofi_exit}" -eq 12 ]]; then typePass;
+  elif [[ "${rofi_exit}" -eq 17 ]]; then copyURL;
+  elif [[ "${rofi_exit}" -eq 16 ]]; then viewEntry;
+  elif [[ "${rofi_exit}" -eq 15 ]]; then copyPass;
+  elif [[ "${rofi_exit}" -eq 22 ]]; then typeMenu;
+  elif [[ "${rofi_exit}" -eq 23 ]]; then actionMenu;
+  elif [[ "${rofi_exit}" -eq 25 ]]; then unset selected_password; helpMenu;
+  elif [[ "${rofi_exit}" -eq 24 ]]; then copyMenu;
+  elif [[ "${rofi_exit}" -eq 26 ]]; then $(${basecommand} --bmarks);
+  elif [[ "${rofi_exit}" -eq 27 ]]; then insertPass;
+  fi
+  password=''
+  selected_password=''
+  unset stuff
+  unset password
+  unset selected_password
+  unset password_temp
+  unset stuff
 }
 
 helpMenu () {
@@ -283,19 +279,17 @@ else unset helptext; mainMenu; fi
 
 typeMenu () {
   checkIfPass
-  typefield=$({ echo -e "< Return\n---\npassword"; \
-    pass "${selected_password}" \
-    | grep -P ':[\t ]' \
-    | gawk -F ':' '{ print $1 }';} \
-    | _rofi -kb-accept-entry '!Return' \
-    -dmenu \
-    -p "Choose Field to type > ")
+  typefield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -kb-accept-entry '!Return' -dmenu  -p "Choose Field to type > ")
+  val=$?
+  if [[ $val -eq 1 ]]; then
+    exit
+  fi
   if [[ $typefield == "" ]]; then
     exit;
   elif [[ $typefield == "password" ]]; then
-    typePass;
-  elif [[ $typefield == "< Return" ]]; then
-    mainMenu;
+      typePass;
+  elif [[ $typefield == "${AUTOTYPE_field}" ]]; then
+      autopass
   else
     typeField
   fi
@@ -303,23 +297,17 @@ typeMenu () {
 
 copyMenu () {
   checkIfPass
-  copyfield=$({ echo -e "< Return\n---\npassword"; \
-    pass "${selected_password}" \
-    | grep -P ':[\t ]' \
-    | gawk -F ':' '{ print $1 }';} \
-    | _rofi -kb-accept-entry '!Return' \
-    -dmenu \
-    -p "Choose Field to copy > ")
-  if [[ $copyfield == "" ]]; then
+  copyfield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -kb-accept-entry '!Return' -dmenu  -p "Choose Field to type > ")
+  val=$?
+  if [[ $val -eq 1 ]]; then
     exit;
-  elif [[ $copyfield == "password" ]]; then
+  fi
+  if [[ $copyfield == "password" ]]; then
     copyPass;
-  elif [[ $copyfield == "< Return" ]]; then
-    mainMenu;
   else
     copyField
-  fi
-}
+  fi 
+}    
 
 actionMenu () {
   checkIfPass
