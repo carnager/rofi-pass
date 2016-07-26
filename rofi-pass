@@ -28,15 +28,9 @@ doClip () {
 }
 
 checkIfPass () {
-  if [[ $selected_password == "[ Add Entry ]>" ]]; then
-    mainMenu;
-  elif [[ $selected_password == "---" ]]; then
-    mainMenu;
-  else
     rm -f "$HOME/.cache/rofi-pass/last_used"
     echo "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
     chmod 600 "$HOME/.cache/rofi-pass/last_used"
-  fi
 }
 
 
@@ -213,13 +207,13 @@ Type field of entry with <span color='$help_color'>Enter</span>. For more help h
 
     # generate Array of fields
     password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
-    password=$(echo "${password_temp}" | head -1)
+    password="${password_temp%%$'\n'*}"
     declare -A stuff
     while read -r LINE; do
-      _id=$(echo "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
-      _val=$(echo "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
+      _id="${LINE%%: *}"
+      _val="${LINE#* }"
       stuff["${_id}"]=${_val}
-    done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
+    done < <(echo "${password_temp}" | tail -n+2 | grep -P '(: |:\t)' )
     stuff["pass"]=${password}
   fi
   if test "${stuff['autotype']+autotype}"
@@ -247,6 +241,9 @@ Type field of entry with <span color='$help_color'>Enter</span>. For more help h
   elif [[ "${rofi_exit}" -eq 26 ]]; then $(${basecommand} --bmarks);
   elif [[ "${rofi_exit}" -eq 27 ]]; then insertPass;
   fi
+}
+
+clearUp () {
   password=''
   selected_password=''
   unset stuff
