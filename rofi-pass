@@ -306,8 +306,8 @@ copyMenu () {
     copyPass;
   else
     copyField
-  fi 
-}    
+  fi
+}
 
 actionMenu () {
   checkIfPass
