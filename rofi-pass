@@ -337,23 +337,25 @@ actionMenu () {
 
 showEntry () {
   HELP="<span color='${help_color}'>${copy_entry}: Copy Entry</span>"
-  bla=$(echo -e "${pass_content}" | _rofi -kb-accept-entry '!Return' -dmenu -mesg "${HELP}" -p "> ")
+  bla=$(echo -e "< Return\n${pass_content}" | _rofi -kb-accept-entry '!Return' -dmenu -mesg "Enter: Copy entry to clipboard" -p "> ")
   rofi_exit=$?
 
   word=$(echo "$bla" | gawk -F': ' '{print $1}')
-  if [[ ${rofi_exit} -eq 0 ]]; then
-    mainMenu
-  elif [[ ${rofi_exit} -eq 1 ]]; then
+  if [[ ${rofi_exit} -eq 1 ]]; then
     exit
-  elif [[ ${rofi_exit} -eq 11 ]]; then
-    if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
-      echo -n "$word" | doClip
+  elif [[ ${rofi_exit} -eq 0 ]]; then
+    if [[ ${bla} == "< Return" ]]; then
+      mainMenu
     else
-      echo -n "${stuff[${word}]}" | doClip
+      if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
+        echo -n "$word" | doClip
+      else
+        echo -n "${stuff[${word}]}" | doClip
+      fi
+      notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
+      $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+      exit
     fi
-    notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
-    $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
-    exit
   fi
   exit
   unset stuff
