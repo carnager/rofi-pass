@@ -4,13 +4,6 @@
 # (c) 2015 Rasmus Steinke <rasi@xssn.at>
 basecommand=$(echo "$0" | gawk '{ print $1 }')
 
-case "$OSTYPE" in
-  *bsd*) GREP='/usr/local/bin/grep' ;;
-  linux*) GREP='/usr/bin/grep' ;;
-  darwin*) GREP='/usr/bin/ggrep' ;;
-  *) echo 'OS not supported, patches welcome' && exit 1 ;;
-esac
-
 # get all password files and create an array
 list_passwords() {
   cd "${root}" || exit
@@ -80,7 +73,7 @@ autopass () {
 
 openURL () {
   checkIfPass
-  $BROWSER "$(pass "$selected_password" | $GREP "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
+  $BROWSER "$(pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
   clearUp
 }
 
@@ -220,12 +213,13 @@ Type field of entry with <span color='$help_color'>Enter</span>. For more help h
     # generate Array of fields
     password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password="${password_temp%%$'\n'*}"
+    pass_key_value=$(echo "${password_temp}" | tail -n+2 | grep ': ' | while read line; do echo "${line%%: *}: ${line#* }"; done)
     declare -A stuff
     while read -r LINE; do
       _id="${LINE%%: *}"
       _val="${LINE#* }"
       stuff["${_id}"]=${_val}
-    done < <(echo "${password_temp}" | tail -n+2 | $GREP -P '(: |:\t)' )
+    done < <(echo "${pass_key_value}")
     stuff["pass"]=${password}
     if test "${stuff['autotype']+autotype}"
       then
@@ -234,6 +228,7 @@ Type field of entry with <span color='$help_color'>Enter</span>. For more help h
           stuff["autotype"]="user :tab pass"
     fi
   fi
+  pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
 
   # actions based on keypresses
   if [[ "${rofi_exit}" -eq 0 ]]; then typeMenu;
@@ -339,63 +334,26 @@ actionMenu () {
 }
 
 showEntry () {
-  HELP="<span color='$help_color'>${type_entry}: Type Entry | ${copy_entry}: Copy Entry</span>"
-  bla=$({ echo -e "< Return\n---"; PASSWORD_STORE_DIR="${root}" pass "$selected_password";} | _rofi -kb-accept-entry '!Return' -dmenu -mesg "${HELP}" -p "> ")
+  HELP="<span color='${help_color}'>${copy_entry}: Copy Entry</span>"
+  bla=$(echo -e "${pass_content}" | _rofi -kb-accept-entry '!Return' -dmenu -mesg "${HELP}" -p "> ")
   rofi_exit=$?
-  password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
-  password=$(echo "${password_temp}" | head -1)
-  declare -A stuff
-
-  while read -r LINE; do
-    _id=$(echo "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
-    _val=$(echo "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
-    stuff["${_id}"]=${_val}
-  done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | $GREP -P '(: |:\t)' )
-  stuff["pass"]=${password}
 
   word=$(echo "$bla" | gawk -F': ' '{print $1}')
   if [[ ${rofi_exit} -eq 0 ]]; then
-    if [[ $bla == "" ]]; then
-      exit
-    elif [[ $bla == "< Return" ]]; then
-      selected_password=""
-      mainMenu
-    fi
+    exit
   elif [[ ${rofi_exit} -eq 1 ]]; then
     exit
   elif [[ ${rofi_exit} -eq 11 ]]; then
-    if [[ ${bla} == "< Return" ]]; then
-      echo "not doing anything"
+    if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
+      echo -n "$word" | doClip
     else
-      if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
-        echo -n "$word" | doClip
-      else
-        echo -n "${stuff[${word}]}" | doClip
-      fi
-      notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
-      $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
-      exit
+      echo -n "${stuff[${word}]}" | doClip
     fi
-  elif  [[ ${rofi_exit} -eq 10 ]]; then
-    if [[ ${bla} == "< Return" ]]; then
-      echo "not doing anything"
-    else
-      if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
-        xdotool type "${word}"
-      else
-        echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
-        xdotool key ctrl+alt
-      fi
-    fi
-    if [[ ${count} == "off" ]]; then
-      exit
-    else
-      sleep "${count}"
-    fi
-    showEntry
-  elif [[ ${rofi_exit} -eq 1 ]]; then
+    notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
+    $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
     exit
   fi
+  exit
   unset stuff
   unset password
   unset selected_password
@@ -505,7 +463,7 @@ fi
 
 # set help color
 if [[ $help_color == "" ]]; then
-  help_color=$(rofi -dump-xresources | $GREP 'rofi.color.normal' | gawk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
+  help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | gawk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
 fi
 
 # check for BROWSER variable, use xdg-open as fallback
