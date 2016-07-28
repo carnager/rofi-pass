@@ -210,6 +210,9 @@ Type field of entry with <span color='$help_color'>Enter</span>. For more help h
       -p "rofi-pass > ")"
 
     rofi_exit=$?
+    if [[ $rofi_exit -eq 1 ]]; then
+      exit
+    fi
     # generate Array of fields
     password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password="${password_temp%%$'\n'*}"
@@ -233,7 +236,6 @@ Type field of entry with <span color='$help_color'>Enter</span>. For more help h
   # actions based on keypresses
   if [[ "${rofi_exit}" -eq 0 ]]; then typeMenu;
   elif [[ "${rofi_exit}" -eq 13 ]]; then openURL;
-  elif [[ "${rofi_exit}" -eq 1 ]]; then exit ${rofi_exit};
   elif [[ "${rofi_exit}" -eq 10 ]]; then sleep 0.2; autopass;
   elif [[ "${rofi_exit}" -eq 14 ]]; then copyMenu;
   elif [[ "${rofi_exit}" -eq 11 ]]; then sleep 0.2; typeUser;
@@ -340,7 +342,7 @@ showEntry () {
 
   word=$(echo "$bla" | gawk -F': ' '{print $1}')
   if [[ ${rofi_exit} -eq 0 ]]; then
-    exit
+    mainMenu
   elif [[ ${rofi_exit} -eq 1 ]]; then
     exit
   elif [[ ${rofi_exit} -eq 11 ]]; then
