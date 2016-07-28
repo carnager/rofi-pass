@@ -4,6 +4,11 @@
 # (c) 2015 Rasmus Steinke <rasi@xssn.at>
 basecommand=$(echo "$0" | gawk '{ print $1 }')
 
+case "$OSTYPE" in
+  *bsd*) GREP='/usr/local/bin/grep' ;;
+  linux*) GREP='/usr/bin/grep' ;;
+  *) echo 'OS not supported, patches welcome' && exit 1 ;;
+esac
 
 # get all password files and create an array
 list_passwords() {
@@ -74,7 +79,7 @@ autopass () {
 
 openURL () {
   checkIfPass
-  $BROWSER "$(pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
+  $BROWSER "$(pass "$selected_password" | $GREP "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
   clearUp
 }
 
@@ -219,7 +224,7 @@ Type field of entry with <span color='$help_color'>Enter</span>. For more help h
       _id="${LINE%%: *}"
       _val="${LINE#* }"
       stuff["${_id}"]=${_val}
-    done < <(echo "${password_temp}" | tail -n+2 | grep -P '(: |:\t)' )
+    done < <(echo "${password_temp}" | tail -n+2 | $GREP -P '(: |:\t)' )
     stuff["pass"]=${password}
     if test "${stuff['autotype']+autotype}"
       then
@@ -344,7 +349,7 @@ showEntry () {
     _id=$(echo "${LINE}" | gawk -F ':[[:space:]]*' '{print $1}')
     _val=$(echo "${LINE}" | gawk '{sub(/:/,"")}{for (i=2; i<NF; i++) printf $i " "; print $NF}')
     stuff["${_id}"]=${_val}
-  done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | grep -P '(: |:\t)' )
+  done < <(PASSWORD_STORE_DIR="${root}" pass "${selected_password}" | tail -n+2 | $GREP -P '(: |:\t)' )
   stuff["pass"]=${password}
 
   word=$(echo "$bla" | gawk -F': ' '{print $1}')
@@ -499,7 +504,7 @@ fi
 
 # set help color
 if [[ $help_color == "" ]]; then
-  help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | gawk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
+  help_color=$(rofi -dump-xresources | $GREP 'rofi.color.normal' | gawk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
 fi
 
 # check for BROWSER variable, use xdg-open as fallback

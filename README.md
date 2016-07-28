@@ -46,6 +46,10 @@ In addition to those `:enter` and `:delay` are available.
 * gawk
 * bash
 
+### BSD
+* gnugrep
+* gawk
+
 ## Configuration
 rofi-pass may read its configuration values from `/etc/rofi-pass` and/or `$HOME/.config/rofi-pass/config`.
 For an example configuration please take a look at the included `config.example` file.
