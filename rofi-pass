@@ -7,6 +7,7 @@ basecommand=$(echo "$0" | gawk '{ print $1 }')
 case "$OSTYPE" in
   *bsd*) GREP='/usr/local/bin/grep' ;;
   linux*) GREP='/usr/bin/grep' ;;
+  darwin*) GREP='/usr/bin/ggrep' ;;
   *) echo 'OS not supported, patches welcome' && exit 1 ;;
 esac
 
