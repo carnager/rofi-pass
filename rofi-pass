@@ -4,6 +4,42 @@
 # (c) 2015 Rasmus Steinke <rasi@xssn.at>
 basecommand=$(echo "$0" | gawk '{ print $1 }')
 
+# set default settings
+_rofi () {
+    rofi -i -width 700 -no-levenshtein-sort "$@"
+}
+
+URL_field='url'
+USERNAME_field='user'
+AUTOTYPE_field='autotype'
+delay=2
+default_do='autopass' # copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
+auto_enter='false'
+notify='false'
+passlength='20'
+count=2
+help_color=""
+clip=primary
+default_user=john_doe
+default_user2=mary_ann
+password_length=12
+autotype="Alt+1"
+type_user="Alt+2"
+type_pass="Alt+3"
+open_url="Alt+4"
+copy_name="Alt+u"
+copy_url="Alt+l"
+copy_pass="Alt+p"
+show="Alt+o"
+copy_entry="Alt+2"
+type_entry="Alt+1"
+copy_menu="Alt+c"
+action_menu="Alt+a"
+type_menu="Alt+t"
+help="Alt+h"
+switch="Alt+x"
+insert_pass="Alt+n"
+
 # get all password files and create an array
 list_passwords() {
   cd "${root}" || exit
