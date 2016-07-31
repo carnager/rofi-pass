@@ -40,6 +40,8 @@ help="Alt+h"
 switch="Alt+x"
 insert_pass="Alt+n"
 
+setxkbmap "${keyboard}"
+
 # get all password files and create an array
 list_passwords() {
   cd "${root}" || exit
