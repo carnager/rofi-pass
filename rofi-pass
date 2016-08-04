@@ -376,6 +376,25 @@ actionMenu () {
 }
 
 showEntry () {
+  if [[ -z $pass_content ]]; then
+    password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
+    password="${password_temp%%$'\n'*}"
+    pass_key_value=$(echo "${password_temp}" | tail -n+2 | grep ': ')
+    declare -A stuff
+    while read -r LINE; do
+      _id="${LINE%%: *}"
+      _val="${LINE#* }"
+      stuff["${_id}"]=${_val}
+    done < <(echo "${pass_key_value}")
+    stuff["pass"]=${password}
+    if test "${stuff['autotype']+autotype}"
+      then
+          :
+      else
+          stuff["autotype"]="user :tab pass"
+    fi
+    pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
+  fi
   HELP="<span color='${help_color}'>${copy_entry}: Copy Entry</span>"
   bla=$(echo -e "< Return\n${pass_content}" | _rofi -kb-accept-entry '!Return' -dmenu -mesg "Enter: Copy entry to clipboard" -p "> ")
   rofi_exit=$?
@@ -553,7 +572,7 @@ export PASSWORD_STORE_DIR="${root}"
       ;;
     --show-last)
       if [[ -r "$HOME/.cache/rofi-pass/last_used" ]]; then
-        selected_password="$(awk -F ': ' '{ print $2 }' "$HOME/.cache/rofi-pass/last_used")" showEntry
+        selected_password="$(awk -F ': ' '{ print $2 }' "$HOME/.cache/rofi-pass/last_used")" viewEntry
       else
         mainMenu
       fi
