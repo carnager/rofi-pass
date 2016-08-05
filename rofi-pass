@@ -16,7 +16,7 @@ delay=2
 default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
 notify='false'
-passlength='20'
+password_length='20'
 count=2
 help_color=""
 clip=primary
@@ -198,10 +198,10 @@ generatePass () {
     symbols="-n";
   fi
   HELP="<span color='$help_color'>Enter Number or hit Enter to use default length</span>"
-  length=$(echo -e "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${passlength}) > ")
+  length=$(echo -e "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${password_length}) > ")
   askGen
   if [[ $length == "" ]]; then
-    pass generate ${symbols} -i "$selected_password" "${passlength}" > /dev/null;
+    pass generate ${symbols} -i "$selected_password" "${password_length}" > /dev/null;
   else
     pass generate ${symbols} -i "$selected_password" "${length}" > /dev/null;
   fi
