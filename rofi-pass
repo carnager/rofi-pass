@@ -346,8 +346,6 @@ typeMenu () {
         typeField
       fi
       clearUp
-    elif [[ $default_do == "autotype" ]]; then
-      autopass
     else
       $(${default_do})
     fi
