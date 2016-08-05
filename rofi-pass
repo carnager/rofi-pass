@@ -229,7 +229,7 @@ mainMenu () {
   else
     unset selected_password
     HELP="Welcome to rofi-pass. Use <span color='$help_color'>${insert_pass}</span> to create a new pass entry.
-Type field of entry with <span color='$help_color'>Enter</span>. For more help hit <span color='$help_color'>${help}</span>."
+Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit <span color='$help_color'>${help}</span>."
     selected_password="$(list_passwords 2>/dev/null \
       | _rofi -mesg "${HELP}" \
       -dmenu -kb-accept-entry '!Return' -kb-custom-1 "${autotype}" \
