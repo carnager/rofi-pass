@@ -256,7 +256,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
     # generate Array of fields
     password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password="${password_temp%%$'\n'*}"
-    pass_key_value=$(echo "${password_temp}" | awk '$2{ print $1, $2 }')
+    pass_key_value=$(echo "${password_temp}" | awk '$2{ print }')
     declare -A stuff
     while read -r LINE; do
       _id="${LINE%%: *}"
@@ -282,7 +282,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
   elif [[ "${rofi_exit}" -eq 12 ]]; then sleep 0.2; typePass;
   elif [[ "${rofi_exit}" -eq 17 ]]; then copyURL;
   elif [[ "${rofi_exit}" -eq 16 ]]; then viewEntry;
-  elif [[ "${rofi_exit}" -eq 18 ]]; then typeMenu;
+  elif [[ "${rofi_exit}" -eq 18 ]]; then force_type=1 typeMenu;
   elif [[ "${rofi_exit}" -eq 15 ]]; then copyPass;
   elif [[ "${rofi_exit}" -eq 23 ]]; then actionMenu;
   elif [[ "${rofi_exit}" -eq 25 ]]; then unset selected_password; helpMenu;
@@ -325,8 +325,9 @@ else unset helptext; mainMenu; fi
 }
 
 typeMenu () {
-  clear
-  echo "${default_do}"
+  if [[ -n $force_type ]]; then
+    default_do="menu"
+  fi
   if [[ -n $default_do ]]; then
     if [[ $default_do == "menu" ]]; then
       checkIfPass
@@ -345,6 +346,8 @@ typeMenu () {
         typeField
       fi
       clearUp
+    elif [[ $default_do == "autotype" ]]; then
+      autopass
     else
       $(${default_do})
     fi
