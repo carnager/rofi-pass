@@ -256,7 +256,7 @@ Type field of entry with <span color='$help_color'>Enter</span>. For more help h
     # generate Array of fields
     password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password="${password_temp%%$'\n'*}"
-    pass_key_value=$(echo "${password_temp}" | tail -n+2 | grep ': ')
+    pass_key_value=$(echo "${password_temp}" | awk '$2{ print $1, $2 }')
     declare -A stuff
     while read -r LINE; do
       _id="${LINE%%: *}"
@@ -268,7 +268,7 @@ Type field of entry with <span color='$help_color'>Enter</span>. For more help h
       then
           :
       else
-          stuff["autotype"]="user :tab pass"
+          stuff["autotype"]="${USERNAME_field} :tab pass"
     fi
   fi
   pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
@@ -399,7 +399,7 @@ showEntry () {
       then
           :
       else
-          stuff["autotype"]="user :tab pass"
+          stuff["autotype"]="${USERNAME_field} :tab pass"
     fi
     pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
   fi
