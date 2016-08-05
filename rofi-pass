@@ -256,7 +256,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
     # generate Array of fields
     password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password="${password_temp%%$'\n'*}"
-    pass_key_value=$(echo "${password_temp}" | awk '$2{ print }')
+    pass_key_value=$(echo "${password_temp}" | awk '$1 ~ /:$/{$1=$1;print}')
     declare -A stuff
     while read -r LINE; do
       _id="${LINE%%: *}"
@@ -274,7 +274,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
   pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
 
   # actions based on keypresses
-  if [[ "${rofi_exit}" -eq 0 ]]; then typeMenu;
+  if [[ "${rofi_exit}" -eq 0 ]]; then export default_do="$default_do"; typeMenu;
   elif [[ "${rofi_exit}" -eq 13 ]]; then openURL;
   elif [[ "${rofi_exit}" -eq 10 ]]; then sleep 0.2; autopass;
   elif [[ "${rofi_exit}" -eq 14 ]]; then copyMenu;
@@ -282,7 +282,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
   elif [[ "${rofi_exit}" -eq 12 ]]; then sleep 0.2; typePass;
   elif [[ "${rofi_exit}" -eq 17 ]]; then copyURL;
   elif [[ "${rofi_exit}" -eq 16 ]]; then viewEntry;
-  elif [[ "${rofi_exit}" -eq 18 ]]; then force_type=1 typeMenu;
+  elif [[ "${rofi_exit}" -eq 18 ]]; then export default_do="menu"; typeMenu;
   elif [[ "${rofi_exit}" -eq 15 ]]; then copyPass;
   elif [[ "${rofi_exit}" -eq 23 ]]; then actionMenu;
   elif [[ "${rofi_exit}" -eq 25 ]]; then unset selected_password; helpMenu;
@@ -324,10 +324,10 @@ if [[ $help_val -eq 1 ]]; then exit;
 else unset helptext; mainMenu; fi
 }
 
+
 typeMenu () {
-  if [[ -n $force_type ]]; then
-    default_do="menu"
-  fi
+  clear
+  echo "${default_do}"
   if [[ -n $default_do ]]; then
     if [[ $default_do == "menu" ]]; then
       checkIfPass
@@ -346,8 +346,6 @@ typeMenu () {
         typeField
       fi
       clearUp
-    elif [[ $default_do == "autotype" ]]; then
-      autopass
     else
       $(${default_do})
     fi
