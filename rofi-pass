@@ -240,6 +240,7 @@ Type field of entry with <span color='$help_color'>Enter</span>. For more help h
       -kb-custom-6 "${copy_pass}" \
       -kb-custom-7 "${show}" \
       -kb-custom-8 "${copy_url}" \
+      -kb-custom-9 "${type_menu}" \
       -kb-custom-14 "${action_menu}" \
       -kb-custom-15 "${copy_menu}" \
       -kb-custom-16 "${help}" \
@@ -282,6 +283,7 @@ Type field of entry with <span color='$help_color'>Enter</span>. For more help h
   elif [[ "${rofi_exit}" -eq 12 ]]; then sleep 0.2; typePass;
   elif [[ "${rofi_exit}" -eq 17 ]]; then copyURL;
   elif [[ "${rofi_exit}" -eq 16 ]]; then viewEntry;
+  elif [[ "${rofi_exit}" -eq 18 ]]; then typeMenu;
   elif [[ "${rofi_exit}" -eq 15 ]]; then copyPass;
   elif [[ "${rofi_exit}" -eq 23 ]]; then actionMenu;
   elif [[ "${rofi_exit}" -eq 25 ]]; then unset selected_password; helpMenu;
