@@ -13,7 +13,7 @@ URL_field='url'
 USERNAME_field='user'
 AUTOTYPE_field='autotype'
 delay=2
-default_do='autopass' # copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
+default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
 notify='false'
 passlength='20'
@@ -324,22 +324,30 @@ else unset helptext; mainMenu; fi
 }
 
 typeMenu () {
-  checkIfPass
-  typefield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -kb-accept-entry '!Return' -dmenu  -p "Choose Field to type > ")
-  val=$?
-  if [[ $val -eq 1 ]]; then
-    exit
+  clear
+  echo "${default_do}"
+  if [[ -n $default_do ]]; then
+    if [[ $default_do == "menu" ]]; then
+      checkIfPass
+      typefield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -kb-accept-entry '!Return' -dmenu  -p "Choose Field to type > ")
+      val=$?
+      if [[ $val -eq 1 ]]; then
+        exit
+      fi
+      if [[ $typefield == "" ]]; then
+        exit;
+      elif [[ $typefield == "password" ]]; then
+          typePass
+      elif [[ $typefield == "${AUTOTYPE_field}" ]]; then
+          autopass
+      else
+        typeField
+      fi
+      clearUp
+    else
+      $(${default_do})
+    fi
   fi
-  if [[ $typefield == "" ]]; then
-    exit;
-  elif [[ $typefield == "password" ]]; then
-      typePass
-  elif [[ $typefield == "${AUTOTYPE_field}" ]]; then
-      autopass
-  else
-    typeField
-  fi
-  clearUp
 }
 
 copyMenu () {
