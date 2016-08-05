@@ -17,7 +17,6 @@ default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewE
 auto_enter='false'
 notify='false'
 password_length='20'
-count=2
 help_color=""
 clip=primary
 default_user=john_doe
@@ -542,10 +541,6 @@ fi
 # check for BROWSER variable, use xdg-open as fallback
 if [[ -z $BROWSER ]]; then
   export BROWSER=xdg-open
-fi
-
-if [[ -z ${count} ]]; then
-  count=2
 fi
 
 # check if alternative root directory was given on commandline

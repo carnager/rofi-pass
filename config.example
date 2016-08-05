@@ -30,10 +30,6 @@ default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewE
 auto_enter='false'
 notify='false'
 
-# seconds to wait before re-opening showEntry-menu
-# after autotyping an entry. Set to "off" to disable
-count=2
-
 # color of the help messages
 # leave empty for autodetection
 help_color=""
