@@ -26,7 +26,7 @@ BROWSER='chromium'
 
 ## Misc settings
 
-default_do='menu' # menu, autopass, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
+default_do='menu' # menu, autotype, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
 notify='false'
 

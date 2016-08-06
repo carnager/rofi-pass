@@ -87,7 +87,6 @@ autopass () {
       xdotool key Return
     fi
   else
-    echo "${stuff["$AUTOTYPE_field"]}"
     for word in ${stuff["$AUTOTYPE_field"]}; do
       if [[ $word == ":tab" ]]; then
         xdotool key Tab;
@@ -274,7 +273,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
   pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
 
   # actions based on keypresses
-  if [[ "${rofi_exit}" -eq 0 ]]; then export default_do="$default_do"; typeMenu;
+  if [[ "${rofi_exit}" -eq 0 ]]; then typeMenu;
   elif [[ "${rofi_exit}" -eq 13 ]]; then openURL;
   elif [[ "${rofi_exit}" -eq 10 ]]; then sleep 0.2; autopass;
   elif [[ "${rofi_exit}" -eq 14 ]]; then copyMenu;
@@ -326,8 +325,6 @@ else unset helptext; mainMenu; fi
 
 
 typeMenu () {
-  clear
-  echo "${default_do}"
   if [[ -n $default_do ]]; then
     if [[ $default_do == "menu" ]]; then
       checkIfPass
@@ -346,6 +343,8 @@ typeMenu () {
         typeField
       fi
       clearUp
+    elif [[ $default_do == "${AUTOTYPE_field}" ]]; then
+      autopass
     else
       $(${default_do})
     fi
