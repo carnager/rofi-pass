@@ -257,18 +257,20 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
     password="${password_temp%%$'\n'*}"
     pass_key_value=$(echo "${password_temp}" | awk '$1 ~ /:$/{$1=$1;print}')
     declare -A stuff
-    while read -r LINE; do
-      _id="${LINE%%: *}"
-      _val="${LINE#* }"
-      stuff["${_id}"]=${_val}
-    done < <(echo "${pass_key_value}")
     stuff["pass"]=${password}
-    if test "${stuff['autotype']+autotype}"
-      then
-          :
-      else
+    if [[ -n $pass_key_value ]]; then
+      while read -r LINE; do
+        _id="${LINE%%: *}"
+        _val="${LINE#* }"
+        stuff["${_id}"]=${_val}
+      done < <(echo "${pass_key_value}")
+      if test "${stuff['autotype']+autotype}"
+        then
+            :
+        else
           stuff["autotype"]="${USERNAME_field} :tab pass"
-    fi
+        fi
+      fi
   fi
   pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
 
