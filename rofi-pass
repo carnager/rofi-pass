@@ -353,12 +353,12 @@ typeMenu () {
 
 copyMenu () {
   checkIfPass
-  copyfield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -kb-accept-entry '!Return' -dmenu  -p "Choose Field to type > ")
+  copyfield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -kb-accept-entry '!Return' -dmenu  -p "Choose Field to copy > ")
   val=$?
   if [[ $val -eq 1 ]]; then
     exit;
   fi
-  if [[ $copyfield == "password" ]]; then
+  if [[ $copyfield == "pass" ]]; then
     copyPass;
   else
     copyField
