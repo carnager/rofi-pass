@@ -533,7 +533,7 @@ if [[ ! -d "$HOME/.cache/rofi-pass" ]]; then
 fi
 
 if [[ -n $keyboard ]]; then
-  setxkbmap "${keyboard}"
+  setxkbmap ${keyboard}
 fi
 
 # set help color
