@@ -39,9 +39,6 @@ help="Alt+h"
 switch="Alt+x"
 insert_pass="Alt+n"
 
-if [[ -n $keyboard ]]; then
-  setxkbmap "${keyboard}"
-fi
 
 # get all password files and create an array
 list_passwords() {
@@ -533,6 +530,10 @@ fi
 # create tmp dir
 if [[ ! -d "$HOME/.cache/rofi-pass" ]]; then
   mkdir "$HOME/.cache/rofi-pass"
+fi
+
+if [[ -n $keyboard ]]; then
+  setxkbmap "${keyboard}"
 fi
 
 # set help color
