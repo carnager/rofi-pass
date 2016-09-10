@@ -250,18 +250,22 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
       exit
     fi
     # generate Array of fields
-    password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
-    password="${password_temp%%$'\n'*}"
-    fields="$(echo "${password_temp}" | tail -n +2)"
-    pass_key_value=$(echo "${fields}" | awk '$1 ~ /:$/{$1=$1;print}')
+#    password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
+#    password="${password_temp%%$'\n'*}"
+#    fields="$(echo "${password_temp}" | tail -n +2)"
+#    pass_key_value=$(echo "${fields}" | awk '$1 ~ /:$/{$1=$1;print}')
+    mapfile -t password_temp < <(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
+    password=${password_temp[0]}
+    fields=$(printf '%s\n' "${password_temp[@]:1}" | awk '$1 ~ /:$/{$1=$1;print}')
+
     declare -A stuff
     stuff["pass"]=${password}
-    if [[ -n $pass_key_value ]]; then
+    if [[ -n $fields ]]; then
       while read -r LINE; do
         _id="${LINE%%: *}"
         _val="${LINE#* }"
         stuff["${_id}"]=${_val}
-      done < <(echo "${pass_key_value}")
+      done < <(echo "${fields}")
       if test "${stuff['autotype']+autotype}"
         then
             :
