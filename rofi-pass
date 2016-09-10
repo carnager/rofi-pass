@@ -252,7 +252,8 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
     # generate Array of fields
     password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password="${password_temp%%$'\n'*}"
-    pass_key_value=$(echo "${password_temp}" | awk '$1 ~ /:$/{$1=$1;print}')
+    fields="$(echo "${password_temp}" | tail -n +2)"
+    pass_key_value=$(echo "${fields}" | awk '$1 ~ /:$/{$1=$1;print}')
     declare -A stuff
     stuff["pass"]=${password}
     if [[ -n $pass_key_value ]]; then
