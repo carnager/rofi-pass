@@ -75,10 +75,21 @@ autopass () {
   chmod 600 "$HOME/.cache/rofi-pass/last_used"
   if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
     if [[ "${stuff["${USERNAME_field}"]}" ]]; then
-      echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
+      if [[ $failsafe == "false" ]]; then
+        echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
+      elif [[ $failsafe == "true" ]]; then
+        echo -n "${stuff["${USERNAME_field}"]}" | xclip -sel clip
+        xdotool key "ctrl+v"
+      fi
       xdotool key Tab
     fi
-    echo -n "${password}" | xdotool type --clearmodifiers --file -
+
+    if [[ $failsafe == "false" ]]; then
+      echo -n "${password}" | xdotool type --clearmodifiers --file -
+    elif [[ $failsafe == "true" ]]; then
+      echo -n "${stuff["${USERNAME_field}"]}" | xclip -sel clip
+      xdotool key "ctrl+v"
+    fi
     sleep 1
     if [[ ${auto_enter} == "true" ]]; then
       xdotool key Return
@@ -94,9 +105,19 @@ autopass () {
       elif [[ $word == ":enter" ]]; then
         xdotool key Return;
       elif [[ $word == "pass" ]]; then
-        echo -n "${password}" | xdotool type --clearmodifiers --file -
+        if [[ $failsafe == "false" ]]; then
+          echo -n "${password}" | xdotool type --clearmodifiers --file -
+        elif [[ $failsafe == "true" ]]; then
+          echo -n "${password}" | xclip -sel clip
+          xdotool key "ctrl+v"
+        fi
       else
-        echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
+        if [[ $failsafe == "false" ]]; then
+         echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
+       elif [[ $failsafe == "true" ]]; then
+         echo -n "${stuff[${word}]}" | xclip -sel clip
+         xdotool key "ctrl+v"
+       fi
       fi
     done
     if [[ ${auto_enter} == "true" ]]; then
@@ -168,11 +189,6 @@ copyPass () {
   $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
 }
 
-viewEntry () {
-  checkIfPass
-  showEntry "${selected_password}"
-}
-
 generatePass () {
   askGen () {
     askGenMenu=$(echo -e "Yes\nNo" | rofi -dmenu -p "Generate new Password for ${selected_password}? > ")
@@ -226,7 +242,7 @@ mainMenu () {
     HELP="Welcome to rofi-pass. Use <span color='$help_color'>${insert_pass}</span> to create a new pass entry.
 Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit <span color='$help_color'>${help}</span>."
     selected_password="$(list_passwords 2>/dev/null \
-      | _rofi -mesg "${HELP}" \
+      | _rofi \
       -dmenu -kb-accept-entry '!Return' -kb-custom-1 "${autotype}" \
       -kb-custom-2 "${type_user}" \
       -kb-custom-3 "${type_pass}" \
@@ -241,6 +257,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
       -kb-custom-16 "${help}" \
       -kb-custom-17 "${switch}" \
       -kb-custom-18 "${insert_pass}" \
+      -kb-custom-19 "Alt-g" \
       -dmenu \
       -select "$entry" \
       -p "rofi-pass > ")"
@@ -284,7 +301,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
   elif [[ "${rofi_exit}" -eq 11 ]]; then sleep 0.2; typeUser;
   elif [[ "${rofi_exit}" -eq 12 ]]; then sleep 0.2; typePass;
   elif [[ "${rofi_exit}" -eq 17 ]]; then copyURL;
-  elif [[ "${rofi_exit}" -eq 16 ]]; then viewEntry;
+  elif [[ "${rofi_exit}" -eq 16 ]]; then export pass_content="${pass_content}"; showEntry;
   elif [[ "${rofi_exit}" -eq 18 ]]; then export default_do="menu"; typeMenu;
   elif [[ "${rofi_exit}" -eq 15 ]]; then copyPass;
   elif [[ "${rofi_exit}" -eq 23 ]]; then actionMenu;
@@ -292,10 +309,16 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
   elif [[ "${rofi_exit}" -eq 24 ]]; then copyMenu;
   elif [[ "${rofi_exit}" -eq 26 ]]; then $(${basecommand} --bmarks);
   elif [[ "${rofi_exit}" -eq 27 ]]; then insertPass;
+  elif [[ "${rofi_exit}" -eq 28 ]]; then unlock_database;
   fi
   clearUp
 }
 
+unlock_database() {
+  _rofi -dmenu -p "Enter passphrase to unlock pass db: " -password | gpg -s --passphrase-fd 0
+  mainMenu
+
+}
 
 clearUp () {
   password=''
@@ -305,6 +328,7 @@ clearUp () {
   unset selected_password
   unset password_temp
   unset stuff
+  echo -n "" | xclip -sel clip
 }
 
 helpMenu () {
@@ -389,53 +413,68 @@ actionMenu () {
 }
 
 showEntry () {
-  if [[ -z $pass_content ]]; then
-    password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
-    password="${password_temp%%$'\n'*}"
-    pass_key_value=$(echo "${password_temp}" | tail -n+2 | grep ': ')
-    declare -A stuff
-    while read -r LINE; do
-      _id="${LINE%%: *}"
-      _val="${LINE#* }"
-      stuff["${_id}"]=${_val}
-    done < <(echo "${pass_key_value}")
-    stuff["pass"]=${password}
-    if test "${stuff['autotype']+autotype}"
-      then
-          :
-      else
-          stuff["autotype"]="${USERNAME_field} :tab pass"
-    fi
-    pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
-  fi
-  HELP="<span color='${help_color}'>${copy_entry}: Copy Entry</span>"
-  bla=$(echo -e "< Return\n${pass_content}" | _rofi -kb-accept-entry '!Return' -dmenu -mesg "Enter: Copy entry to clipboard" -p "> ")
+  entry=$(echo "${pass_content}" | _rofi -dmenu -p "content of '${selected_password}'")
   rofi_exit=$?
 
-  word=$(echo "$bla" | gawk -F': ' '{print $1}')
-  if [[ ${rofi_exit} -eq 1 ]]; then
+  if [[ $rofi_exit -eq 1 ]];
+  then
     exit
-  elif [[ ${rofi_exit} -eq 0 ]]; then
-    if [[ ${bla} == "< Return" ]]; then
-      mainMenu
-    else
-      if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
-        echo -n "$word" | doClip
-      else
-        echo -n "${stuff[${word}]}" | doClip
-      fi
-      notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
-      $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
-      exit
-    fi
   fi
-  exit
-  unset stuff
-  unset password
-  unset selected_password
-  unset password_temp
-  unset stuff
-  exit
+
+  if [[ $rofi_exit -eq 0 ]]; then
+    echo -n "${entry}" | doClip
+    notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
+    $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+  fi
+    
+
+#    if [[ -z $pass_content ]]; then
+#    password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
+#    password="${password_temp%%$'\n'*}"
+#    pass_key_value=$(echo "${password_temp}" | tail -n+2 | grep ': ')
+#    declare -A stuff
+#    while read -r LINE; do
+#      _id="${LINE%%: *}"
+#      _val="${LINE#* }"
+#      stuff["${_id}"]=${_val}
+#    done < <(echo "${pass_key_value}")
+#    stuff["pass"]=${password}
+#    if test "${stuff['autotype']+autotype}"
+#      then
+#          :
+#      else
+#          stuff["autotype"]="${USERNAME_field} :tab pass"
+#    fi
+#    pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
+#  fi
+#  HELP="<span color='${help_color}'>${copy_entry}: Copy Entry</span>"
+#  bla=$(echo -e "< Return\n${pass_content}" | _rofi -kb-accept-entry '!Return' -dmenu -mesg "Enter: Copy entry to clipboard" -p "> ")
+#  rofi_exit=$?
+#
+#  word=$(echo "$bla" | gawk -F': ' '{print $1}')
+#  if [[ ${rofi_exit} -eq 1 ]]; then
+#    exit
+#  elif [[ ${rofi_exit} -eq 0 ]]; then
+#    if [[ ${bla} == "< Return" ]]; then
+#      mainMenu
+#    else
+#      if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
+#        echo -n "$word" | doClip
+#      else
+#        echo -n "${stuff[${word}]}" | doClip
+#      fi
+#      notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
+#      $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+#      exit
+#    fi
+#  fi
+#  exit
+#  unset stuff
+#  unset password
+#  unset selected_password
+#  unset password_temp
+#  unset stuff
+#  exit
 }
 
 manageEntry () {
@@ -467,7 +506,7 @@ manageEntry () {
 }
 
 listgpg () {
-  find . -name \*.gpg -print | cut -c 3- | while read line; do echo -e "${line##*/}\t(In: ${line%%/*})"; done | sed 's/(.*.gpg)$//g; s/.gpg\t/\t/g' | column -s $'\t' -t
+  find . -type f -not -path '*/\.*' | cut -c 3-
 }
 
 insertPass () {
