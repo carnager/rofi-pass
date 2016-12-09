@@ -206,7 +206,7 @@ generatePass () {
 mainMenu () {
   if [[ $1 == "--bmarks" ]]; then
     selected_password="$(list_passwords 2>/dev/null \
-      | _rofi -kb-accept-entry '!Return' -mesg "Bookmarks Mode. ${switch} to switch" \
+      | _rofi -mesg "Bookmarks Mode. ${switch} to switch" \
       -dmenu \
       -kb-custom-1 "Alt+x" \
       -select "$entry" \
@@ -227,7 +227,7 @@ mainMenu () {
 Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit <span color='$help_color'>${help}</span>."
     selected_password="$(list_passwords 2>/dev/null \
       | _rofi -mesg "${HELP}" \
-      -dmenu -kb-accept-entry '!Return' -kb-custom-1 "${autotype}" \
+      -dmenu -kb-custom-1 "${autotype}" \
       -kb-custom-2 "${type_user}" \
       -kb-custom-3 "${type_pass}" \
       -kb-custom-4 "${open_url}" \
@@ -332,7 +332,7 @@ typeMenu () {
   if [[ -n $default_do ]]; then
     if [[ $default_do == "menu" ]]; then
       checkIfPass
-      typefield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -kb-accept-entry '!Return' -dmenu  -p "Choose Field to type > ")
+      typefield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -dmenu  -p "Choose Field to type > ")
       val=$?
       if [[ $val -eq 1 ]]; then
         exit
@@ -357,7 +357,7 @@ typeMenu () {
 
 copyMenu () {
   checkIfPass
-  copyfield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -kb-accept-entry '!Return' -dmenu  -p "Choose Field to copy > ")
+  copyfield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -dmenu  -p "Choose Field to copy > ")
   val=$?
   if [[ $val -eq 1 ]]; then
     exit;
@@ -372,7 +372,7 @@ copyMenu () {
 
 actionMenu () {
   checkIfPass
-  action=$(echo -e "< Return\n---\n1 Move Password File\n2 Delete Password File\\n3 Edit Password File\n4 Generate New Password" | _rofi -kb-accept-entry '!Return' -dmenu -p "Choose Action > ")
+  action=$(echo -e "< Return\n---\n1 Move Password File\n2 Delete Password File\\n3 Edit Password File\n4 Generate New Password" | _rofi -dmenu -p "Choose Action > ")
   if [[ ${action} == "1 Move Password File" ]]; then
     manageEntry move;
   elif [[ ${action} == "2 Delete Password File" ]]; then
@@ -409,7 +409,7 @@ showEntry () {
     pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
   fi
   HELP="<span color='${help_color}'>${copy_entry}: Copy Entry</span>"
-  bla=$(echo -e "< Return\n${pass_content}" | _rofi -kb-accept-entry '!Return' -dmenu -mesg "Enter: Copy entry to clipboard" -p "> ")
+  bla=$(echo -e "< Return\n${pass_content}" | _rofi -dmenu -mesg "Enter: Copy entry to clipboard" -p "> ")
   rofi_exit=$?
 
   word=$(echo "$bla" | gawk -F': ' '{print $1}')
