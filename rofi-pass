@@ -256,6 +256,11 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
 #    pass_key_value=$(echo "${fields}" | awk '$1 ~ /:$/{$1=$1;print}')
     mapfile -t password_temp < <(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password=${password_temp[0]}
+    if [[ ${password} == "#FILE="* ]]; then
+      pass_file="${password#*=}"
+      mapfile -t password_temp < <(PASSWORD_STORE_DIR="${root}" pass "${pass_file}")
+      password=${password_temp[0]}
+    fi
     fields=$(printf '%s\n' "${password_temp[@]:1}" | awk '$1 ~ /:$/{$1=$1;print}')
 
     declare -A stuff
