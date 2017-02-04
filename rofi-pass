@@ -377,14 +377,16 @@ copyMenu () {
 
 actionMenu () {
   checkIfPass
-  action=$(echo -e "< Return\n---\n1 Move Password File\n2 Delete Password File\\n3 Edit Password File\n4 Generate New Password" | _rofi -dmenu -p "Choose Action > ")
+  action=$(echo -e "< Return\n---\n1 Move Password File\n2 Copy Password File\n3 Delete Password File\\n4 Edit Password File\n5 Generate New Password" | _rofi -dmenu -p "Choose Action > ")
   if [[ ${action} == "1 Move Password File" ]]; then
     manageEntry move;
-  elif [[ ${action} == "2 Delete Password File" ]]; then
+  elif [[ ${action} == "3 Delete Password File" ]]; then
     manageEntry delete;
-  elif [[ ${action} == "3 Edit Password File" ]]; then
+  elif [[ ${action} == "2 Copy Password File" ]]; then
+    manageEntry copy;
+  elif [[ ${action} == "4 Edit Password File" ]]; then
     manageEntry edit;
-  elif [[ ${action} == "4 Generate New Password" ]]; then
+  elif [[ ${action} == "5 Generate New Password" ]]; then
     generatePass;
   elif [[ ${action} == "< Return" ]]; then
     mainMenu;
@@ -455,6 +457,15 @@ manageEntry () {
       exit
     fi
     PASSWORD_STORE_DIR="${root}" pass mv "$selected_password" "${group}"
+      mainMenu
+  elif [[ $1 == "copy" ]]; then
+    cd "${root}" || exit
+    selected_password2=$(basename "$selected_password" .gpg)
+    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
+    if [[ $group == "" ]]; then
+      exit
+    fi
+    PASSWORD_STORE_DIR="${root}" pass cp "$selected_password" "${group}"
       mainMenu
   elif [[ "$1" == "delete" ]]; then
     HELP="<span color='$help_color'>Selected entry: ${selected_password}</span>"
