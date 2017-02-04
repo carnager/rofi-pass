@@ -494,18 +494,23 @@ insertPass () {
   if [[ $val -eq 1 ]]; then
     exit
   fi
+  
+  pw=$(echo -e "Generate" | rofi -dmenu -p "Password > " -mesg "Type Password or hit Enter to generate one")
+  if [[ $pw == "Generate" ]]; then
+    pw=$(pwgen "${password_length}")
+  fi
 
   if [[ "$group" == "No Group" ]]; then
     if [[ $url == http* ]]; then
-      echo -e "PASS\n---\n${USERNAME_field}: $user\n${URL_field}: $url" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
+      echo -e "${pw}\n---\n${USERNAME_field}: $user\n${URL_field}: $url" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
     else
-      echo -e "PASS\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
+      echo -e "${pw}\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
     fi
   else
     if [[ $url == http* ]]; then
-      echo -e "PASS\n---\n${USERNAME_field}: $user\n${URL_field}: $url" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${group}/${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
+      echo -e "${pw}\n---\n${USERNAME_field}: $user\n${URL_field}: $url" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
     else
-      echo -e "PASS\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass generate -ni "${group}/${name}" "${password_length}" >/dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
+      echo -e "${pw}\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
     fi
   fi
 }
