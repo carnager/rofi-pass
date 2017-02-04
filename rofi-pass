@@ -465,10 +465,8 @@ manageEntry () {
     group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
     if [[ $group == "" ]]; then
       exit
-    elif [[ ${group} == "${original_group}" ]]; then
+    else [[ ${group} == "${original_group}" ]]; then
       new_name="$(listgpg | rofi -dmenu -format 'f' -mesg "Copying to same Group. Please enter a name for the new entry" -p "> ")"
-    else
-      new_name="${selected_password2}"
     fi
     PASSWORD_STORE_DIR="${root}" pass cp "$selected_password" "${group}/${new_name}"
       mainMenu
