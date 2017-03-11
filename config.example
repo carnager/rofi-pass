@@ -7,7 +7,7 @@ _rofi () {
 }
 
 # keyboard layout (set this to your actual layout. E.g. keyboard="de us"
-#keyboard=us
+keyboard=us
 
 # fields to be used
 URL_field='url'
