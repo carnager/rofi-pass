@@ -69,6 +69,11 @@ addpass --name "My new Site" +user "zeltak" +branch "branch" +custom "foobar" +a
 
 Also included is an import script for keepass2 databases. It's the same script that can be downloaded from the pass homepage, with some minor modifications to match rofi-pass structure.
 
+## FAQ
+
+* rofi pass prints garbage instead of my actual passes
+** Set your keyboard layout in config
+
 ## Alternative
 
 jreinert has written the roughly compatible tool [autopass](https://github.com/jreinert/autopass). It has less features, but definately saner code.
