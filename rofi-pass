@@ -563,6 +563,9 @@ fi
 
 if [[ -n $keyboard ]]; then
   setxkbmap ${keyboard}
+else
+  keyboard=$(setxkbmap -query | grep layout | grep -oE '[^: ]+$')
+  setxkbmap ${keyboard}
 fi
 
 # set help color

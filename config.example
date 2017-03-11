@@ -6,8 +6,9 @@ _rofi () {
     rofi -i -width 700 -no-levenshtein-sort "$@"
 }
 
-# keyboard layout (set this to your actual layout. E.g. keyboard="de us"
-keyboard=us
+# rofi-pass tries to detect keyboard layout automatically
+# if this fails try to set it manually here.
+# keyboard=us
 
 # fields to be used
 URL_field='url'
