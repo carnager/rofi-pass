@@ -6,7 +6,7 @@ basecommand=$(echo "$0" | gawk '{ print $1 }')
 
 # set default settings
 _rofi () {
-    rofi -i -width 700 -no-levenshtein-sort "$@"
+    rofi "$@"
 }
 
 URL_field='url'
