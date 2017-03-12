@@ -43,6 +43,8 @@ help="Alt+h"
 switch="Alt+x"
 insert_pass="Alt+n"
 
+# Safe permissions
+umask 077
 
 # get all password files and create an array
 list_passwords() {
@@ -69,14 +71,12 @@ doClip () {
 checkIfPass () {
     rm -f "$HOME/.cache/rofi-pass/last_used"
     echo "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
-    chmod 600 "$HOME/.cache/rofi-pass/last_used"
 }
 
 
 autopass () {
   rm -f "$HOME/.cache/rofi-pass/last_used"
   echo "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
-  chmod 600 "$HOME/.cache/rofi-pass/last_used"
   if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
     if [[ "${stuff["${USERNAME_field}"]}" ]]; then
       echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
