@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # rofi-pass
 # (c) 2015 Rasmus Steinke <rasi@xssn.at>
 basecommand=$(echo "$0" | gawk '{ print $1 }')
@@ -38,7 +37,14 @@ type_menu="Alt+t"
 help="Alt+h"
 switch="Alt+x"
 insert_pass="Alt+n"
+unlock_menu="Alt-e"
 
+
+unlock_database() {
+  _rofi -dmenu -p "Enter passphrase to unlock pass db: " -password | gpg -s --passphrase-fd 0
+  mainMenu
+
+}
 
 # get all password files and create an array
 list_passwords() {
@@ -241,6 +247,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
       -kb-custom-16 "${help}" \
       -kb-custom-17 "${switch}" \
       -kb-custom-18 "${insert_pass}" \
+      -kb-custom-19 "${unlock_menu}" \
       -dmenu \
       -select "$entry" \
       -p "rofi-pass > ")"
@@ -297,6 +304,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
   elif [[ "${rofi_exit}" -eq 24 ]]; then copyMenu;
   elif [[ "${rofi_exit}" -eq 26 ]]; then $(${basecommand} --bmarks);
   elif [[ "${rofi_exit}" -eq 27 ]]; then insertPass;
+  elif [[ "${rofi_exit}" -eq 28 ]]; then unlock_database;
   fi
   clearUp
 }
@@ -326,6 +334,7 @@ ${copy_menu}: Copy Custom Field
 ${action_menu}: Edit, Move, Delete, Re-generate Submenu
 ${show}: Show Password File
 ${insert_pass}: Insert new Pass Entry
+${unlock_menu}: Unlock Database
 ${switch}: Switch Pass/Bookmark Mode" | _rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > ")
 help_val=$?
 if [[ $help_val -eq 1 ]]; then exit;
