@@ -6,12 +6,14 @@ basecommand=$(echo "$0" | gawk '{ print $1 }')
 
 # set default settings
 _rofi () {
-    rofi -i -width 700 -no-levenshtein-sort "$@"
+    rofi "$@"
 }
 
+# We expect to find these fields in pass(1)'s output
 URL_field='url'
 USERNAME_field='user'
 AUTOTYPE_field='autotype'
+
 delay=2
 default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
@@ -19,9 +21,11 @@ notify='false'
 password_length='20'
 help_color=""
 clip=primary
-default_user=john_doe
-default_user2=mary_ann
+default_user="$(whoami)"
+default_user2=john_doe
 password_length=12
+
+# default shortcuts
 autotype="Alt+1"
 type_user="Alt+2"
 type_pass="Alt+3"
@@ -39,6 +43,8 @@ help="Alt+h"
 switch="Alt+x"
 insert_pass="Alt+n"
 
+# Safe permissions
+umask 077
 
 # get all password files and create an array
 list_passwords() {
@@ -65,14 +71,12 @@ doClip () {
 checkIfPass () {
     rm -f "$HOME/.cache/rofi-pass/last_used"
     echo "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
-    chmod 600 "$HOME/.cache/rofi-pass/last_used"
 }
 
 
 autopass () {
   rm -f "$HOME/.cache/rofi-pass/last_used"
   echo "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
-  chmod 600 "$HOME/.cache/rofi-pass/last_used"
   if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
     if [[ "${stuff["${USERNAME_field}"]}" ]]; then
       echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
@@ -559,13 +563,6 @@ fi
 # create tmp dir
 if [[ ! -d "$HOME/.cache/rofi-pass" ]]; then
   mkdir "$HOME/.cache/rofi-pass"
-fi
-
-if [[ -n $keyboard ]]; then
-  setxkbmap ${keyboard}
-else
-  keyboard=$(setxkbmap -query | grep layout | grep -oE '[^: ]+$')
-  setxkbmap ${keyboard}
 fi
 
 # set help color
