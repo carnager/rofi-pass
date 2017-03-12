@@ -9,9 +9,11 @@ _rofi () {
     rofi "$@"
 }
 
+# We expect to find these fields in pass(1)'s output
 URL_field='url'
 USERNAME_field='user'
 AUTOTYPE_field='autotype'
+
 delay=2
 default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
@@ -22,6 +24,8 @@ clip=primary
 default_user="$(whoami)"
 default_user2=john_doe
 password_length=12
+
+# default shortcuts
 autotype="Alt+1"
 type_user="Alt+2"
 type_pass="Alt+3"
