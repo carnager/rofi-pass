@@ -3,8 +3,13 @@
 
 # rofi command. Make sure to have "$@" as last argument
 _rofi () {
-    rofi -i -width 700 -no-levenshtein-sort "$@"
+    rofi "$@"
 }
+
+# If you want rofi-pass to set keyboard layout, enable this
+# However It's recommended to call setxkbmap on login manually
+# Setting it in Xorg config is not sufficient for some reason
+fix_layout=false
 
 # rofi-pass tries to detect keyboard layout automatically
 # if this fails try to set it manually here.

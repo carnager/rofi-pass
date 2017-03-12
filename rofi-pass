@@ -565,6 +565,18 @@ if [[ ! -d "$HOME/.cache/rofi-pass" ]]; then
   mkdir "$HOME/.cache/rofi-pass"
 fi
 
+# fix keyboard layout if enabled in config
+if [[ $fix_layout == "true" ]]
+then
+  if [[ -n $keyboard ]]
+  then
+    setxkbmap "${keyboard}"
+  else
+    keyboard=$(setxkbmap -query | grep -E 'layout|variant|options' | grep -oE '[^: ]+$' | tr '\n' ' ')
+    setxkbmap ${keyboard}
+  fi
+fi
+
 # set help color
 if [[ $help_color == "" ]]; then
   help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | gawk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
