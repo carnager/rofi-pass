@@ -3,7 +3,7 @@
 
 # rofi command. Make sure to have "$@" as last argument
 _rofi () {
-    rofi "$@"
+    rofi -kb-accept-entry "!Return" "$@"
 }
 
 # If you want rofi-pass to set keyboard layout, enable this
