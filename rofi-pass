@@ -125,12 +125,24 @@ openURL () {
 
 typeUser () {
   checkIfPass
+
+  x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
+  xset r off
+
   echo -n "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
+
+  xset r "$x_repeat_enabled"
+  unset x_repeat_enabled
+
   clearUp
 }
 
 typePass () {
   checkIfPass
+
+  x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
+  xset r off
+
   echo -n "${password}" | xdotool type --clearmodifiers --file -
   if [[ $notify == "true" ]]; then
     if [[ "${stuff[notify]}" == "false" ]]; then
@@ -145,12 +157,24 @@ typePass () {
       :
     fi
   fi
+
+  xset r "$x_repeat_enabled"
+  unset x_repeat_enabled
+
   clearUp
 }
 
 typeField () {
   checkIfPass
+
+  x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
+  xset r off
+
   echo -n "${stuff[${typefield}]}" | xdotool type --clearmodifiers --file -
+
+  xset r "$x_repeat_enabled"
+  unset x_repeat_enabled
+
   clearUp
 }
 
