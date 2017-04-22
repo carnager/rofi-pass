@@ -75,6 +75,9 @@ checkIfPass () {
 
 
 autopass () {
+  x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
+  xset r off
+
   rm -f "$HOME/.cache/rofi-pass/last_used"
   echo "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
   if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
@@ -107,6 +110,10 @@ autopass () {
       xdotool key Return
     fi
   fi
+
+  xset r "$x_repeat_enabled"
+  unset x_repeat_enabled
+
   clearUp
 }
 
