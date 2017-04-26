@@ -12,18 +12,20 @@ else
     root="$HOME/.password-store"
 fi
 
-if [[ $1 == "--help" || $1 == "-h" ]]; then
-    echo "add pass files for rofi-pass"
-    echo "(C) 2015 Rasmus Steinke <rasi at xssn dot at>"
-    echo ""
-    echo "--name \"foobar\"     Mandatory first argument - filename of password file"
-    echo "--root \"foobar\"     Optional second argument - Absolute path to password store"
-    echo ""
-    echo "+FIELD \"barbaz\"     Every field name has to start with \"+\""
-    echo "                    Values should be quoted"
-    echo ""
-    echo "Example:"
-    echo "addpass --name \"my password file\" --root \"$HOME/passwords\" +user \"Richard\" +foo \"bar\" +autotype \"foo :tab user :tab pass\""
+if [[ $1 == "--help" ]] || [[ $1 == "-h" ]]; then
+    cat << EOH
+add pass files for rofi-pass
+(C) 2015 Rasmus Steinke <rasi at xssn dot at>
+
+--name \"foobar\"     Mandatory first argument - filename of password file
+--root \"foobar\"     Optional second argument - Absolute path to password store
+
++FIELD \"barbaz\"     Every field name has to start with \"+\"
+                    Values should be quoted
+
+Example:
+ % addpass --name \"my password file\" --root \"$HOME/passwords\" +user \"Richard\" +foo \"bar\" +autotype \"foo :tab user :tab pass\"
+EOH
     exit
 else
     echo "$1"
