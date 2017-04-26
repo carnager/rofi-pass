@@ -33,7 +33,7 @@ else
         echo "Missing --name option. Try --help"
         exit
     elif [[ $1 == "--name" ]]; then
-        Name="$2"
+        name="$2"
     fi
 fi
 
@@ -44,12 +44,12 @@ IFS="+";
 
 fields="$@";
 fieldsArray=($fields);
-read -p "Enter password for entry \"${Name}\" > " -s pass
+read -p "Enter password for entry \"${name}\" > " -s pass
 
 cd "${root}"
 group=$(echo -e "No Group\n---\n$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)" | rofi -dmenu -p "Choose Group > ")
 
-echo -e "\n\nStoring file ${Name} in group ${group}"
+echo -e "\n\nStoring file ${name} in group ${group}"
 
 printEntry () {
     echo -e "$pass\n---"
@@ -61,9 +61,9 @@ printEntry () {
 }
 
 if [[ "$group" == "No Group" ]]; then
-    printEntry | PASSWORD_STORE_DIR="${root}" pass insert -m "${Name}"
+    printEntry | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}"
 elif [[ "$group" == "" ]]; then
     exit
 else
-    printEntry | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${Name}"
+    printEntry | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}"
 fi
