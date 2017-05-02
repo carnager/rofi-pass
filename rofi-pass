@@ -49,12 +49,10 @@ umask 077
 # get all password files and create an array
 list_passwords() {
   cd "${root}" || exit
-    passwords=( **/*.gpg )
 
-  for password in "${passwords[@]}"; do
-    filename="${password}"
-    filename="${filename%.gpg}"
-    echo "$filename"
+  find -L . -iname '*.gpg' -printf '%P\n' | \
+    while read filename; do
+      echo "${filename%.gpg}"
   done
 }
 
