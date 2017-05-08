@@ -589,6 +589,43 @@ if [[ -f "$HOME/.config/rofi-pass/config" ]]; then
   source "$HOME/.config/rofi-pass/config"
 fi
 
+# Load default config files if they don't exist already
+declare -f _rofi || _rofi () {
+  rofi -i -width 700 -no-levenshtein-sort "$@"
+}
+URL_field=${URL_field:='url'}
+USERNAME_field=${USERNAME_field:='user'}
+AUTOTYPE_field=${AUTOTYPE_field:='autotype'}
+delay=${delay:=2}
+EDITOR=${EDITOR:='gvim -f'}
+BROWSER=${BROWSER:='chromium'}
+default_do=${default_do:='autopass'}
+auto_enter=${auto_enter:='false'}
+notify=${notify:='false'}
+passlength=${passlength:='20'}
+count=${count:=2}
+help_color=${help_color:=""}
+clip=${clip:=primary}
+default_user=${default_user:=john_doe}
+default_user2=${default_user2:=mary_ann}
+password_length=${password_length:=12}
+autotype=${autotype:="Alt+1"}
+type_user=${type_user:="Alt+2"}
+type_pass=${type_pass:="Alt+3"}
+open_url=${open_url:="Alt+4"}
+copy_name=${copy_name:="Alt+u"}
+copy_url=${copy_url:="Alt+l"}
+copy_pass=${copy_pass:="Alt+p"}
+show=${show:="Alt+o"}
+copy_entry=${copy_entry:="Alt+2"}
+type_entry=${type_entry:="Alt+1"}
+copy_menu=${copy_menu:="Alt+c"}
+action_menu=${action_menu:="Alt+a"}
+type_menu=${type_menu:="Alt+t"}
+help=${help:="Alt+h"}
+switch=${switch:="Alt+x"}
+insert_pass=${insert_pass:="Alt+n"}
+
 # create tmp dir
 if [[ ! -d "$HOME/.cache/rofi-pass" ]]; then
   mkdir "$HOME/.cache/rofi-pass"
