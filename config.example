@@ -6,14 +6,14 @@ _rofi () {
     rofi -kb-accept-entry "!Return" "$@"
 }
 
-# keyboard layout. If set to true make sure to set at least a layout.
-# If model is not set, rofi-pass defaults to 'pc104'.
-# If layout is not set, rofi will try to autodetect correct settings.
-# It's highly recommended to set these options though or even
-# better call setxkbmap from your login script. Setting these options
-# in Xorg config is not sufficient - this is a xdotool bug.
+# xdotool needs the keyboard layout to be set using setxkbmap
+# You can do this in your autostart scripts (e.g. xinitrc)
 
-fix_layout=true
+# Alternatively you can set your options here and set fix_layout to "true"
+# rofi-pass will try to autodetect correct settings, if no layout is set (not recommended)
+# if model is unset, rofi-pass defaults to 'pc104'
+
+fix_layout=false
 model=pc104
 layout=us
 #variant=us
