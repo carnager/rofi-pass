@@ -12,12 +12,12 @@ _rofi () {
 # It's highly recommended to set these options though or even
 # better call setxkbmap from your login script. Setting these options
 # in Xorg config is not sufficient - this is a xdotool bug.
-fix_layout=true
 
+fix_layout=true
 model=pc104
-layout=de
-variant=us
-option=compose:caps
+layout=us
+#variant=us
+#option=compose:caps
 
 # fields to be used
 URL_field='url'
