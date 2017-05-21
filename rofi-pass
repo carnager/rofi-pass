@@ -597,29 +597,7 @@ fi
 # fix keyboard layout if enabled in config
 if [[ $fix_layout == "true" ]]
 then
-  if [[ -z $model ]]
-  then
-    model=pc104
-  fi
-  if [[ -n $layout ]]
-  then
-    if [[ -n $variant && -n $option ]]
-    then
-      setxkbmap -model $model -layout $layout -variant $variant -option $option
-    elif [[ -n $variant && -z $option ]]
-    then
-      setxkbmap -model $model -layout $layout -variant $variant
-    elif [[ -z $variant && -n $option ]]
-    then
-      setxkbmap -model $model -layout $layout -option $option
-    elif [[ -z $variant && -z $option ]]
-    then
-      setxkbmap -model $model -layout $layout
-    fi
-  else
-    keyboard=$(setxkbmap -query | grep -E 'layout|variant' | grep -oE '[^: ]+$' | tr '\n' ' ')
-    setxkbmap ${keyboard}
-  fi
+  layout_cmd
 fi
 
 # set help color

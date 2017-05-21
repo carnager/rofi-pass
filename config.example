@@ -9,15 +9,13 @@ _rofi () {
 # xdotool needs the keyboard layout to be set using setxkbmap
 # You can do this in your autostart scripts (e.g. xinitrc)
 
-# Alternatively you can set your options here and set fix_layout to "true"
-# rofi-pass will try to autodetect correct settings, if no layout is set (not recommended)
-# if model is unset, rofi-pass defaults to 'pc104'
-
+# If for some reason, you cannot do this, you can set the command here.
+# and set fix_layout to true
 fix_layout=false
-model=pc104
-layout=us
-#variant=us
-#option=compose:caps
+
+layout_cmd () {
+  setxkbmap us
+}
 
 # fields to be used
 URL_field='url'
