@@ -6,14 +6,18 @@ _rofi () {
     rofi -kb-accept-entry "!Return" "$@"
 }
 
-# If you want rofi-pass to set keyboard layout, enable this
-# However It's recommended to call setxkbmap on login manually
-# Setting it in Xorg config is not sufficient for some reason
-fix_layout=false
+# keyboard layout. If set to true make sure to set at least a layout.
+# If model is not set, rofi-pass defaults to 'pc104'.
+# If layout is not set, rofi will try to autodetect correct settings.
+# It's highly recommended to set these options though or even
+# better call setxkbmap from your login script. Setting these options
+# in Xorg config is not sufficient - this is a xdotool bug.
+fix_layout=true
 
-# rofi-pass tries to detect keyboard layout automatically
-# if this fails try to set it manually here.
-# keyboard=us
+model=pc104
+layout=de
+variant=us
+option=compose:caps
 
 # fields to be used
 URL_field='url'
