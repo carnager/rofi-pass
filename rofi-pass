@@ -6,7 +6,7 @@ basecommand=$(echo "$0" | gawk '{ print $1 }')
 
 # set default settings
 _rofi () {
-    rofi "$@"
+    rofi -kb-accept-entry "!Return" "$@"
 }
 
 # We expect to find these fields in pass(1)'s output
@@ -208,7 +208,7 @@ viewEntry () {
 
 generatePass () {
   askGen () {
-    askGenMenu=$(echo -e "Yes\nNo" | rofi -dmenu -p "Generate new Password for ${selected_password}? > ")
+    askGenMenu=$(echo -e "Yes\nNo" | _rofi -kb-row-tab '' -dmenu -p "Generate new Password for ${selected_password}? > ")
     if [[ $askGenMenu == "Yes" ]]; then
       true
     elif [[ $askGenMenu == "No" ]]; then
@@ -217,7 +217,7 @@ generatePass () {
   }
 
   checkIfPass
-  symbols=$(echo -e "0  Cancel\n---\n1  Yes\n2  No" | rofi -dmenu -p "Use Symbols? > ")
+  symbols=$(echo -e "0  Cancel\n---\n1  Yes\n2  No" | _rofi -kb-row-tab '' -dmenu -p "Use Symbols? > ")
   if [[ $symbols == "0  Cancel" ]]; then
     mainMenu;
   elif [[ $symbols == "1  Yes" ]]; then
@@ -226,7 +226,7 @@ generatePass () {
     symbols="-n";
   fi
   HELP="<span color='$help_color'>Enter Number or hit Enter to use default length</span>"
-  length=$(echo -e "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${password_length}) > ")
+  length=$(echo -e "" | _rofi -dmenu -kb-row-tab '' -mesg "${HELP}" -p "Password length? (Default: ${password_length}) > ")
   askGen
   if [[ $length == "" ]]; then
     pass generate ${symbols} -i "$selected_password" "${password_length}" > /dev/null;
@@ -239,7 +239,7 @@ generatePass () {
 mainMenu () {
   if [[ $1 == "--bmarks" ]]; then
     selected_password="$(list_passwords 2>/dev/null \
-      | _rofi -mesg "Bookmarks Mode. ${switch} to switch" \
+      | _rofi -kb-row-tab '' -mesg "Bookmarks Mode. ${switch} to switch" \
       -dmenu \
       -kb-custom-1 "Alt+x" \
       -select "$entry" \
@@ -259,7 +259,7 @@ mainMenu () {
     HELP="Welcome to rofi-pass. Use <span color='$help_color'>${insert_pass}</span> to create a new pass entry.
 Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit <span color='$help_color'>${help}</span>."
     selected_password="$(list_passwords 2>/dev/null \
-      | _rofi -mesg "${HELP}" \
+      | _rofi -kb-row-tab '' -mesg "${HELP}" \
       -dmenu -kb-custom-1 "${autotype}" \
       -kb-custom-2 "${type_user}" \
       -kb-custom-3 "${type_pass}" \
@@ -359,7 +359,7 @@ ${copy_menu}: Copy Custom Field
 ${action_menu}: Edit, Move, Delete, Re-generate Submenu
 ${show}: Show Password File
 ${insert_pass}: Insert new Pass Entry
-${switch}: Switch Pass/Bookmark Mode" | _rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > ")
+${switch}: Switch Pass/Bookmark Mode" | _rofi -kb-row-tab '' -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > ")
 help_val=$?
 if [[ $help_val -eq 1 ]]; then exit;
 else unset helptext; mainMenu; fi
@@ -370,7 +370,7 @@ typeMenu () {
   if [[ -n $default_do ]]; then
     if [[ $default_do == "menu" ]]; then
       checkIfPass
-      typefield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -dmenu  -p "Choose Field to type > ")
+      typefield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -kb-row-tab '' -dmenu  -p "Choose Field to type > ")
       val=$?
       if [[ $val -eq 1 ]]; then
         exit
@@ -395,7 +395,7 @@ typeMenu () {
 
 copyMenu () {
   checkIfPass
-  copyfield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -dmenu  -p "Choose Field to copy > ")
+  copyfield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -kb-row-tab '' -dmenu  -p "Choose Field to copy > ")
   val=$?
   if [[ $val -eq 1 ]]; then
     exit;
@@ -449,7 +449,7 @@ showEntry () {
     pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
   fi
   HELP="<span color='${help_color}'>${copy_entry}: Copy Entry</span>"
-  bla=$(echo -e "< Return\n${pass_content}" | _rofi -dmenu -mesg "Enter: Copy entry to clipboard" -p "> ")
+  bla=$(echo -e "< Return\n${pass_content}" | _rofi -kb-row-tab '' -dmenu -mesg "Enter: Copy entry to clipboard" -p "> ")
   rofi_exit=$?
 
   word=$(echo "$bla" | gawk -F': ' '{print $1}')
@@ -485,7 +485,7 @@ manageEntry () {
   elif [[ $1 == "move" ]]; then
     cd "${root}" || exit
     selected_password2=$(basename "$selected_password" .gpg)
-    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
+    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -kb-row-tab '' -dmenu -p "Choose Group > ")
     if [[ $group == "" ]]; then
       exit
     fi
@@ -495,7 +495,7 @@ manageEntry () {
     cd "${root}" || exit
     selected_password2=$(basename "$selected_password" .gpg)
     original_group=$(dirname "${selected_password}")
-    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
+    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -kb-row-tab '' -dmenu -p "Choose Group > ")
     if [[ $group == "" ]]; then
       exit
     else 
@@ -505,7 +505,7 @@ manageEntry () {
       mainMenu
   elif [[ "$1" == "delete" ]]; then
     HELP="<span color='$help_color'>Selected entry: ${selected_password}</span>"
-    ask=$(echo -e "Yes\nNo" | _rofi -mesg "${HELP}" -dmenu -p "Are You Sure? > ")
+    ask=$(echo -e "Yes\nNo" | _rofi -kb-row-tab '' -mesg "${HELP}" -dmenu -p "Are You Sure? > ")
     if [[ "$ask" == "Yes" ]]; then
       PASSWORD_STORE_DIR="${root}" pass rm --force "${selected_password}"
     elif [[ "$ask" == "No" ]]; then
