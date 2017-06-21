@@ -14,6 +14,7 @@ URL_field='url'
 USERNAME_field='user'
 AUTOTYPE_field='autotype'
 
+default_autotype="user :tab pass"
 delay=2
 default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
@@ -73,44 +74,28 @@ checkIfPass () {
 
 
 autopass () {
-  if [[ -n $default_autotype ]]
-  then
-    stuff["autotype"]="${default_autotype}"
-  fi
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
   xset r off
 
   rm -f "$HOME/.cache/rofi-pass/last_used"
   echo "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
-  if [[ -z "${stuff["$AUTOTYPE_field"]}" ]]; then
-    if [[ "${stuff["${USERNAME_field}"]}" ]]; then
-      echo -n "${stuff["${USERNAME_field}"]}" | xdotool type --clearmodifiers --file -
-      xdotool key Tab
+  for word in ${stuff["$AUTOTYPE_field"]}; do
+    if [[ $word == ":tab" ]]; then
+      xdotool key Tab;
+    elif [[ $word == ":space" ]]; then
+      xdotool key space
+    elif [[ $word == ":delay" ]]; then
+      sleep "${delay}";
+    elif [[ $word == ":enter" ]]; then
+      xdotool key Return;
+    elif [[ $word == "pass" ]]; then
+      echo -n "${password}" | xdotool type --clearmodifiers --file -
+    else
+      echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
     fi
-    echo -n "${password}" | xdotool type --clearmodifiers --file -
-    sleep 1
-    if [[ ${auto_enter} == "true" ]]; then
-      xdotool key Return
-    fi
-  else
-    for word in ${stuff["$AUTOTYPE_field"]}; do
-      if [[ $word == ":tab" ]]; then
-        xdotool key Tab;
-      elif [[ $word == ":space" ]]; then
-        xdotool key space
-      elif [[ $word == ":delay" ]]; then
-        sleep "${delay}";
-      elif [[ $word == ":enter" ]]; then
-        xdotool key Return;
-      elif [[ $word == "pass" ]]; then
-        echo -n "${password}" | xdotool type --clearmodifiers --file -
-      else
-        echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
-      fi
-    done
-    if [[ ${auto_enter} == "true" ]]; then
-      xdotool key Return
-    fi
+  done
+  if [[ ${auto_enter} == "true" ]]; then
+    xdotool key Return
   fi
 
   xset r "$x_repeat_enabled"
@@ -315,6 +300,20 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
           stuff["autotype"]="${USERNAME_field} :tab pass"
         fi
       fi
+  fi
+  if [[ -z "${stuff["${AUTOTYPE_field}"]}" ]]
+  then
+    if [[ -n $default_autotype ]]
+    then
+      stuff["${AUTOTYPE_field}"]="${default_autotype}"
+    fi
+  fi
+  if [[ -z "${stuff["${USERNAME_field}"]}" ]]
+  then
+    if [[ -n $default_user ]]
+    then
+      stuff["${USERNAME_field}"]="${default_user}"
+    fi
   fi
   pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
 

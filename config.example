@@ -48,9 +48,10 @@ help_color="#4872FF"
 clip=primary
 
 # Options for generating new password entries
-default_user=john_doe
-default_user2=mary_ann
-password_length=12
+# default_user is also used for password files that have no user field.
+#default_user=john_doe
+#default_user2=mary_ann
+#password_length=12
 
 # Custom Keybindings
 autotype="Alt+1"
