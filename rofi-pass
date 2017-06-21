@@ -73,6 +73,10 @@ checkIfPass () {
 
 
 autopass () {
+  if [[ -n $default_autotype ]]
+  then
+    stuff["autotype"]="${default_autotype}"
+  fi
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
   xset r off
 
