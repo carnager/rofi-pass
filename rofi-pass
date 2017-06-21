@@ -2,7 +2,7 @@
 
 # rofi-pass
 # (c) 2015 Rasmus Steinke <rasi@xssn.at>
-basecommand=$(echo "$0" | gawk '{ print $1 }')
+basecommand=$(echo "$0")
 
 # set default settings
 _rofi () {
