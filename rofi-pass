@@ -186,7 +186,10 @@ copyURL () {
 copyPass () {
   checkIfPass
   echo -n "$password" | doClip
-  notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
+  if [[ $notify == "true" ]]
+  then
+    notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
+  fi
   $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
 }
 
@@ -467,8 +470,17 @@ showEntry () {
       else
         echo -n "${stuff[${word}]}" | doClip
       fi
-      notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
-      $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+      if [[ $notify == "true" ]]
+      then
+        notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
+      fi
+      if [[ $notify == "true" ]]
+      then
+        $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+      elif [[ $notify == "false" ]]
+      then
+        $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard) &
+      fi
       exit
     fi
   fi
