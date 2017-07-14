@@ -36,7 +36,6 @@ copy_url="Alt+l"
 copy_pass="Alt+p"
 show="Alt+o"
 copy_entry="Alt+2"
-type_entry="Alt+1"
 copy_menu="Alt+c"
 action_menu="Alt+a"
 type_menu="Alt+t"
@@ -52,7 +51,7 @@ list_passwords() {
   cd "${root}" || exit
 
   find -L . -iname '*.gpg' -printf '%P\n' | \
-    while read filename; do
+    while read -r filename; do
       echo "${filename%.gpg}"
   done
 }
@@ -249,7 +248,7 @@ mainMenu () {
     if [[ $rofi_exit -eq 1 ]]; then
       exit
     elif [[ $rofi_exit -eq 10 ]]; then
-      $(${basecommand})
+      ${basecommand}
     elif [[ $rofi_exit -eq 0 ]]; then
       openURL
     fi
@@ -341,7 +340,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
   elif [[ "${rofi_exit}" -eq 23 ]]; then actionMenu;
   elif [[ "${rofi_exit}" -eq 25 ]]; then unset selected_password; helpMenu;
   elif [[ "${rofi_exit}" -eq 24 ]]; then copyMenu;
-  elif [[ "${rofi_exit}" -eq 26 ]]; then $(${basecommand} --bmarks);
+  elif [[ "${rofi_exit}" -eq 26 ]]; then ${basecommand} --bmarks;
   elif [[ "${rofi_exit}" -eq 27 ]]; then insertPass;
   fi
   clearUp
@@ -401,7 +400,7 @@ typeMenu () {
     elif [[ $default_do == "${AUTOTYPE_field}" ]]; then
       autopass
     else
-      $(${default_do})
+      ${default_do}
     fi
   fi
 }
@@ -483,10 +482,10 @@ showEntry () {
       fi
       if [[ $notify == "true" ]]
       then
-        $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+        (sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
       elif [[ $notify == "false" ]]
       then
-        $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard) &
+        (sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard) &
       fi
       exit
     fi
@@ -506,8 +505,7 @@ manageEntry () {
     mainMenu
   elif [[ $1 == "move" ]]; then
     cd "${root}" || exit
-    selected_password2=$(basename "$selected_password" .gpg)
-    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
+    group=$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
     if [[ $group == "" ]]; then
       exit
     fi
@@ -515,12 +513,10 @@ manageEntry () {
       mainMenu
   elif [[ $1 == "copy" ]]; then
     cd "${root}" || exit
-    selected_password2=$(basename "$selected_password" .gpg)
-    original_group=$(dirname "${selected_password}")
-    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
+    group=$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
     if [[ $group == "" ]]; then
       exit
-    else 
+    else
       new_name="$(listgpg | rofi -dmenu -format 'f' -mesg "Copying to same Group. Please enter a name for the new entry" -p "> ")"
     fi
     PASSWORD_STORE_DIR="${root}" pass cp "$selected_password" "${group}/${new_name}"
@@ -546,7 +542,7 @@ listgpg () {
 
 insertPass () {
   url=$(xclip -o)
-  cd "${root}"
+  cd "${root}" || exit
   name="$(listgpg | rofi -dmenu -format 'f' -mesg "Type name, make sure it is unique" -p "> ")"
 #  name="$(echo -e "$(list_passwords 2>/dev/null)" | rofi -dmenu -mesg "Type name, make sure it is unique" -p "> ")"
   val=$?
@@ -558,12 +554,12 @@ insertPass () {
   if [[ $val -eq 1 ]]; then
     exit
   fi
-  group=$(echo -e "No Group\n---\n$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)" | rofi -dmenu -p "Choose Group > ")
+  group=$(echo -e "No Group\n---\n$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)" | rofi -dmenu -p "Choose Group > ")
   val=$?
   if [[ $val -eq 1 ]]; then
     exit
   fi
-  
+
   pw=$(echo -e "Generate" | rofi -dmenu -p "Password > " -mesg "Type Password or hit Enter to generate one")
   if [[ $pw == "Generate" ]]; then
     pw=$(pwgen "${password_length}")
