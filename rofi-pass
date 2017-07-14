@@ -50,7 +50,7 @@ umask 077
 list_passwords() {
   cd "${root}" || exit
 
-  find -L . -iname '*.gpg' -printf '%P\n' | \
+  find -L . -iname '*.gpg' -printf '%P\n' | sort -n | \
     while read -r filename; do
       echo "${filename%.gpg}"
   done
