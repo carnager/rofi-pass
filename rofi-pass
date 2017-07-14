@@ -542,7 +542,7 @@ listgpg () {
 
 insertPass () {
   url=$(xclip -o)
-  cd "${root}"
+  cd "${root}" || exit
   name="$(listgpg | rofi -dmenu -format 'f' -mesg "Type name, make sure it is unique" -p "> ")"
 #  name="$(echo -e "$(list_passwords 2>/dev/null)" | rofi -dmenu -mesg "Type name, make sure it is unique" -p "> ")"
   val=$?
