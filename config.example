@@ -3,7 +3,7 @@
 
 # rofi command. Make sure to have "$@" as last argument
 _rofi () {
-    rofi -no-auto-select -kb-accept-entry "!Return" "$@"
+    rofi -no-auto-select -kb-row-tab '' -kb-accept-entry "!Return" "$@"
 }
 
 # xdotool needs the keyboard layout to be set using setxkbmap
