@@ -505,7 +505,6 @@ manageEntry () {
     mainMenu
   elif [[ $1 == "move" ]]; then
     cd "${root}" || exit
-    selected_password2=$(basename "$selected_password" .gpg)
     group=$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
     if [[ $group == "" ]]; then
       exit
@@ -514,8 +513,6 @@ manageEntry () {
       mainMenu
   elif [[ $1 == "copy" ]]; then
     cd "${root}" || exit
-    selected_password2=$(basename "$selected_password" .gpg)
-    original_group=$(dirname "${selected_password}")
     group=$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
     if [[ $group == "" ]]; then
       exit
