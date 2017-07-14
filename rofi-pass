@@ -519,7 +519,7 @@ manageEntry () {
     group=$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
     if [[ $group == "" ]]; then
       exit
-    else 
+    else
       new_name="$(listgpg | rofi -dmenu -format 'f' -mesg "Copying to same Group. Please enter a name for the new entry" -p "> ")"
     fi
     PASSWORD_STORE_DIR="${root}" pass cp "$selected_password" "${group}/${new_name}"
@@ -562,7 +562,7 @@ insertPass () {
   if [[ $val -eq 1 ]]; then
     exit
   fi
-  
+
   pw=$(echo -e "Generate" | rofi -dmenu -p "Password > " -mesg "Type Password or hit Enter to generate one")
   if [[ $pw == "Generate" ]]; then
     pw=$(pwgen "${password_length}")
