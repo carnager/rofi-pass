@@ -507,7 +507,7 @@ manageEntry () {
   elif [[ $1 == "move" ]]; then
     cd "${root}" || exit
     selected_password2=$(basename "$selected_password" .gpg)
-    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
+    group=$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
     if [[ $group == "" ]]; then
       exit
     fi
@@ -517,7 +517,7 @@ manageEntry () {
     cd "${root}" || exit
     selected_password2=$(basename "$selected_password" .gpg)
     original_group=$(dirname "${selected_password}")
-    group=$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
+    group=$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2- | _rofi -dmenu -p "Choose Group > ")
     if [[ $group == "" ]]; then
       exit
     else 
@@ -558,7 +558,7 @@ insertPass () {
   if [[ $val -eq 1 ]]; then
     exit
   fi
-  group=$(echo -e "No Group\n---\n$(find -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)" | rofi -dmenu -p "Choose Group > ")
+  group=$(echo -e "No Group\n---\n$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)" | rofi -dmenu -p "Choose Group > ")
   val=$?
   if [[ $val -eq 1 ]]; then
     exit
