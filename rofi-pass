@@ -190,7 +190,14 @@ copyPass () {
   then
     notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
   fi
-  $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+
+  if [[ $notify == "true" ]]
+  then
+    (sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+  elif [[ $notify == "false" ]]
+  then
+    (sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard) &
+  fi
 }
 
 viewEntry () {
