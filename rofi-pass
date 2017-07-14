@@ -249,7 +249,7 @@ mainMenu () {
     if [[ $rofi_exit -eq 1 ]]; then
       exit
     elif [[ $rofi_exit -eq 10 ]]; then
-      $(${basecommand})
+      ${basecommand}
     elif [[ $rofi_exit -eq 0 ]]; then
       openURL
     fi
@@ -341,7 +341,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
   elif [[ "${rofi_exit}" -eq 23 ]]; then actionMenu;
   elif [[ "${rofi_exit}" -eq 25 ]]; then unset selected_password; helpMenu;
   elif [[ "${rofi_exit}" -eq 24 ]]; then copyMenu;
-  elif [[ "${rofi_exit}" -eq 26 ]]; then $(${basecommand} --bmarks);
+  elif [[ "${rofi_exit}" -eq 26 ]]; then ${basecommand} --bmarks;
   elif [[ "${rofi_exit}" -eq 27 ]]; then insertPass;
   fi
   clearUp
@@ -401,7 +401,7 @@ typeMenu () {
     elif [[ $default_do == "${AUTOTYPE_field}" ]]; then
       autopass
     else
-      $(${default_do})
+      ${default_do}
     fi
   fi
 }
@@ -483,10 +483,10 @@ showEntry () {
       fi
       if [[ $notify == "true" ]]
       then
-        $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+        (sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
       elif [[ $notify == "false" ]]
       then
-        $(sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard) &
+        (sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard) &
       fi
       exit
     fi
