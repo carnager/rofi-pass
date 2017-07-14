@@ -239,7 +239,7 @@ mainMenu () {
     selected_password="$(list_passwords 2>/dev/null \
       | _rofi -mesg "Bookmarks Mode. ${switch} to switch" \
       -dmenu \
-      -kb-custom-1 "Alt+x" \
+      -kb-custom-10 "${switch}" \
       -select "$entry" \
       -p "rofi-pass > ")"
 
@@ -247,8 +247,8 @@ mainMenu () {
 
     if [[ $rofi_exit -eq 1 ]]; then
       exit
-    elif [[ $rofi_exit -eq 10 ]]; then
-      ${basecommand}
+    elif [[ $rofi_exit -eq 19 ]]; then
+      $(${basecommand})
     elif [[ $rofi_exit -eq 0 ]]; then
       openURL
     fi
