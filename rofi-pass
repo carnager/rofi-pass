@@ -52,7 +52,7 @@ list_passwords() {
   cd "${root}" || exit
 
   find -L . -iname '*.gpg' -printf '%P\n' | \
-    while read filename; do
+    while read -r filename; do
       echo "${filename%.gpg}"
   done
 }
