@@ -586,7 +586,7 @@ help_msg () {
   echo -e "Usage:\n"
   echo "--insert         insert new entry to password store"
   echo "--manage         edit/move/delete entries"
-  echo -e "--root           set custom root directory"
+  echo "--root           set custom root directory"
   echo "--last-used      highlight last used item"
   echo "--show-last      show details of last used Entry"
   echo "--bmarks         run bookmarks Mode"
