@@ -248,7 +248,7 @@ mainMenu () {
     if [[ $rofi_exit -eq 1 ]]; then
       exit
     elif [[ $rofi_exit -eq 19 ]]; then
-      $(${basecommand})
+      ${basecommand}
     elif [[ $rofi_exit -eq 0 ]]; then
       openURL
     fi
