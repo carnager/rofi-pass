@@ -55,15 +55,12 @@ list_passwords() {
       echo "${filename%.gpg}"
   done
 }
-
 doClip () {
-  if [[ $clip == "primary" ]]; then
-    xclip
-  elif [[ $clip == "clipboard" ]]; then
-    xclip -selection clipboard;
-  elif [[ $clip == "both" ]]; then
-    xclip; xclip -o | xclip -selection clipboard;
-  fi
+  case "$clip" in
+    "primary") xclip ;;
+    "clipboard") xclip -selection clipboard;;
+    "both") xclip; xclip -o | xclip -selection clipboard;;
+  esac
 }
 
 checkIfPass () {
@@ -79,27 +76,20 @@ autopass () {
   rm -f "$HOME/.cache/rofi-pass/last_used"
   echo "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
   for word in ${stuff["$AUTOTYPE_field"]}; do
-    if [[ $word == ":tab" ]]; then
-      xdotool key Tab;
-    elif [[ $word == ":space" ]]; then
-      xdotool key space
-    elif [[ $word == ":delay" ]]; then
-      sleep "${delay}";
-    elif [[ $word == ":enter" ]]; then
-      xdotool key Return;
-    elif [[ $word == "pass" ]]; then
-      echo -n "${password}" | xdotool type --clearmodifiers --file -
-    else
-      echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
-    fi
+  case "$word" in
+    ":tab") xdotool key Tab;;
+    ":space") xdotool key space;;
+    ":delay") sleep "${delay}";;
+    ":enter") xdotool key Return;;
+    "pass") echo -n "${password}" | xdotool type --clearmodifiers --file -;;
+    *) echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -;;
+  esac
   done
   if [[ ${auto_enter} == "true" ]]; then
     xdotool key Return
   fi
-
   xset r "$x_repeat_enabled"
   unset x_repeat_enabled
-
   clearUp
 }
 
@@ -327,22 +317,23 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
   pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
 
   # actions based on keypresses
-  if [[ "${rofi_exit}" -eq 0 ]]; then typeMenu;
-  elif [[ "${rofi_exit}" -eq 10 ]]; then sleep 0.2; autopass;
-  elif [[ "${rofi_exit}" -eq 11 ]]; then sleep 0.2; typeUser;
-  elif [[ "${rofi_exit}" -eq 12 ]]; then sleep 0.2; typePass;
-  elif [[ "${rofi_exit}" -eq 13 ]]; then openURL;
-  elif [[ "${rofi_exit}" -eq 14 ]]; then copyUser;
-  elif [[ "${rofi_exit}" -eq 15 ]]; then copyPass;
-  elif [[ "${rofi_exit}" -eq 16 ]]; then viewEntry;
-  elif [[ "${rofi_exit}" -eq 17 ]]; then copyURL;
-  elif [[ "${rofi_exit}" -eq 18 ]]; then export default_do="menu"; typeMenu;
-  elif [[ "${rofi_exit}" -eq 23 ]]; then actionMenu;
-  elif [[ "${rofi_exit}" -eq 24 ]]; then copyMenu;
-  elif [[ "${rofi_exit}" -eq 25 ]]; then unset selected_password; helpMenu;
-  elif [[ "${rofi_exit}" -eq 26 ]]; then ${basecommand} --bmarks;
-  elif [[ "${rofi_exit}" -eq 27 ]]; then insertPass;
-  fi
+  case "${rofi_exit}" in
+    0) typeMenu;;
+    10) sleep 0.2; autopass;;
+    11) sleep 0.2; typeUser;;
+    12) sleep 0.2; typePass;;
+    13) openURL;;
+    14) copyMenu;;
+    15) copyPass;;
+    16) viewEntry;;
+    17) copyURL;;
+    18) export default_do="menu"; typeMenu;;
+    23) actionMenu;;
+    24) copyMenu;;
+    25) unset selected_password; helpMenu;;
+    26) $(${basecommand} --bmarks);;
+    27) insertPass;;
+  esac
   clearUp
 }
 
@@ -387,15 +378,12 @@ typeMenu () {
       if [[ $val -eq 1 ]]; then
         exit
       fi
-      if [[ $typefield == "" ]]; then
-        exit;
-      elif [[ $typefield == "password" ]]; then
-          typePass
-      elif [[ $typefield == "${AUTOTYPE_field}" ]]; then
-          autopass
-      else
-        typeField
-      fi
+      case "$typefield" in
+        "") exit;;
+        "password") typePass;;
+        "${AUTOTYPE_field}") autopass;;
+        *) typeField
+      esac
       clearUp
     elif [[ $default_do == "${AUTOTYPE_field}" ]]; then
       autopass
@@ -582,7 +570,7 @@ insertPass () {
 
 help_msg () {
   cat <<'EOF' 
-rofi-pass (Version: 1.2)"
+rofi-pass (Version: 1.2)
 
 Usage:
   --insert         insert new entry to password store
