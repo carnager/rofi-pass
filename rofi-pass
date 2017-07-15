@@ -332,7 +332,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
   elif [[ "${rofi_exit}" -eq 11 ]]; then sleep 0.2; typeUser;
   elif [[ "${rofi_exit}" -eq 12 ]]; then sleep 0.2; typePass;
   elif [[ "${rofi_exit}" -eq 13 ]]; then openURL;
-  elif [[ "${rofi_exit}" -eq 14 ]]; then copyMenu;
+  elif [[ "${rofi_exit}" -eq 14 ]]; then copyUser;
   elif [[ "${rofi_exit}" -eq 15 ]]; then copyPass;
   elif [[ "${rofi_exit}" -eq 16 ]]; then viewEntry;
   elif [[ "${rofi_exit}" -eq 17 ]]; then copyURL;
