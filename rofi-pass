@@ -594,85 +594,86 @@ help_msg () {
 }
 
 main () {
-# enable extended globbing
-shopt -s nullglob globstar
+  # enable extended globbing
+  shopt -s nullglob globstar
 
-# check if global config exists and load it
-if [[ -f /etc/rofi-pass.conf ]]; then
-  source /etc/rofi-pass.conf
-fi
+  # check if global config exists and load it
+  if [[ -f /etc/rofi-pass.conf ]]; then
+    source /etc/rofi-pass.conf
+  fi
 
-# check if local config exists and load it
-if [[ -f "$HOME/.config/rofi-pass/config" ]]; then
-  source "$HOME/.config/rofi-pass/config"
-fi
+  # check if local config exists and load it
+  if [[ -f "$HOME/.config/rofi-pass/config" ]]; then
+    source "$HOME/.config/rofi-pass/config"
+  fi
 
-# create tmp dir
-if [[ ! -d "$HOME/.cache/rofi-pass" ]]; then
-  mkdir "$HOME/.cache/rofi-pass"
-fi
+  # create tmp dir
+  if [[ ! -d "$HOME/.cache/rofi-pass" ]]; then
+    mkdir "$HOME/.cache/rofi-pass"
+  fi
 
-# fix keyboard layout if enabled in config
-if [[ $fix_layout == "true" ]]
-then
-  layout_cmd
-fi
+  # fix keyboard layout if enabled in config
+  if [[ $fix_layout == "true" ]]
+  then
+    layout_cmd
+  fi
 
-# set help color
-if [[ $help_color == "" ]]; then
-  help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | gawk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
-fi
+  # set help color
+  if [[ $help_color == "" ]]; then
+    help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | gawk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
+  fi
 
-# check for BROWSER variable, use xdg-open as fallback
-if [[ -z $BROWSER ]]; then
-  export BROWSER=xdg-open
-fi
+  # check for BROWSER variable, use xdg-open as fallback
+  if [[ -z $BROWSER ]]; then
+    export BROWSER=xdg-open
+  fi
 
-# check if alternative root directory was given on commandline
-if [[ -r "$HOME/.cache/rofi-pass/last_used" ]] && [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
-  export root; root=$(awk -F ': ' '{ print $1 }' "$HOME/.cache/rofi-pass/last_used")
-elif [[ -n "$2" && "$1" == "--root" ]]; then
-  export root="${2}"
-elif [[ -n $root ]]; then
-  export root="${root}"
-elif [[ -n ${PASSWORD_STORE_DIR} ]]; then
-  export root=${PASSWORD_STORE_DIR}
-else
-  export root="$HOME/.password-store"
-fi
-export PASSWORD_STORE_DIR="${root}"
-  case $1 in
-    --insert)
-      insertPass
-      ;;
-    --root)
-      mainMenu
-      ;;
-    --manage)
-      manageEntry
-      ;;
-    --help)
-      help_msg
-      ;;
-    --last-used)
-      if [[ -r "$HOME/.cache/rofi-pass/last_used" ]]; then
-        entry="$(awk -F ': ' '{ print $2 }' "$HOME/.cache/rofi-pass/last_used")"
-      fi
-      mainMenu
-      ;;
-    --show-last)
-      if [[ -r "$HOME/.cache/rofi-pass/last_used" ]]; then
-        selected_password="$(awk -F ': ' '{ print $2 }' "$HOME/.cache/rofi-pass/last_used")" viewEntry
-      else
+  # check if alternative root directory was given on commandline
+  if [[ -r "$HOME/.cache/rofi-pass/last_used" ]] && [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
+    export root; root=$(awk -F ': ' '{ print $1 }' "$HOME/.cache/rofi-pass/last_used")
+  elif [[ -n "$2" && "$1" == "--root" ]]; then
+    export root="${2}"
+  elif [[ -n $root ]]; then
+    export root="${root}"
+  elif [[ -n ${PASSWORD_STORE_DIR} ]]; then
+    export root=${PASSWORD_STORE_DIR}
+  else
+    export root="$HOME/.password-store"
+  fi
+  export PASSWORD_STORE_DIR="${root}"
+    case $1 in
+      --insert)
+        insertPass
+        ;;
+      --root)
         mainMenu
-      fi
-      ;;
-    --bmarks)
-      mainMenu --bmarks;
-      ;;
-    *)
-      mainMenu
-      ;;
-esac
+        ;;
+      --manage)
+        manageEntry
+        ;;
+      --help)
+        help_msg
+        ;;
+      --last-used)
+        if [[ -r "$HOME/.cache/rofi-pass/last_used" ]]; then
+          entry="$(awk -F ': ' '{ print $2 }' "$HOME/.cache/rofi-pass/last_used")"
+        fi
+        mainMenu
+        ;;
+      --show-last)
+        if [[ -r "$HOME/.cache/rofi-pass/last_used" ]]; then
+          selected_password="$(awk -F ': ' '{ print $2 }' "$HOME/.cache/rofi-pass/last_used")" viewEntry
+        else
+          mainMenu
+        fi
+        ;;
+      --bmarks)
+        mainMenu --bmarks;
+        ;;
+      *)
+        mainMenu
+        ;;
+  esac
 }
+
 main "$@"
