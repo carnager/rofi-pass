@@ -331,7 +331,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
     23) actionMenu;;
     24) copyMenu;;
     25) unset selected_password; helpMenu;;
-    26) $(${basecommand} --bmarks);;
+    26) ${basecommand} --bmarks;;
     27) insertPass;;
   esac
   clearUp
