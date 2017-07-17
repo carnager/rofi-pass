@@ -198,7 +198,7 @@ generatePass () {
   askGen () {
     askmenu_content=(
     "Yes"
-    "No"
+    "No")
 
     askGenMenu=$(printf '%s\n' "${askmenu_content[@]}" | _rofi -dmenu -p "Generate new Password for ${selected_password}? > ")
     if [[ $askGenMenu == "Yes" ]]; then
