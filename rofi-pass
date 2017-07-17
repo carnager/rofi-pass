@@ -52,7 +52,7 @@ list_passwords() {
 
   find -L . -iname '*.gpg' -printf '%P\n' | sort -n | \
     while read -r filename; do
-      echo "${filename%.gpg}"
+      printf '%s\n' "${filename%.gpg}"
   done
 }
 doClip () {
@@ -65,7 +65,7 @@ doClip () {
 
 checkIfPass () {
     rm -f "$HOME/.cache/rofi-pass/last_used"
-    echo "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
+    printf '%s\n' "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
 }
 
 
@@ -74,15 +74,15 @@ autopass () {
   xset r off
 
   rm -f "$HOME/.cache/rofi-pass/last_used"
-  echo "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
+  printf '%s\n' "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
   for word in ${stuff["$AUTOTYPE_field"]}; do
   case "$word" in
     ":tab") xdotool key Tab;;
     ":space") xdotool key space;;
     ":delay") sleep "${delay}";;
     ":enter") xdotool key Return;;
-    "pass") echo -n "${password}" | xdotool type --clearmodifiers --file -;;
-    *) echo -n "${stuff[${word}]}" | xdotool type --clearmodifiers --file -;;
+    "pass") printf '%s' "${password}" | xdotool type --clearmodifiers --file -;;
+    *) printf '%s' "${stuff[${word}]}" | xdotool type --clearmodifiers --file -;;
   esac
   done
   if [[ ${auto_enter} == "true" ]]; then
@@ -105,7 +105,7 @@ typeUser () {
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
   xset r off
 
-  echo -n "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
+  printf '%s' "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
 
   xset r "$x_repeat_enabled"
   unset x_repeat_enabled
@@ -119,7 +119,7 @@ typePass () {
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
   xset r off
 
-  echo -n "${password}" | xdotool type --clearmodifiers --file -
+  printf '%s' "${password}" | xdotool type --clearmodifiers --file -
   if [[ $notify == "true" ]]; then
     if [[ "${stuff[notify]}" == "false" ]]; then
       :
@@ -146,7 +146,7 @@ typeField () {
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
   xset r off
 
-  echo -n "${stuff[${typefield}]}" | xdotool type --clearmodifiers --file -
+  printf '%s' "${stuff[${typefield}]}" | xdotool type --clearmodifiers --file -
 
   xset r "$x_repeat_enabled"
   unset x_repeat_enabled
@@ -156,25 +156,25 @@ typeField () {
 
 copyUser () {
   checkIfPass
-  echo -n "${stuff[${USERNAME_field}]}" | doClip
+  printf '%s' "${stuff[${USERNAME_field}]}" | doClip
   clearUp
 }
 
 copyField () {
   checkIfPass
-  echo -n "${stuff[${copyfield}]}" | doClip
+  printf '%s' "${stuff[${copyfield}]}" | doClip
   clearUp
 }
 
 copyURL () {
   checkIfPass
-  echo -n "${stuff[${URL_field}]}" | doClip
+  printf '%s' "${stuff[${URL_field}]}" | doClip
   clearUp
 }
 
 copyPass () {
   checkIfPass
-  echo -n "$password" | doClip
+  printf '%s' "$password" | doClip
   if [[ $notify == "true" ]]
   then
     notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
@@ -182,10 +182,10 @@ copyPass () {
 
   if [[ $notify == "true" ]]
   then
-    (sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+    (sleep 45; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
   elif [[ $notify == "false" ]]
   then
-    (sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard) &
+    (sleep 45; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard) &
   fi
 }
 
@@ -196,7 +196,11 @@ viewEntry () {
 
 generatePass () {
   askGen () {
-    askGenMenu=$(echo -e "Yes\nNo" | _rofi -dmenu -p "Generate new Password for ${selected_password}? > ")
+    askmenu_content=(
+    "Yes"
+    "No"
+
+    askGenMenu=$(printf '%s\n' "${askmenu_content[@]}" | _rofi -dmenu -p "Generate new Password for ${selected_password}? > ")
     if [[ $askGenMenu == "Yes" ]]; then
       true
     elif [[ $askGenMenu == "No" ]]; then
@@ -205,7 +209,13 @@ generatePass () {
   }
 
   checkIfPass
-  symbols=$(echo -e "0  Cancel\n---\n1  Yes\n2  No" | _rofi -dmenu -p "Use Symbols? > ")
+
+  symbols_content=(
+  "0  Cancel"
+  "1  Yes"
+  "2  No")
+
+  symbols=$(printf '%s\n' "${symbols_content[@]}" | _rofi -dmenu -p "Use Symbols? > ")
   if [[ $symbols == "0  Cancel" ]]; then
     mainMenu;
   elif [[ $symbols == "1  Yes" ]]; then
@@ -214,7 +224,7 @@ generatePass () {
     symbols="-n";
   fi
   HELP="<span color='$help_color'>Enter Number or hit Enter to use default length</span>"
-  length=$(echo -e "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${password_length}) > ")
+  length=$(printf '%s' "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${password_length}) > ")
   askGen
   if [[ $length == "" ]]; then
     pass generate ${symbols} -i "$selected_password" "${password_length}" > /dev/null;
@@ -270,11 +280,6 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
     if [[ $rofi_exit -eq 1 ]]; then
       exit
     fi
-    # generate Array of fields
-#    password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
-#    password="${password_temp%%$'\n'*}"
-#    fields="$(echo "${password_temp}" | tail -n +2)"
-#    pass_key_value=$(echo "${fields}" | awk '$1 ~ /:$/{$1=$1;print}')
     mapfile -t password_temp < <(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password=${password_temp[0]}
     if [[ ${password} == "#FILE="* ]]; then
@@ -291,7 +296,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
         _id="${LINE%%: *}"
         _val="${LINE#* }"
         stuff["${_id}"]=${_val}
-      done < <(echo "${fields}")
+      done < <(printf '%s' "${fields}")
       if test "${stuff['autotype']+autotype}"
         then
             :
@@ -314,7 +319,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
       stuff["${USERNAME_field}"]="${default_user}"
     fi
   fi
-  pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
+  pass_content="$(for key in "${!stuff[@]}"; do printf '%s' "${key}: ${stuff[$key]}"; done)"
 
   # actions based on keypresses
   case "${rofi_exit}" in
@@ -349,7 +354,7 @@ clearUp () {
 }
 
 helpMenu () {
-  helptext=$(echo -e "${autotype}: Autotype
+  helptext=$(printf '%s' "${autotype}: Autotype
 ${type_user}: Type Username
 ${type_pass}: Type Password
 ---
@@ -410,7 +415,16 @@ copyMenu () {
 
 actionMenu () {
   checkIfPass
-  action=$(echo -e "< Return\n---\n1 Move Password File\n2 Copy Password File\n3 Delete Password File\\n4 Edit Password File\n5 Generate New Password" | _rofi -dmenu -p "Choose Action > ")
+  action_content=(
+  "< Return"
+  "---"
+  "1 Move Password File"
+  "2 Copy Password File"
+  "3 Delete Password File"
+  "4 Edit Password File"
+  "5 Generate New Password")
+
+  action=$(printf '%s\n' "${action_content[@]}" | _rofi -dmenu -p "Choose Action > ")
   if [[ ${action} == "1 Move Password File" ]]; then
     manageEntry move;
   elif [[ ${action} == "3 Delete Password File" ]]; then
@@ -432,13 +446,13 @@ showEntry () {
   if [[ -z $pass_content ]]; then
     password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password="${password_temp%%$'\n'*}"
-    pass_key_value=$(echo "${password_temp}" | tail -n+2 | grep ': ')
+    pass_key_value=$(printf '%s' "${password_temp}" | tail -n+2 | grep ': ')
     declare -A stuff
     while read -r LINE; do
       _id="${LINE%%: *}"
       _val="${LINE#* }"
       stuff["${_id}"]=${_val}
-    done < <(echo "${pass_key_value}")
+    done < <(printf '%s' "${pass_key_value}")
     stuff["pass"]=${password}
     if test "${stuff['autotype']+autotype}"
       then
@@ -446,23 +460,27 @@ showEntry () {
       else
           stuff["autotype"]="${USERNAME_field} :tab pass"
     fi
-    pass_content="$(for key in "${!stuff[@]}"; do echo "${key}: ${stuff[$key]}"; done)"
+    pass_content="$(for key in "${!stuff[@]}"; do printf '%s' "${key}: ${stuff[$key]}"; done)"
   fi
   HELP="<span color='${help_color}'>${copy_entry}: Copy Entry</span>"
-  bla=$(echo -e "< Return\n${pass_content}" | _rofi -dmenu -mesg "Enter: Copy entry to clipboard" -p "> ")
+  bla_content=(
+  "< Return"
+  "${pass_content}")
+
+  bla=$(printf '%s\n' "${bla_content[@]}" | _rofi -dmenu -mesg "Enter: Copy entry to clipboard" -p "> ")
   rofi_exit=$?
 
-  word=$(echo "$bla" | gawk -F': ' '{print $1}')
+  word=$(printf '%s' "$bla" | gawk -F': ' '{print $1}')
   if [[ ${rofi_exit} -eq 1 ]]; then
     exit
   elif [[ ${rofi_exit} -eq 0 ]]; then
     if [[ ${bla} == "< Return" ]]; then
       mainMenu
     else
-      if [[ -z $(echo -n "${stuff[${word}]}") ]]; then
-        echo -n "$word" | doClip
+      if [[ -z $(printf '%s' "${stuff[${word}]}") ]]; then
+        printf '%s' "$word" | doClip
       else
-        echo -n "${stuff[${word}]}" | doClip
+        printf '%s' "${stuff[${word}]}" | doClip
       fi
       if [[ $notify == "true" ]]
       then
@@ -470,10 +488,10 @@ showEntry () {
       fi
       if [[ $notify == "true" ]]
       then
-        (sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+        (sleep 45; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
       elif [[ $notify == "false" ]]
       then
-        (sleep 45; echo -n "" | xclip; echo "" | xclip -selection clipboard) &
+        (sleep 45; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard) &
       fi
       exit
     fi
@@ -511,7 +529,10 @@ manageEntry () {
       mainMenu
   elif [[ "$1" == "delete" ]]; then
     HELP="<span color='$help_color'>Selected entry: ${selected_password}</span>"
-    ask=$(echo -e "Yes\nNo" | _rofi -mesg "${HELP}" -dmenu -p "Are You Sure? > ")
+    ask_content=(
+    "Yes"
+    "No")
+    ask=$(printf '%s\n' "${ask_content[@]}" | _rofi -mesg "${HELP}" -dmenu -p "Are You Sure? > ")
     if [[ "$ask" == "Yes" ]]; then
       PASSWORD_STORE_DIR="${root}" pass rm --force "${selected_password}"
     elif [[ "$ask" == "No" ]]; then
@@ -532,38 +553,51 @@ insertPass () {
   url=$(xclip -o)
   cd "${root}" || exit
   name="$(listgpg | rofi -dmenu -format 'f' -mesg "Type name, make sure it is unique" -p "> ")"
-#  name="$(echo -e "$(list_passwords 2>/dev/null)" | rofi -dmenu -mesg "Type name, make sure it is unique" -p "> ")"
   val=$?
   if [[ $val -eq 1 ]]; then
     exit
   fi
-  user=$(echo -e "${default_user2}\n$USER\n${default_user}" | rofi -dmenu -mesg "Chose Username or type" -p "> ")
+  user_content=(
+  "${default_user2}"
+  "${USER}"
+  "${default_user}")
+  user=$(printf '%s\n' "${user_content[@]}" | rofi -dmenu -mesg "Chose Username or type" -p "> ")
   val=$?
   if [[ $val -eq 1 ]]; then
     exit
   fi
-  group=$(echo -e "No Group\n---\n$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)" | rofi -dmenu -p "Choose Group > ")
+  group_content=(
+  "No Group"
+  "---"
+  "$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)")
+  group=$(printf '%s\n' "${group_content}" | rofi -dmenu -p "Choose Group > ")
   val=$?
   if [[ $val -eq 1 ]]; then
     exit
   fi
 
-  pw=$(echo -e "Generate" | rofi -dmenu -p "Password > " -mesg "Type Password or hit Enter to generate one")
+  pw=$(printf '%s' "Generate" | rofi -dmenu -p "Password > " -mesg "Type Password or hit Enter to generate one")
   if [[ $pw == "Generate" ]]; then
     pw=$(pwgen "${password_length}")
   fi
 
   if [[ "$group" == "No Group" ]]; then
     if [[ $url == http* ]]; then
-      echo -e "${pw}\n---\n${USERNAME_field}: $user\n${URL_field}: $url" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
+      pass_content=(
+      "${pw}"
+      "---"
+      "${USERNAME_field}: ${user}"
+      "${URL_field}: ${url}")
+
+      printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
     else
-      echo -e "${pw}\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
+       printf '%s\n' "${pass_content[0]}${pass_content[1]}${pass_content[2]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
     fi
   else
     if [[ $url == http* ]]; then
-      echo -e "${pw}\n---\n${USERNAME_field}: $user\n${URL_field}: $url" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
+      printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
     else
-      echo -e "${pw}\n---\n${USERNAME_field}: $user" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
+      printf '%s\n' "${pass_content[0]}${pass_content[1]}${pass_content[2]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
     fi
   fi
 }
