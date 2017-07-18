@@ -296,7 +296,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
         _id="${LINE%%: *}"
         _val="${LINE#* }"
         stuff["${_id}"]=${_val}
-      done < <(printf '%s' "${fields}")
+      done < <(printf '%s\n' "${fields}")
       if test "${stuff['autotype']+autotype}"
         then
             :
@@ -319,7 +319,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
       stuff["${USERNAME_field}"]="${default_user}"
     fi
   fi
-  pass_content="$(for key in "${!stuff[@]}"; do printf '%s' "${key}: ${stuff[$key]}"; done)"
+  pass_content="$(for key in "${!stuff[@]}"; do printf '%s\n' "${key}: ${stuff[$key]}"; done)"
 
   # actions based on keypresses
   case "${rofi_exit}" in
