@@ -552,6 +552,7 @@ listgpg () {
 insertPass () {
   url=$(xclip -o)
   cd "${root}" || exit
+  grouplist="$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)"
   name="$(listgpg | rofi -dmenu -format 'f' -mesg "Type name, make sure it is unique" -p "> ")"
   val=$?
   if [[ $val -eq 1 ]]; then
@@ -569,8 +570,8 @@ insertPass () {
   group_content=(
   "No Group"
   "---"
-  "$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)")
-  group=$(printf '%s\n' "${group_content}" | rofi -dmenu -p "Choose Group > ")
+  "${grouplist}")
+  group=$(printf '%s\n' "${group_content[@]}" | rofi -dmenu -p "Choose Group > ")
   val=$?
   if [[ $val -eq 1 ]]; then
     exit
@@ -580,6 +581,9 @@ insertPass () {
   if [[ $pw == "Generate" ]]; then
     pw=$(pwgen "${password_length}")
   fi
+  clear
+  echo "${pw}"
+
 
   if [[ "$group" == "No Group" ]]; then
     if [[ $url == http* ]]; then
@@ -588,16 +592,28 @@ insertPass () {
       "---"
       "${USERNAME_field}: ${user}"
       "${URL_field}: ${url}")
-
       printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
     else
-       printf '%s\n' "${pass_content[0]}${pass_content[1]}${pass_content[2]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
+      pass_content=(
+      "${pw}"
+      "---"
+      "${USERNAME_field}: ${user}")
+       printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
     fi
   else
     if [[ $url == http* ]]; then
+      pass_content=(
+      "${pw}"
+      "---"
+      "${USERNAME_field}: ${user}"
+      "${URL_field}: ${url}")
       printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
     else
-      printf '%s\n' "${pass_content[0]}${pass_content[1]}${pass_content[2]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
+      pass_content=(
+      "${pw}"
+      "---"
+      "${USERNAME_field}: ${user}")
+      printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
     fi
   fi
 }
