@@ -81,8 +81,8 @@ autopass () {
     ":space") xdotool key space;;
     ":delay") sleep "${delay}";;
     ":enter") xdotool key Return;;
-    "pass") printf '%s\n' "${password}" | xdotool type --clearmodifiers --file -;;
-    *) printf '%s\n' "${stuff[${word}]}" | xdotool type --clearmodifiers --file -;;
+    "pass") printf '%s' "${password}" | xdotool type --clearmodifiers --file -;;
+    *) printf '%s' "${stuff[${word}]}" | xdotool type --clearmodifiers --file -;;
   esac
   done
   if [[ ${auto_enter} == "true" ]]; then
@@ -105,7 +105,7 @@ typeUser () {
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
   xset r off
 
-  printf '%s\n' "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
+  printf '%s' "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
 
   xset r "$x_repeat_enabled"
   unset x_repeat_enabled
@@ -119,7 +119,7 @@ typePass () {
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
   xset r off
 
-  printf '%s\n' "${password}" | xdotool type --clearmodifiers --file -
+  printf '%s' "${password}" | xdotool type --clearmodifiers --file -
   if [[ $notify == "true" ]]; then
     if [[ "${stuff[notify]}" == "false" ]]; then
       :
@@ -146,7 +146,7 @@ typeField () {
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
   xset r off
 
-  printf '%s\n' "${stuff[${typefield}]}" | xdotool type --clearmodifiers --file -
+  printf '%s' "${stuff[${typefield}]}" | xdotool type --clearmodifiers --file -
 
   xset r "$x_repeat_enabled"
   unset x_repeat_enabled
@@ -156,25 +156,25 @@ typeField () {
 
 copyUser () {
   checkIfPass
-  printf '%s\n' "${stuff[${USERNAME_field}]}" | doClip
+  printf '%s' "${stuff[${USERNAME_field}]}" | doClip
   clearUp
 }
 
 copyField () {
   checkIfPass
-  printf '%s\n' "${stuff[${copyfield}]}" | doClip
+  printf '%s' "${stuff[${copyfield}]}" | doClip
   clearUp
 }
 
 copyURL () {
   checkIfPass
-  printf '%s\n' "${stuff[${URL_field}]}" | doClip
+  printf '%s' "${stuff[${URL_field}]}" | doClip
   clearUp
 }
 
 copyPass () {
   checkIfPass
-  printf '%s\n' "$password" | doClip
+  printf '%s' "$password" | doClip
   if [[ $notify == "true" ]]
   then
     notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
@@ -182,10 +182,10 @@ copyPass () {
 
   if [[ $notify == "true" ]]
   then
-    (sleep 45; printf '%s\n' "" | xclip; printf '%s\n' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+    (sleep 45; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
   elif [[ $notify == "false" ]]
   then
-    (sleep 45; printf '%s\n' "" | xclip; printf '%s\n' "" | xclip -selection clipboard) &
+    (sleep 45; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard) &
   fi
 }
 
@@ -224,7 +224,7 @@ generatePass () {
     symbols="-n";
   fi
   HELP="<span color='$help_color'>Enter Number or hit Enter to use default length</span>"
-  length=$(printf '%s\n' "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${password_length}) > ")
+  length=$(printf '%s' "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${password_length}) > ")
   askGen
   if [[ $length == "" ]]; then
     pass generate ${symbols} -i "$selected_password" "${password_length}" > /dev/null;
@@ -354,7 +354,7 @@ clearUp () {
 }
 
 helpMenu () {
-  helptext=$(printf '%s\n' "${autotype}: Autotype
+  helptext=$(printf '%s' "${autotype}: Autotype
 ${type_user}: Type Username
 ${type_pass}: Type Password
 ---
@@ -446,13 +446,13 @@ showEntry () {
   if [[ -z $pass_content ]]; then
     password_temp=$(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password="${password_temp%%$'\n'*}"
-    pass_key_value=$(printf '%s\n' "${password_temp}" | tail -n+2 | grep ': ')
+    pass_key_value=$(printf '%s' "${password_temp}" | tail -n+2 | grep ': ')
     declare -A stuff
     while read -r LINE; do
       _id="${LINE%%: *}"
       _val="${LINE#* }"
       stuff["${_id}"]=${_val}
-    done < <(printf '%s\n' "${pass_key_value}")
+    done < <(printf '%s' "${pass_key_value}")
     stuff["pass"]=${password}
     if test "${stuff['autotype']+autotype}"
       then
@@ -460,7 +460,7 @@ showEntry () {
       else
           stuff["autotype"]="${USERNAME_field} :tab pass"
     fi
-    pass_content="$(for key in "${!stuff[@]}"; do printf '%s\n' "${key}: ${stuff[$key]}"; done)"
+    pass_content="$(for key in "${!stuff[@]}"; do printf '%s' "${key}: ${stuff[$key]}"; done)"
   fi
   HELP="<span color='${help_color}'>${copy_entry}: Copy Entry</span>"
   bla_content=(
@@ -470,17 +470,17 @@ showEntry () {
   bla=$(printf '%s\n' "${bla_content[@]}" | _rofi -dmenu -mesg "Enter: Copy entry to clipboard" -p "> ")
   rofi_exit=$?
 
-  word=$(printf '%s\n' "$bla" | gawk -F': ' '{print $1}')
+  word=$(printf '%s' "$bla" | gawk -F': ' '{print $1}')
   if [[ ${rofi_exit} -eq 1 ]]; then
     exit
   elif [[ ${rofi_exit} -eq 0 ]]; then
     if [[ ${bla} == "< Return" ]]; then
       mainMenu
     else
-      if [[ -z $(printf '%s\n' "${stuff[${word}]}") ]]; then
-        printf '%s\n' "$word" | doClip
+      if [[ -z $(printf '%s' "${stuff[${word}]}") ]]; then
+        printf '%s' "$word" | doClip
       else
-        printf '%s\n' "${stuff[${word}]}" | doClip
+        printf '%s' "${stuff[${word}]}" | doClip
       fi
       if [[ $notify == "true" ]]
       then
@@ -488,10 +488,10 @@ showEntry () {
       fi
       if [[ $notify == "true" ]]
       then
-        (sleep 45; printf '%s\n' "" | xclip; printf '%s\n' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+        (sleep 45; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
       elif [[ $notify == "false" ]]
       then
-        (sleep 45; printf '%s\n' "" | xclip; printf '%s\n' "" | xclip -selection clipboard) &
+        (sleep 45; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard) &
       fi
       exit
     fi
@@ -576,7 +576,7 @@ insertPass () {
     exit
   fi
 
-  pw=$(printf '%s\n' "Generate" | rofi -dmenu -p "Password > " -mesg "Type Password or hit Enter to generate one")
+  pw=$(printf '%s' "Generate" | rofi -dmenu -p "Password > " -mesg "Type Password or hit Enter to generate one")
   if [[ $pw == "Generate" ]]; then
     pw=$(pwgen "${password_length}")
   fi
