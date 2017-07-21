@@ -582,8 +582,6 @@ insertPass () {
     pw=$(pwgen "${password_length}")
   fi
   clear
-  echo "${pw}"
-
 
   if [[ "$group" == "No Group" ]]; then
     if [[ $url == http* ]]; then
