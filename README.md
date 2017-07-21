@@ -71,8 +71,7 @@ Also included is an import script for keepass2 databases. It's the same script t
 
 ## FAQ
 
-* rofi pass prints garbage instead of my actual passes <br>
-** Make sure to run `setxkbmap <language> <variant>` at the start of your Xorg session.
+* rofi pass prints garbage instead of my actual passes <br>Make sure to run `setxkbmap <language> <variant>` at the start of your Xorg session.
 
 ## Alternative
 
