@@ -618,7 +618,7 @@ insertPass () {
 
 help_msg () {
   cat <<'EOF' 
-rofi-pass (Version: 1.2)
+rofi-pass (Version: 1.6-git)
 
 Usage:
   --insert         insert new entry to password store
