@@ -45,6 +45,7 @@ In addition to those `:enter` and `:delay` are available.
 * xdotool
 * gawk
 * bash
+* pwgen
 
 ### BSD
 * gnugrep
