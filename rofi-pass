@@ -19,7 +19,6 @@ delay=2
 default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
 notify='false'
-password_length='20'
 help_color=""
 clip=primary
 default_user="$(whoami)"
