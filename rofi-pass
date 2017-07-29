@@ -194,18 +194,21 @@ viewEntry () {
 }
 
 generatePass () {
-  askGen () {
-    askmenu_content=(
-    "Yes"
-    "No")
+  askmenu_content=(
+  "Yes"
+  "No")
 
-    askGenMenu=$(printf '%s\n' "${askmenu_content[@]}" | _rofi -dmenu -p "Generate new Password for ${selected_password}? > ")
-    if [[ $askGenMenu == "Yes" ]]; then
-      true
-    elif [[ $askGenMenu == "No" ]]; then
-      generatePass
-    fi
-  }
+  askGenMenu=$(printf '%s\n' "${askmenu_content[@]}" | _rofi -dmenu -p "Generate new Password for ${selected_password}? > ")
+  askgen_exit=$?
+  if [[ $askgen_exit -eq 1 ]]
+  then
+  	  exit
+  fi
+  if [[ $askGenMenu == "Yes" ]]; then
+    true
+  elif [[ $askGenMenu == "No" ]]; then
+    actionMenu
+  fi
 
   checkIfPass
 
@@ -215,6 +218,11 @@ generatePass () {
   "2  No")
 
   symbols=$(printf '%s\n' "${symbols_content[@]}" | _rofi -dmenu -p "Use Symbols? > ")
+  symbols_val=$?
+  if [[ $symbols_val -eq 1 ]]
+  then
+  	  exit
+  fi
   if [[ $symbols == "0  Cancel" ]]; then
     mainMenu;
   elif [[ $symbols == "1  Yes" ]]; then
@@ -224,7 +232,11 @@ generatePass () {
   fi
   HELP="<span color='$help_color'>Enter Number or hit Enter to use default length</span>"
   length=$(printf '%s' "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${password_length}) > ")
-  askGen
+  length_exit=$?
+  if [[ $length_exit -eq 1 ]]
+  then
+    exit
+  fi
   if [[ $length == "" ]]; then
     pass generate ${symbols} -i "$selected_password" "${password_length}" > /dev/null;
   else
@@ -549,10 +561,19 @@ listgpg () {
 }
 
 insertPass () {
-  url=$(xclip -o)
+  url=$(xclip --selection clipboard -o)
+  if [[ "${url:0:4}" == "http" ]]
+  then
+    domain_name="$(printf '%s\n' "${url}" | awk -F \/ '{l=split($3,a,"."); print (a[l-1]=="com"?a[l-2] OFS:X) a[l-1] OFS a[l]}' OFS=".")"
+	help_content="Domain: ${domain_name}
+Type name, make sure it is unique"
+  else
+  	help_content="Hint: Copy URL to clipboard before calling this menu.
+Type name, make sure it is unique"
+  fi
   cd "${root}" || exit
   grouplist="$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)"
-  name="$(listgpg | rofi -dmenu -format 'f' -mesg "Type name, make sure it is unique" -p "> ")"
+  name="$(listgpg | rofi -dmenu -format 'f' -filter "${domain_name}" -mesg "${help_content}" -p "> ")"
   val=$?
   if [[ $val -eq 1 ]]; then
     exit
