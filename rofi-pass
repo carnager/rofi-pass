@@ -638,7 +638,7 @@ Type name, make sure it is unique"
 
 help_msg () {
   cat <<'EOF' 
-rofi-pass (Version: 1.6-git)
+rofi-pass (Version: 1.5.1)
 
 Usage:
   --insert         insert new entry to password store
