@@ -6,7 +6,7 @@ basecommand="$0"
 
 # set default settings
 _rofi () {
-    rofi -kb-accept-entry "!Return" "$@"
+    rofi -no-auto-select -i "$@"
 }
 
 # We expect to find these fields in pass(1)'s output
@@ -638,7 +638,7 @@ Type name, make sure it is unique"
 
 help_msg () {
   cat <<'EOF' 
-rofi-pass (Version: 1.5.1)
+rofi-pass (Version: 1.6-git)
 
 Usage:
   --insert         insert new entry to password store
