@@ -43,6 +43,9 @@ default_autotype='user :tab pass'
 # leave empty for autodetection
 help_color="#4872FF"
 
+# if you want to see the help header
+help_header='true'
+
 # Clipboard settings
 # Possible options: primary, clipboard, both
 clip=primary
