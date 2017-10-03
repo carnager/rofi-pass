@@ -25,6 +25,9 @@ AUTOTYPE_field='autotype'
 # delay to be used for :delay keyword
 delay=2
 
+# rofi-pass needs to close itself before it can type passwords. Set delay here.
+wait=0.2
+
 ## Programs to be used
 # Editor
 EDITOR='gvim -f'

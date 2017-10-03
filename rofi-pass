@@ -16,6 +16,7 @@ AUTOTYPE_field='autotype'
 
 default_autotype="user :tab pass"
 delay=2
+wait=0.2
 default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
 notify='false'
@@ -341,9 +342,9 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
   # actions based on keypresses
   case "${rofi_exit}" in
     0) typeMenu;;
-    10) sleep 0.2; autopass;;
-    11) sleep 0.2; typeUser;;
-    12) sleep 0.2; typePass;;
+    10) sleep $wait; autopass;;
+    11) sleep $wait; typeUser;;
+    12) sleep $wait; typePass;;
     13) openURL;;
     14) copyMenu;;
     15) copyPass;;
@@ -402,13 +403,13 @@ typeMenu () {
       fi
       case "$typefield" in
         "") exit;;
-        "password") typePass;;
-        "${AUTOTYPE_field}") autopass;;
-        *) typeField
+        "password") sleep $wait; typePass;;
+        "${AUTOTYPE_field}") sleep $wait; autopass;;
+        *) sleep $wait; typeField
       esac
       clearUp
     elif [[ $default_do == "${AUTOTYPE_field}" ]]; then
-      autopass
+      sleep $wait; autopass
     else
       ${default_do}
     fi
