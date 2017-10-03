@@ -291,7 +291,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
     then
       args+=( -mesg "${HELP}" )
     fi
-    selected_password="$(list_passwords 2>/dev/null | rofi "${args[@]}")"
+    selected_password="$(list_passwords 2>/dev/null | _rofi "${args[@]}")"
 
     rofi_exit=$?
     if [[ $rofi_exit -eq 1 ]]; then
@@ -540,7 +540,7 @@ manageEntry () {
     if [[ $group == "" ]]; then
       exit
     else
-      new_name="$(listgpg | rofi -dmenu -format 'f' -mesg "Copying to same Group. Please enter a name for the new entry" -p "> ")"
+      new_name="$(listgpg | _rofi -dmenu -format 'f' -mesg "Copying to same Group. Please enter a name for the new entry" -p "> ")"
     fi
     PASSWORD_STORE_DIR="${root}" pass cp "$selected_password" "${group}/${new_name}"
       mainMenu
@@ -579,7 +579,7 @@ Type name, make sure it is unique"
   fi
   cd "${root}" || exit
   grouplist="$(find . -type d -not -iwholename '*.git*' -printf '%d\t%P\n' | sort -r -nk1 | cut -f2-)"
-  name="$(listgpg | rofi -dmenu -format 'f' -filter "${domain_name}" -mesg "${help_content}" -p "> ")"
+  name="$(listgpg | _rofi -dmenu -format 'f' -filter "${domain_name}" -mesg "${help_content}" -p "> ")"
   val=$?
   if [[ $val -eq 1 ]]; then
     exit
@@ -588,7 +588,7 @@ Type name, make sure it is unique"
   "${default_user2}"
   "${USER}"
   "${default_user}")
-  user=$(printf '%s\n' "${user_content[@]}" | rofi -dmenu -mesg "Chose Username or type" -p "> ")
+  user=$(printf '%s\n' "${user_content[@]}" | _rofi -dmenu -mesg "Chose Username or type" -p "> ")
   val=$?
   if [[ $val -eq 1 ]]; then
     exit
@@ -597,13 +597,13 @@ Type name, make sure it is unique"
   "No Group"
   "---"
   "${grouplist}")
-  group=$(printf '%s\n' "${group_content[@]}" | rofi -dmenu -p "Choose Group > ")
+  group=$(printf '%s\n' "${group_content[@]}" | _rofi -dmenu -p "Choose Group > ")
   val=$?
   if [[ $val -eq 1 ]]; then
     exit
   fi
 
-  pw=$(printf '%s' "Generate" | rofi -dmenu -p "Password > " -mesg "Type Password or hit Enter to generate one")
+  pw=$(printf '%s' "Generate" | _rofi -dmenu -p "Password > " -mesg "Type Password or hit Enter to generate one")
   if [[ $pw == "Generate" ]]; then
     pw=$(pwgen "${password_length}")
   fi
