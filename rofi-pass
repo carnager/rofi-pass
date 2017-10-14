@@ -95,7 +95,7 @@ autopass () {
 
 openURL () {
   checkIfPass
-  $BROWSER "$(pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
+  $BROWSER "$(PASSWORD_STORE_DIR="${root}" pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
   clearUp
 }
 
@@ -239,9 +239,9 @@ generatePass () {
     exit
   fi
   if [[ $length == "" ]]; then
-    pass generate ${symbols} -i "$selected_password" "${password_length}" > /dev/null;
+    PASSWORD_STORE_DIR="${root}" pass generate ${symbols} -i "$selected_password" "${password_length}" > /dev/null;
   else
-    pass generate ${symbols} -i "$selected_password" "${length}" > /dev/null;
+    PASSWORD_STORE_DIR="${root}" pass generate ${symbols} -i "$selected_password" "${length}" > /dev/null;
   fi
 }
 
