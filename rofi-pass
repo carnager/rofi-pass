@@ -269,9 +269,6 @@ mainMenu () {
   else
     unset selected_password
 
-    HELP="Welcome to rofi-pass. Use <span color='$help_color'>${insert_pass}</span> to create a new pass entry.
-Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit <span color='$help_color'>${help}</span>."
-
     args=( -dmenu
     -kb-custom-1 "${autotype}"
     -kb-custom-2 "${type_user}"
@@ -489,7 +486,6 @@ showEntry () {
     fi
     pass_content="$(for key in "${!stuff[@]}"; do printf '%s' "${key}: ${stuff[$key]}"; done)"
   fi
-  HELP="<span color='${help_color}'>${copy_entry}: Copy Entry</span>"
   bla_content=(
   "< Return"
   "${pass_content}")
