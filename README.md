@@ -65,7 +65,7 @@ addpass --name "My new Site" +user "zeltak" +branch "branch" +custom "foobar" +a
 
 * First argument `--name` is mandatory. This will be the filename of the new password entry.
 * Second argument can be `--root` followed by absolute path to your password-store. addpass also uses root config setting from rofi-pass config file. If both are not found, PASSWORD_STORE_DIR variable is checked. If none of the above are found, the default location `$HOME/.password-store` is used.
-
+* `--root` can also be a colon separated list of directories, in which case you can navigate between them on the main menu with Shift+Left and Shift+Right.
 * Fieldnames are defined with `+` and the actual value is defined inside the quotations. You can add as many fields as you like
 
 Also included is an import script for keepass2 databases. It's the same script that can be downloaded from the pass homepage, with some minor modifications to match rofi-pass structure.

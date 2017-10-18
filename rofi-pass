@@ -42,6 +42,8 @@ type_menu="Alt+t"
 help="Alt+h"
 switch="Alt+x"
 insert_pass="Alt+n"
+previous_root="Shift+Left"
+next_root="Shift+Right"
 
 # Safe permissions
 umask 077
@@ -95,7 +97,7 @@ autopass () {
 
 openURL () {
   checkIfPass
-  $BROWSER "$(pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
+  $BROWSER "$(PASSWORD_STORE_DIR="${root}" pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
   clearUp
 }
 
@@ -239,9 +241,9 @@ generatePass () {
     exit
   fi
   if [[ $length == "" ]]; then
-    pass generate ${symbols} -i "$selected_password" "${password_length}" > /dev/null;
+    PASSWORD_STORE_DIR="${root}" pass generate ${symbols} -i "$selected_password" "${password_length}" > /dev/null;
   else
-    pass generate ${symbols} -i "$selected_password" "${length}" > /dev/null;
+    PASSWORD_STORE_DIR="${root}" pass generate ${symbols} -i "$selected_password" "${length}" > /dev/null;
   fi
 }
 
@@ -280,13 +282,17 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
     -kb-custom-7 "${show}"
     -kb-custom-8 "${copy_url}"
     -kb-custom-9 "${type_menu}"
+    -kb-custom-10 "${previous_root}"
+    -kb-custom-11 "${next_root}"
     -kb-custom-14 "${action_menu}"
     -kb-custom-15 "${copy_menu}"
     -kb-custom-16 "${help}"
     -kb-custom-17 "${switch}"
     -kb-custom-18 "${insert_pass}"
+    -kb-mode-previous ""    # These keyboard shortcut options are needed, because
+    -kb-mode-next ""        # Shift+<Left|Right> are otherwise taken by rofi.
     -select $entry
-    -p "rofi-pass > ")
+    -p "rofi-pass($root) > ")
 
     if [[ $help_header == "true" ]]
     then
@@ -351,6 +357,8 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
     16) viewEntry;;
     17) copyURL;;
     18) export default_do="menu"; typeMenu;;
+    19) roots_index=$(( (roots_index-1+roots_length) % roots_length)); root=${roots[$roots_index]}; mainMenu;;
+    20) roots_index=$(( (roots_index+1) % roots_length)); root=${roots[$roots_index]}; mainMenu;;
     23) actionMenu;;
     24) copyMenu;;
     25) unset selected_password; helpMenu;;
@@ -385,7 +393,11 @@ ${copy_menu}: Copy Custom Field
 ${action_menu}: Edit, Move, Delete, Re-generate Submenu
 ${show}: Show Password File
 ${insert_pass}: Insert new Pass Entry
-${switch}: Switch Pass/Bookmark Mode" | _rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > ")
+${switch}: Switch Pass/Bookmark Mode
+---
+${previous_root}: Switch to previous password store (--roots)
+${next_root}: Switch to next password store (--roots)
+" | _rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > ")
 help_val=$?
 if [[ $help_val -eq 1 ]]; then exit;
 else unset helptext; mainMenu; fi
@@ -650,7 +662,7 @@ rofi-pass (Version: 1.6-git)
 Usage:
   --insert         insert new entry to password store
   --manage         edit/move/delete entries
-  --root           set custom root directory
+  --root           set custom root directories (colon separated)
   --last-used      highlight last used item
   --show-last      show details of last used Entry
   --bmarks         run bookmarks Mode 
@@ -694,16 +706,19 @@ main () {
 
   # check if alternative root directory was given on commandline
   if [[ -r "$HOME/.cache/rofi-pass/last_used" ]] && [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
-    export root; root=$(awk -F ': ' '{ print $1 }' "$HOME/.cache/rofi-pass/last_used")
+    roots=("$(awk -F ': ' '{ print $1 }' "$HOME/.cache/rofi-pass/last_used")")
   elif [[ -n "$2" && "$1" == "--root" ]]; then
-    export root="${2}"
+    IFS=: read -r -a roots <<< "$2"
   elif [[ -n $root ]]; then
-    export root="${root}"
+    roots=("${root}")
   elif [[ -n ${PASSWORD_STORE_DIR} ]]; then
-    export root=${PASSWORD_STORE_DIR}
+    roots=("${PASSWORD_STORE_DIR}")
   else
-    export root="$HOME/.password-store"
+    roots=("$HOME/.password-store")
   fi
+  roots_index=0
+  roots_length=${#roots[@]}
+  export root=${roots[$roots_index]}
   export PASSWORD_STORE_DIR="${root}"
     case $1 in
       --insert)
