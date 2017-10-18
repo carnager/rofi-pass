@@ -349,7 +349,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
     11) sleep $wait; typeUser;;
     12) sleep $wait; typePass;;
     13) openURL;;
-    14) copyMenu;;
+    14) copyUser;;
     15) copyPass;;
     16) viewEntry;;
     17) copyURL;;
