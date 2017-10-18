@@ -292,12 +292,9 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
     -kb-mode-previous ""    # These keyboard shortcut options are needed, because
     -kb-mode-next ""        # Shift+<Left|Right> are otherwise taken by rofi.
     -select $entry
-    -p "rofi-pass($root) > ")
+    -mesg "PW Store: ${root}"
+    -p "> ")
 
-    if [[ $help_header == "true" ]]
-    then
-      args+=( -mesg "${HELP}" )
-    fi
     selected_password="$(list_passwords 2>/dev/null | _rofi "${args[@]}")"
 
     rofi_exit=$?

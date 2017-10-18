@@ -50,9 +50,6 @@ help_color="#4872FF"
 # Possible options: primary, clipboard, both
 clip=primary
 
-# show help header
-help_header="true"
-
 # Options for generating new password entries
 # default_user is also used for password files that have no user field.
 #default_user=john_doe
