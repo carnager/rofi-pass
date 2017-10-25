@@ -35,7 +35,6 @@ copy_name="Alt+u"
 copy_url="Alt+l"
 copy_pass="Alt+p"
 show="Alt+o"
-copy_entry="Alt+2"
 copy_menu="Alt+c"
 action_menu="Alt+a"
 type_menu="Alt+t"
@@ -288,7 +287,7 @@ mainMenu () {
     -kb-custom-18 "${insert_pass}"
     -kb-mode-previous ""    # These keyboard shortcut options are needed, because
     -kb-mode-next ""        # Shift+<Left|Right> are otherwise taken by rofi.
-    -select $entry
+    -select "$entry"
     -mesg "PW Store: ${root}"
     -p "> ")
 
