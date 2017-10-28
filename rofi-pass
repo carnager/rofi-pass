@@ -35,7 +35,6 @@ copy_name="Alt+u"
 copy_url="Alt+l"
 copy_pass="Alt+p"
 show="Alt+o"
-copy_entry="Alt+2"
 copy_menu="Alt+c"
 action_menu="Alt+a"
 type_menu="Alt+t"
@@ -269,9 +268,6 @@ mainMenu () {
   else
     unset selected_password
 
-    HELP="Welcome to rofi-pass. Use <span color='$help_color'>${insert_pass}</span> to create a new pass entry.
-Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit <span color='$help_color'>${help}</span>."
-
     args=( -dmenu
     -kb-custom-1 "${autotype}"
     -kb-custom-2 "${type_user}"
@@ -291,7 +287,7 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
     -kb-custom-18 "${insert_pass}"
     -kb-mode-previous ""    # These keyboard shortcut options are needed, because
     -kb-mode-next ""        # Shift+<Left|Right> are otherwise taken by rofi.
-    -select $entry
+    -select "$entry"
     -mesg "PW Store: ${root}"
     -p "> ")
 
@@ -301,6 +297,16 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
     if [[ $rofi_exit -eq 1 ]]; then
       exit
     fi
+
+    # Actions based on exit code, which do not need the entry.
+    # The exit code for -kb-custom-X is X+9.
+    case "${rofi_exit}" in
+      19) roots_index=$(( (roots_index-1+roots_length) % roots_length)); root=${roots[$roots_index]}; mainMenu;;
+      20) roots_index=$(( (roots_index+1) % roots_length)); root=${roots[$roots_index]}; mainMenu;;
+      25) helpMenu; return;;
+      26) ${basecommand} --bmarks; return;;
+    esac
+
     mapfile -t password_temp < <(PASSWORD_STORE_DIR="${root}" pass "$selected_password")
     password=${password_temp[0]}
     if [[ ${password} == "#FILE="* ]]; then
@@ -343,23 +349,20 @@ Run ${default_do} with <span color='$help_color'>Enter</span>. For more help hit
   pass_content="$(for key in "${!stuff[@]}"; do printf '%s\n' "${key}: ${stuff[$key]}"; done)"
 
   # actions based on keypresses
+  # The exit code for -kb-custom-X is X+9.
   case "${rofi_exit}" in
     0) typeMenu;;
     10) sleep $wait; autopass;;
     11) sleep $wait; typeUser;;
     12) sleep $wait; typePass;;
     13) openURL;;
-    14) copyMenu;;
+    14) copyUser;;
     15) copyPass;;
     16) viewEntry;;
     17) copyURL;;
-    18) export default_do="menu"; typeMenu;;
-    19) roots_index=$(( (roots_index-1+roots_length) % roots_length)); root=${roots[$roots_index]}; mainMenu;;
-    20) roots_index=$(( (roots_index+1) % roots_length)); root=${roots[$roots_index]}; mainMenu;;
+    18) default_do="menu" typeMenu;;
     23) actionMenu;;
     24) copyMenu;;
-    25) unset selected_password; helpMenu;;
-    26) ${basecommand} --bmarks;;
     27) insertPass;;
   esac
   clearUp
@@ -405,7 +408,9 @@ typeMenu () {
   if [[ -n $default_do ]]; then
     if [[ $default_do == "menu" ]]; then
       checkIfPass
-      typefield=$(printf '%s\n' "${!stuff[@]}" | sort | _rofi -dmenu  -p "Choose Field to type > ")
+      local -a keys=(${!stuff[@]})
+      keys=(${keys[@]/$AUTOTYPE_field})
+      typefield=$({ echo ${AUTOTYPE_field} ; printf '%s\n' "${keys[@]}" | sort; } | _rofi -dmenu  -p "Choose Field to type > ")
       val=$?
       if [[ $val -eq 1 ]]; then
         exit
@@ -489,7 +494,6 @@ showEntry () {
     fi
     pass_content="$(for key in "${!stuff[@]}"; do printf '%s' "${key}: ${stuff[$key]}"; done)"
   fi
-  HELP="<span color='${help_color}'>${copy_entry}: Copy Entry</span>"
   bla_content=(
   "< Return"
   "${pass_content}")
