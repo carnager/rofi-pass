@@ -1,4 +1,5 @@
-# permanently set alternative root dir
+# permanently set alternative root dir. Use ":" to separate multiple roots
+# which can be switched at runtime with shift+left/right
 # root=/path/to/root
 
 # rofi command. Make sure to have "$@" as last argument
