@@ -2,7 +2,7 @@
 
 #### bash script to handle pass storages in a convenient way
 
-![rofi-pass](screenshot.jpg "rofi-pass in action")
+![rofi-pass](https://53280.de/rofi/rofi-pass.png "rofi-pass in action")
 
 ## Features:
 
