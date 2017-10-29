@@ -74,11 +74,8 @@ Also included is an import script for keepass2 databases. It's the same script t
 ## Sharing passwords
 
 Rofi-pass allows you to easily share common used passwords across multiple entries. 
-
-
 For example, if you have an academic account which includes several services (such as a library, Salary, Student portal etc),  all with different URL's, login forms etc. you can share one password across all of them. This is very handy when the passwords change annually.
-
-To use this function you need to add the following line instead of the password, referencing the file which holds the password
+To use this function you need to add the following line instead of the password, referencing a pass file which holds the password.
 
 ```
 #FILE=PATH/to/filename
