@@ -16,6 +16,7 @@
 * Type any field from entry
 * Auto Type User and Password. Format of password files are expected to be like:
 * Bookmarks mode (default: Alt+x)
+* Share common used passwords between several entries (with different URLS,usernames etc)
 ```
 foobarmysecurepassword
 user: MyUser
@@ -69,6 +70,21 @@ addpass --name "My new Site" +user "zeltak" +branch "branch" +custom "foobar" +a
 * Fieldnames are defined with `+` and the actual value is defined inside the quotations. You can add as many fields as you like
 
 Also included is an import script for keepass2 databases. It's the same script that can be downloaded from the pass homepage, with some minor modifications to match rofi-pass structure.
+
+## Sharing passwords
+
+Rofi-pass allows you to easily share common used passwords across multiple entries. 
+
+
+For example, if you have an academic account which includes several services (such as a library, Salary, Student portal etc),  all with different URL's, login forms etc. you can share one password across all of them. This is very handy when the passwords change annually.
+
+To use this function you need to add the following line instead of the password, referencing the file which holds the password
+
+```
+#FILE=PATH/to/filename
+```
+where PATH is relative to your password-store.
+
 
 ## FAQ
 
