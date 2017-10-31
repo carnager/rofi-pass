@@ -290,7 +290,7 @@ mainMenu () {
     -select "$entry"
     -p "> ")
 
-	if [[ ${#roots[@]} -ne "1" ]]
+	if [[ ${#roots[@]} -gt "1" ]]
 	then
 		args+=(-mesg "PW Store: ${root}")
 	fi
