@@ -288,8 +288,12 @@ mainMenu () {
     -kb-mode-previous ""    # These keyboard shortcut options are needed, because
     -kb-mode-next ""        # Shift+<Left|Right> are otherwise taken by rofi.
     -select "$entry"
-    -mesg "PW Store: ${root}"
     -p "> ")
+
+	if [[ ${#roots[@]} -ne "1" ]]
+	then
+		args+=(-mesg "PW Store: ${root}")
+	fi
 
     selected_password="$(list_passwords 2>/dev/null | _rofi "${args[@]}")"
 
