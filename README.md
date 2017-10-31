@@ -82,6 +82,7 @@ To use this function you need to add the following line instead of the password,
 ```
 where PATH is relative to your password-store.
 
+*And yes, you should slap your service provider for forcing you to share passwords across services.*
 
 ## FAQ
 
