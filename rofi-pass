@@ -667,7 +667,6 @@ Usage:
 
       Commands:
         --insert         insert new entry to password store
-        --manage         edit/move/delete entries
         --root           set custom root directories (colon separated)
         --last-used      highlight last used item
         --show-last      show details of last used Entry
