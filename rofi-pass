@@ -290,7 +290,7 @@ mainMenu () {
     -select "$entry"
     -p "> ")
 
-	if [[ ${#roots[@]} -gt "1" ]]
+	if [[ ${#roots[@]} -gt "1" || $custom_root == "true" ]]
 	then
 		args+=(-mesg "PW Store: ${root}")
 	fi
@@ -713,7 +713,7 @@ main () {
   if [[ -r "$HOME/.cache/rofi-pass/last_used" ]] && [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
     roots=("$(awk -F ': ' '{ print $1 }' "$HOME/.cache/rofi-pass/last_used")")
   elif [[ -n "$2" && "$1" == "--root" ]]; then
-    IFS=: read -r -a roots <<< "$2"
+    custom_root=true; IFS=: read -r -a roots <<< "$2"
   elif [[ -n $root ]]; then
     roots=("${root}")
   elif [[ -n ${PASSWORD_STORE_DIR} ]]; then
