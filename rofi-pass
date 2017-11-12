@@ -143,14 +143,21 @@ typePass () {
 
 typeField () {
   checkIfPass
+  local to_type
 
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
   xset r off
 
-  printf '%s' "${stuff[${typefield}]}" | xdotool type --clearmodifiers --file -
+  case $typefield in
+    "OTP") to_type="$(PASSWORD_STORE_DIR="${root}" pass otp "$selected_password")" ;;
+    *) to_type="${stuff[${typefield}]}" ;;
+  esac
+
+  printf '%s' "$to_type" | xdotool type --clearmodifiers --file -
 
   xset r "$x_repeat_enabled"
   unset x_repeat_enabled
+  unset to_type
 
   clearUp
 }
@@ -327,7 +334,7 @@ mainMenu () {
         case "$LINE" in
           "otpauth://"*)
             _id="OTP"
-            _val="$(PASSWORD_STORE_DIR="${root}" pass otp "$selected_password")"
+            _val=""
             ;;
           *)
             _id="${LINE%%: *}"
