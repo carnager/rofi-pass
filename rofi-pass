@@ -383,7 +383,7 @@ clearUp () {
 }
 
 helpMenu () {
-  helptext=$(printf '%s' "${autotype}: Autotype
+  printf '%s' "${autotype}: Autotype
 ${type_user}: Type Username
 ${type_pass}: Type Password
 ---
@@ -400,7 +400,7 @@ ${switch}: Switch Pass/Bookmark Mode
 ---
 ${previous_root}: Switch to previous password store (--roots)
 ${next_root}: Switch to next password store (--roots)
-" | _rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > ")
+" | _rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > "
 help_val=$?
 if [[ $help_val -eq 1 ]]; then exit;
 else unset helptext; mainMenu; fi
@@ -414,13 +414,13 @@ typeMenu () {
       local -a keys=(${!stuff[@]})
       keys=(${keys[@]/$AUTOTYPE_field})
       typefield=$({ echo ${AUTOTYPE_field} ; printf '%s\n' "${keys[@]}" | sort; } | _rofi -dmenu  -p "Choose Field to type > ")
-      val=$?
-      if [[ $val -eq 1 ]]; then
+      typefield_exit=$?
+      if [[ $typefield_exit -eq 1 ]]; then
         exit
       fi
       case "$typefield" in
-        "") exit;;
-        "password") sleep $wait; typePass;;
+        '') exit;;
+        'password') sleep $wait; typePass;;
         "${AUTOTYPE_field}") sleep $wait; autopass;;
         *) sleep $wait; typeField
       esac
@@ -587,7 +587,7 @@ insertPass () {
   url=$(xclip --selection clipboard -o)
   if [[ "${url:0:4}" == "http" ]]
   then
-    domain_name="$(printf '%s\n' "${url}" | awk -F \/ '{l=split($3,a,"."); print (a[l-1]=="com"?a[l-2] OFS:X) a[l-1] OFS a[l]}' OFS=".")"
+    domain_name="$(printf '%s\n' "${url}" | awk -F / '{l=split($3,a,"."); print (a[l-1]=="com"?a[l-2] OFS:X) a[l-1] OFS a[l]}' OFS=".")"
 	help_content="Domain: ${domain_name}
 Type name, make sure it is unique"
   else
@@ -669,7 +669,7 @@ Usage:
         --root           set custom root directories (colon separated)
         --last-used      highlight last used item
         --show-last      show details of last used Entry
-        --bmarks         run bookmarks Mode 
+        --bmarks         start in bookmarks mode
 
     rofi-pass version 1.5.3
 EOF
