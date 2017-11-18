@@ -415,7 +415,8 @@ typeMenu () {
       local -a keys=(${!stuff[@]})
       keys=(${keys[@]/$AUTOTYPE_field})
       typefield=$({ echo ${AUTOTYPE_field} ; printf '%s\n' "${keys[@]}" | sort; } | _rofi -dmenu  -p "Choose Field to type > ")
-      if [[ $? -eq 1 ]]; then
+      typefield_exit=$?
+      if [[ $typefield_exit -eq 1 ]]; then
         exit
       fi
       case "$typefield" in
