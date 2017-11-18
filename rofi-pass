@@ -65,8 +65,7 @@ doClip () {
 }
 
 checkIfPass () {
-    rm -f "$HOME/.cache/rofi-pass/last_used"
-    printf '%s\n' "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
+    printf '%s\n' "${root}: $selected_password" >| "$HOME/.cache/rofi-pass/last_used"
 }
 
 
