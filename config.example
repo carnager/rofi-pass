@@ -75,9 +75,9 @@ clip_clear=45
 # open new password entries in editor
 edit_new_pass="true"
 
-# default_user is also used for password files that have no user field.
-#default_user="${ROFI_PASS_DEFAULT_USER-$(whoami)}"
-#default_user2=mary_ann
+# The first entry from default_users is also used for password files that have
+# no user field.
+#default_users=("${ROFI_PASS_DEFAULT_USER-$(whoami)}")
 #password_length=12
 
 # Custom Keybindings
