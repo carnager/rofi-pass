@@ -82,6 +82,7 @@ autopass () {
     ":space") xdotool key space;;
     ":delay") sleep "${delay}";;
     ":enter") xdotool key Return;;
+    ":otp") printf '%s' "$(PASSWORD_STORE_DIR="${root}" pass otp ${selected_password})" | xdotool type --clearmodifiers --file -;;
     "pass") printf '%s' "${password}" | xdotool type --clearmodifiers --file -;;
     *) printf '%s' "${stuff[${word}]}" | xdotool type --clearmodifiers --file -;;
   esac
