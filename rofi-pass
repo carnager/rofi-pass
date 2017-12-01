@@ -420,7 +420,7 @@ typeMenu () {
       fi
       case "$typefield" in
         '') exit;;
-        'password') sleep $wait; typePass;;
+        'pass') sleep $wait; typePass;;
         "${AUTOTYPE_field}") sleep $wait; autopass;;
         *) sleep $wait; typeField
       esac
