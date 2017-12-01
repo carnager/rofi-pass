@@ -82,6 +82,7 @@ autopass () {
     ":delay") sleep "${delay}";;
     ":enter") xdotool key Return;;
     "pass") printf '%s' "${password}" | xdotool type --clearmodifiers --file -;;
+    run_command_*) printf '%s' "$(bash -c "${stuff[${word}]}")" | xdotool type --clearmodifiers --file -;;
     *) printf '%s' "${stuff[${word}]}" | xdotool type --clearmodifiers --file -;;
   esac
   done
@@ -147,6 +148,20 @@ typeField () {
   xset r off
 
   printf '%s' "${stuff[${typefield}]}" | xdotool type --clearmodifiers --file -
+
+  xset r "$x_repeat_enabled"
+  unset x_repeat_enabled
+
+  clearUp
+}
+
+typeRunCommand () {
+  checkIfPass
+
+  x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
+  xset r off
+
+  printf '%s' "$(bash -c "${stuff[${typefield}]}")" | xdotool type --clearmodifiers --file -
 
   xset r "$x_repeat_enabled"
   unset x_repeat_enabled
@@ -422,6 +437,7 @@ typeMenu () {
         '') exit;;
         'password') sleep $wait; typePass;;
         "${AUTOTYPE_field}") sleep $wait; autopass;;
+        run_command_*) sleep $wait; typeRunCommand;;
         *) sleep $wait; typeField
       esac
       clearUp
