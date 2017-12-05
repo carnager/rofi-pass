@@ -350,12 +350,9 @@ mainMenu () {
       while read -r LINE; do
         unset _id _val
         case "$LINE" in
-          "otpauth://"*)
+          "otpauth://"*|"${OTPmethod_field}"*)
             _id="OTP"
             _val=""
-            ;;
-          "${OTPmethod_field}"*)
-            # We don't show otp_method as a field that we can type
             ;;
           *)
             _id="${LINE%%: *}"
