@@ -348,17 +348,23 @@ mainMenu () {
     stuff["pass"]=${password}
     if [[ -n $fields ]]; then
       while read -r LINE; do
+        unset _id _val
         case "$LINE" in
           "otpauth://"*)
             _id="OTP"
             _val=""
+            ;;
+          "${OTPmethod_field}"*)
+            # We don't show otp_method as a field that we can type
             ;;
           *)
             _id="${LINE%%: *}"
             _val="${LINE#* }"
             ;;
         esac
-        stuff["${_id}"]=${_val}
+        if [[ -n "$_id" ]]; then
+          stuff["${_id}"]=${_val}
+        fi
       done < <(printf '%s\n' "${fields}")
       if test "${stuff['autotype']+autotype}"
         then
