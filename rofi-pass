@@ -13,6 +13,7 @@ _rofi () {
 URL_field='url'
 USERNAME_field='user'
 AUTOTYPE_field='autotype'
+OTPmethod_field='otp_method'
 
 default_autotype="user :tab pass"
 delay=2
@@ -81,6 +82,7 @@ autopass () {
     ":space") xdotool key space;;
     ":delay") sleep "${delay}";;
     ":enter") xdotool key Return;;
+    ":otp") printf '%s' "$(generateOTP)" | xdotool type --clearmodifiers --file -;;
     "pass") printf '%s' "${password}" | xdotool type --clearmodifiers --file -;;
     *) printf '%s' "${stuff[${word}]}" | xdotool type --clearmodifiers --file -;;
   esac
@@ -142,14 +144,36 @@ typePass () {
 
 typeField () {
   checkIfPass
+  local to_type
 
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
   xset r off
 
-  printf '%s' "${stuff[${typefield}]}" | xdotool type --clearmodifiers --file -
+  case $typefield in
+    "OTP") to_type="$(generateOTP)" ;;
+    *) to_type="${stuff[${typefield}]}" ;;
+  esac
+
+  printf '%s' "$to_type" | xdotool type --clearmodifiers --file -
 
   xset r "$x_repeat_enabled"
   unset x_repeat_enabled
+  unset to_type
+
+  clearUp
+}
+
+generateOTP () {
+  checkIfPass
+
+  # First, we check if there is a non-conventional OTP command in the pass file
+  if PASSWORD_STORE_DIR="${root}" pass "$selected_password" | grep -q "${OTPmethod_field}: "; then
+    # We execute the commands after otp_method: AS-IS
+    bash -c "$(PASSWORD_STORE_DIR="${root}" pass "$selected_password" | grep "${OTPmethod_field}: " | cut -d' ' -f2-)"
+  else
+  # If there is no method defined, fallback to pass-otp
+    PASSWORD_STORE_DIR="${root}" pass otp "$selected_password"
+  fi
 
   clearUp
 }
@@ -317,15 +341,26 @@ mainMenu () {
       mapfile -t password_temp < <(PASSWORD_STORE_DIR="${root}" pass show "${pass_file}")
       password=${password_temp[0]}
     fi
-    fields=$(printf '%s\n' "${password_temp[@]:1}" | awk '$1 ~ /:$/{$1=$1;print}')
+    fields=$(printf '%s\n' "${password_temp[@]:1}" | awk '$1 ~ /:$/ || /otpauth:\/\// {$1=$1;print}')
 
     declare -A stuff
     stuff["pass"]=${password}
     if [[ -n $fields ]]; then
       while read -r LINE; do
-        _id="${LINE%%: *}"
-        _val="${LINE#* }"
-        stuff["${_id}"]=${_val}
+        unset _id _val
+        case "$LINE" in
+          "otpauth://"*|"${OTPmethod_field}"*)
+            _id="OTP"
+            _val=""
+            ;;
+          *)
+            _id="${LINE%%: *}"
+            _val="${LINE#* }"
+            ;;
+        esac
+        if [[ -n "$_id" ]]; then
+          stuff["${_id}"]=${_val}
+        fi
       done < <(printf '%s\n' "${fields}")
       if test "${stuff['autotype']+autotype}"
         then
