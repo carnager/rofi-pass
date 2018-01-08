@@ -34,7 +34,7 @@ wait=0.2
 EDITOR='gvim -f'
 
 # Browser
-BROWSER='chromium'
+BROWSER='xdg-open'
 
 ## Misc settings
 
