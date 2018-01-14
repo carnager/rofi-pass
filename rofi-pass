@@ -516,13 +516,13 @@ showEntry () {
   if [[ -z $pass_content ]]; then
     password_temp=$(PASSWORD_STORE_DIR="${root}" pass show "$selected_password")
     password="${password_temp%%$'\n'*}"
-    pass_key_value=$(printf '%s' "${password_temp}" | tail -n+2 | grep ': ')
+    pass_key_value=$(printf '%s\n' "${password_temp}" | tail -n+2 | grep ': ')
     declare -A stuff
     while read -r LINE; do
       _id="${LINE%%: *}"
       _val="${LINE#* }"
       stuff["${_id}"]=${_val}
-    done < <(printf '%s' "${pass_key_value}")
+    done < <(printf '%s\n' "${pass_key_value}")
     stuff["pass"]=${password}
     if test "${stuff['autotype']+autotype}"
       then
@@ -530,7 +530,7 @@ showEntry () {
       else
           stuff["autotype"]="${USERNAME_field} :tab pass"
     fi
-    pass_content="$(for key in "${!stuff[@]}"; do printf '%s' "${key}: ${stuff[$key]}"; done)"
+    pass_content="$(for key in "${!stuff[@]}"; do printf '%s\n' "${key}: ${stuff[$key]}"; done)"
   fi
   bla_content=(
   "< Return"
