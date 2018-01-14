@@ -40,6 +40,20 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
   You can use `:tab`, `:enter`, or `:space` here to type <kbd>Tab</kbd>,
   <kbd>Enter</kbd>, or <kbd>Space</kbd> (useful for toggling checkboxes)
   respectively.
+  `:otp` will generate an OTP, either `pass-otp(1)` style, or according to the
+  `otp_method:`, if it is defined.
+* Generating OTPs.
+  The format for OTPs should either be `pass-otp(1)`-compatible
+  ```
+  [...]
+  otpauth://[...]
+  ```
+  Or it should define a method for generating OTPs:
+  ```
+  [...]
+  otp_method: /opt/obscure-otp-generator/oog --some-option some args
+  ```
+  
   `:delay` will trigger a delay (2 seconds by default).
 * All hotkeys are configurable in the config file
 * The field names for `user`, `url` and `autotype` are configurable
@@ -55,7 +69,7 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
 * gawk
 * bash
 * pwgen
-
+* pass-otp(1) (https://github.com/tadfisher/pass-otp) (optional: for OTPs)
 ### BSD
 
 * gnugrep
