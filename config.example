@@ -53,7 +53,7 @@ clip=primary
 
 # Options for generating new password entries
 # default_user is also used for password files that have no user field.
-#default_user=john_doe
+#default_user="${ROFI_PASS_DEFAULT_USER-$(whoami)}"
 #default_user2=mary_ann
 #password_length=12
 
