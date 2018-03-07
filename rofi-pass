@@ -79,22 +79,24 @@ autopass () {
   rm -f "$HOME/.cache/rofi-pass/last_used"
   printf '%s\n' "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
   for word in ${stuff["$AUTOTYPE_field"]}; do
-  case "$word" in
-    ":tab") xdotool key Tab;;
-    ":space") xdotool key space;;
-    ":delay") sleep "${delay}";;
-    ":enter") xdotool key Return;;
-    ":otp") printf '%s' "$(generateOTP)" | xdotool type --clearmodifiers --file -;;
-    "pass") printf '%s' "${password}" | xdotool type --clearmodifiers --file -;;
-    ":clip") inclip=true ;;
-    *)
-        if [[ ${inclip} == "true" ]]; then
-            clipcontent=$(printf '%s%s' "$clipcontent" "${stuff[${word}]} ")
-        else
-            printf '%s' "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
-        fi
-    ;;
-  esac
+    wordToPrint=""
+    case "$word" in
+      ":tab") xdotool key Tab;;
+      ":space") xdotool key space;;
+      ":delay") sleep "${delay}";;
+      ":enter") xdotool key Return;;
+      ":otp") wordToPrint="$(generateOTP)";;
+      "pass") wordToPrint="${password}";;
+      ":clip") inclip=true;;
+      *) wordToPrint="${stuff[${word}]}";;
+    esac
+    if [[ ! -z "$wordToPrint" ]]; then
+      if [[ ${inclip} == "true" ]]; then
+        clipcontent=$(printf '%s%s ' "$clipcontent" "$wordToPrint")
+      else
+        printf '%s' "$wordToPrint" | xdotool type --clearmodifiers --file -
+      fi
+     fi
   done
   if [[ ${inclip} == "true" ]]; then
       printf '%s' "$clipcontent" | doClip
