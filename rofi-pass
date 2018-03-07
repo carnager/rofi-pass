@@ -72,6 +72,8 @@ checkIfPass () {
 
 autopass () {
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
+  inclip='false'
+  clipcontent=""
   xset r off
 
   rm -f "$HOME/.cache/rofi-pass/last_used"
@@ -84,9 +86,19 @@ autopass () {
     ":enter") xdotool key Return;;
     ":otp") printf '%s' "$(generateOTP)" | xdotool type --clearmodifiers --file -;;
     "pass") printf '%s' "${password}" | xdotool type --clearmodifiers --file -;;
-    *) printf '%s' "${stuff[${word}]}" | xdotool type --clearmodifiers --file -;;
+    ":clip") inclip=true ;;
+    *)
+        if [[ ${inclip} == "true" ]]; then
+            clipcontent=$(printf '%s%s' "$clipcontent" "${stuff[${word}]} ")
+        else
+            printf '%s' "${stuff[${word}]}" | xdotool type --clearmodifiers --file -
+        fi
+    ;;
   esac
   done
+  if [[ ${inclip} == "true" ]]; then
+      printf '%s' "$clipcontent" | doClip
+  fi
   if [[ ${auto_enter} == "true" ]]; then
     xdotool key Return
   fi

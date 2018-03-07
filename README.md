@@ -42,6 +42,7 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
   respectively.
   `:otp` will generate an OTP, either `pass-otp(1)` style, or according to the
   `otp_method:`, if it is defined.
+  `:clip` puts every field after it into the clipboard.
 * Generating OTPs.
   The format for OTPs should either be `pass-otp(1)`-compatible
   ```
