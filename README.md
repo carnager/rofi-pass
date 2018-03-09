@@ -78,7 +78,12 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
 ## Configuration
 
 rofi-pass may read its configuration values from `/etc/rofi-pass.conf` and/or `$HOME/.config/rofi-pass/config`.
+You can also set a configuration by using the environment variable ROFI_PASS_CONFIG (see example below).
 For an example configuration please take a look at the included `config.example` file.
+
+```
+ROFI_PASS_CONFIG="$HOME/path/to/config" rofi-pass
+```
 
 ## Extras
 

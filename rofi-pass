@@ -724,6 +724,11 @@ main () {
     source "$HOME/.config/rofi-pass/config"
   fi
 
+  # check if path to config in environment variable exists and load it
+  if [[ -f "$ROFI_PASS_CONFIG" ]]; then
+    source "$ROFI_PASS_CONFIG"
+  fi
+
   # create tmp dir
   if [[ ! -d "$HOME/.cache/rofi-pass" ]]; then
     mkdir "$HOME/.cache/rofi-pass"
