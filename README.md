@@ -42,7 +42,6 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
   respectively.
   `:otp` will generate an OTP, either `pass-otp(1)` style, or according to the
   `otp_method:`, if it is defined.
-  `:clip` puts every field after it into the clipboard.
 * Generating OTPs.
   The format for OTPs should either be `pass-otp(1)`-compatible
   ```
@@ -60,6 +59,17 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
 * The field names for `user`, `url` and `autotype` are configurable
 * Bookmarks mode (open stored URLs in browser, default: Alt+x)
 * Share common used passwords between several entries (with different URLs, usernames etc)
+* Each field after `:clip` gets copied into the clipbard.
+
+```
+hunter2
+user: foo
+url: http://example.com
+oauth://[...]
+autotype: user pass :clip :otp
+```
+
+The otp token will now be copied into the clipboard after auto-typing.
 
 ## Requirements
 
