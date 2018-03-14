@@ -66,7 +66,7 @@ hunter2
 user: foo
 url: http://example.com
 oauth://[...]
-autotype: user pass :clip :otp
+autotype: user :tab pass :clip :otp
 ```
 
 The otp token will now be copied into the clipboard after auto-typing.

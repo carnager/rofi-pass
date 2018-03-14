@@ -99,7 +99,7 @@ autopass () {
      fi
   done
   if [[ ${inclip} == "true" ]]; then
-      printf '%s' "$clipcontent" | doClip
+      printf '%s' "$clipcontent" | sed -e 's/ *$//' | doClip
   fi
   if [[ ${auto_enter} == "true" ]]; then
     xdotool key Return
