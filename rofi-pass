@@ -710,24 +710,30 @@ Usage:
 EOF
 }
 
+get_config_file () {
+  configs=(
+    "$ROFI_PASS_CONFIG"
+    "$HOME/.config/rofi-pass/config"
+    "/etc/rofi-pass.conf"
+  )
+
+  # return the first config file with a valid path
+  for config in "${configs[@]}"; do
+    # '! -z' is needed in case ROFI_PASS_CONFIG is not set
+    if [[ ! -z "${config}" && -f "${config}" ]]; then
+      printf "%s" "$config"
+      return
+    fi
+  done
+}
+
 main () {
   # enable extended globbing
   shopt -s nullglob globstar
 
-  # check if global config exists and load it
-  if [[ -f /etc/rofi-pass.conf ]]; then
-    source /etc/rofi-pass.conf
-  fi
-
-  # check if local config exists and load it
-  if [[ -f "$HOME/.config/rofi-pass/config" ]]; then
-    source "$HOME/.config/rofi-pass/config"
-  fi
-
-  # check if path to config in environment variable exists and load it
-  if [[ -f "$ROFI_PASS_CONFIG" ]]; then
-    source "$ROFI_PASS_CONFIG"
-  fi
+  # load config file
+  config_file="$(get_config_file)"
+  [[ ! -z "$config_file" ]] && source "$config_file"
 
   # create tmp dir
   if [[ ! -d "$HOME/.cache/rofi-pass" ]]; then
