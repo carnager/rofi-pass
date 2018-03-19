@@ -422,7 +422,7 @@ mainMenu () {
     23) actionMenu;;
     24) copyMenu;;
     27) insertPass;;
-    28) generateQrCode;
+    28) generateQrCode;;
   esac
   clearUp
 }
