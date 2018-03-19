@@ -9,6 +9,12 @@ _rofi () {
     rofi -no-auto-select -i "$@"
 }
 
+has_program() {
+  type "$1" >/dev/null 2>&1 \
+  && echo -n 1 \
+  || echo -n 0
+}
+
 # We expect to find these fields in pass(1)'s output
 URL_field='url'
 USERNAME_field='user'
@@ -26,6 +32,8 @@ clip=primary
 default_user="${ROFI_PASS_DEFAULT_USER-$(whoami)}"
 default_user2=john_doe
 password_length=12
+has_qrencode="$(has_program qrencode)"
+has_feh="$(has_program feh)"
 
 # default shortcuts
 autotype="Alt+1"
@@ -42,6 +50,7 @@ type_menu="Alt+t"
 help="Alt+h"
 switch="Alt+x"
 insert_pass="Alt+n"
+qrcode="Alt+q"
 previous_root="Shift+Left"
 next_root="Shift+Right"
 
@@ -92,6 +101,12 @@ autopass () {
   fi
   xset r "$x_repeat_enabled"
   unset x_repeat_enabled
+  clearUp
+}
+
+generateQrCode() {
+  checkIfPass
+  pass "$selected_password" |head -n 1| qrencode -d 300 -v 8 -l H -o -|feh -
   clearUp
 }
 
@@ -308,6 +323,11 @@ mainMenu () {
     -kb-custom-16 "${help}"
     -kb-custom-17 "${switch}"
     -kb-custom-18 "${insert_pass}"
+    )
+    if [[ "$has_qrencode" -eq 1 ]] && [[ "$has_feh" -eq 1 ]]; then
+      args+=(-kb-custom-19 "${qrcode}")
+    fi
+    args+=(
     -kb-mode-previous ""    # These keyboard shortcut options are needed, because
     -kb-mode-next ""        # Shift+<Left|Right> are otherwise taken by rofi.
     -select "$entry"
@@ -402,6 +422,7 @@ mainMenu () {
     23) actionMenu;;
     24) copyMenu;;
     27) insertPass;;
+    28) generateQrCode;;
   esac
   clearUp
 }
