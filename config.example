@@ -7,6 +7,14 @@ _rofi () {
     rofi -i -no-auto-select "$@"
 }
 
+# rofi-pass can create a qrcode for selected entry.
+# This needs qrencode to be installed and an image
+# viewer that supports reading from a pipe.
+# Working viewers are feh and display
+_image_viewer () {
+  feh -                   
+}
+
 # xdotool needs the keyboard layout to be set using setxkbmap
 # You can do this in your autostart scripts (e.g. xinitrc)
 
