@@ -9,6 +9,10 @@ _rofi () {
     rofi -no-auto-select -i "$@"
 }
 
+_image_viewer () {
+  sxiv -
+}
+
 # We expect to find these fields in pass(1)'s output
 URL_field='url'
 USERNAME_field='user'
@@ -42,11 +46,17 @@ type_menu="Alt+t"
 help="Alt+h"
 switch="Alt+x"
 insert_pass="Alt+n"
+qrcode="Alt+q"
 previous_root="Shift+Left"
 next_root="Shift+Right"
 
 # Safe permissions
 umask 077
+img_viewer="display"
+
+has_qrencode() {
+  command -v qrencode >/dev/null 2>&1
+}
 
 # get all password files and create an array
 list_passwords() {
@@ -92,6 +102,35 @@ autopass () {
   fi
   xset r "$x_repeat_enabled"
   unset x_repeat_enabled
+  clearUp
+}
+
+generateQrCode() {
+  has_qrencode
+  if [[ $? -eq "1" ]]
+  then
+    echo "qrencode not found" | _rofi -dmenu
+    exit_code=$?
+    if [[ $exit_code -eq "1" ]]
+    then
+      exit
+    else
+      "${basecommand}"
+    fi
+  fi
+  checkIfPass
+  pass "$selected_password" | head -n 1 | qrencode -d 300 -v 8 -l H -o - | _image_viewer
+  if [[ $? -eq "1" ]]
+  then
+      echo "" | _rofi -dmenu -mesg "Image viewer not defined or cannot read from pipe"
+      exit_value=$?
+      if [[ $exit_value -eq "1" ]]
+      then
+        exit
+      else
+        "${basecommand}"
+      fi
+  fi
   clearUp
 }
 
@@ -308,6 +347,8 @@ mainMenu () {
     -kb-custom-16 "${help}"
     -kb-custom-17 "${switch}"
     -kb-custom-18 "${insert_pass}"
+    -kb-custom-19 "${qrcode}")
+    args+=(
     -kb-mode-previous ""    # These keyboard shortcut options are needed, because
     -kb-mode-next ""        # Shift+<Left|Right> are otherwise taken by rofi.
     -select "$entry"
@@ -402,6 +443,7 @@ mainMenu () {
     23) actionMenu;;
     24) copyMenu;;
     27) insertPass;;
+    28) generateQrCode;;
   esac
   clearUp
 }
@@ -421,6 +463,7 @@ helpMenu () {
   printf '%s' "${autotype}: Autotype
 ${type_user}: Type Username
 ${type_pass}: Type Password
+${qrcode}: Generate and display qrcode
 ---
 ${copy_name}: Copy Username
 ${copy_pass}: Copy Password
@@ -805,3 +848,4 @@ main () {
 }
 
 main "$@"
+
