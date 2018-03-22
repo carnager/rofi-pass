@@ -10,7 +10,7 @@ _rofi () {
 }
 
 _image_viewer () {
-  sxiv -
+  feh -
 }
 
 # We expect to find these fields in pass(1)'s output
