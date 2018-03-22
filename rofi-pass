@@ -114,6 +114,8 @@ generateQrCode() {
     if [[ $exit_code -eq "1" ]]
     then
       exit
+    else
+      "${basecommand}"
     fi
   fi
   checkIfPass
@@ -125,6 +127,8 @@ generateQrCode() {
       if [[ $exit_value -eq "1" ]]
       then
         exit
+      else
+        "${basecommand}"
       fi
   fi
   clearUp
