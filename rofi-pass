@@ -52,7 +52,6 @@ next_root="Shift+Right"
 
 # Safe permissions
 umask 077
-img_viewer="display"
 
 has_qrencode() {
   command -v qrencode >/dev/null 2>&1
