@@ -12,6 +12,7 @@ _rofi () {
 # that can read from pipes. Known viewers to work are feh and display
 _image_viewer () {
     feh -
+#    display
 }
 
 # xdotool needs the keyboard layout to be set using setxkbmap
