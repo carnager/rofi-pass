@@ -10,7 +10,11 @@ _rofi () {
 }
 
 _image_viewer () {
+<<<<<<< HEAD
   sxiv -
+=======
+    feh -
+>>>>>>> qrcode
 }
 
 # We expect to find these fields in pass(1)'s output
@@ -30,6 +34,7 @@ clip=primary
 default_user="${ROFI_PASS_DEFAULT_USER-$(whoami)}"
 default_user2=john_doe
 password_length=12
+fix_layout=false
 
 # default shortcuts
 autotype="Alt+1"
@@ -53,6 +58,10 @@ next_root="Shift+Right"
 # Safe permissions
 umask 077
 img_viewer="display"
+
+has_qrencode() {
+  command -v qrencode >/dev/null 2>&1
+}
 
 has_qrencode() {
   command -v qrencode >/dev/null 2>&1
@@ -240,7 +249,7 @@ copyPass () {
   printf '%s' "$password" | doClip
   if [[ $notify == "true" ]]
   then
-    notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
+    notify-send "rofi-pass" "Copied Password\\nClearing in 45 seconds"
   fi
 
   if [[ $notify == "true" ]]
@@ -489,8 +498,8 @@ typeMenu () {
   if [[ -n $default_do ]]; then
     if [[ $default_do == "menu" ]]; then
       checkIfPass
-      local -a keys=(${!stuff[@]})
-      keys=(${keys[@]/$AUTOTYPE_field})
+      local -a keys=("${!stuff[@]}")
+      keys=("${keys[@]/$AUTOTYPE_field}")
       typefield=$({ echo ${AUTOTYPE_field} ; printf '%s\n' "${keys[@]}" | sort; } | _rofi -dmenu  -p "Choose Field to type > ")
       typefield_exit=$?
       if [[ $typefield_exit -eq 1 ]]; then
@@ -557,9 +566,9 @@ actionMenu () {
 
 showEntry () {
   if [[ -z $pass_content ]]; then
-    password_temp=$(PASSWORD_STORE_DIR="${root}" pass show "$selected_password")
-    password="${password_temp%%$'\n'*}"
-    pass_key_value=$(printf '%s\n' "${password_temp}" | tail -n+2 | grep ': ')
+    pass_temp=$(PASSWORD_STORE_DIR="${root}" pass show "$selected_password")
+    password="${pass_temp%%$'\n'*}"
+    pass_key_value=$(printf '%s\n' "${pass_temp}" | tail -n+2 | grep ': ')
     declare -A stuff
     while read -r LINE; do
       _id="${LINE%%: *}"
@@ -596,7 +605,7 @@ showEntry () {
       fi
       if [[ $notify == "true" ]]
       then
-        notify-send "rofi-pass" "Copied Password\nClearing in 45 seconds"
+        notify-send "rofi-pass" "Copied Password\\nClearing in 45 seconds"
       fi
       if [[ $notify == "true" ]]
       then
