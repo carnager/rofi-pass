@@ -10,11 +10,7 @@ _rofi () {
 }
 
 _image_viewer () {
-<<<<<<< HEAD
-  sxiv -
-=======
     feh -
->>>>>>> qrcode
 }
 
 # We expect to find these fields in pass(1)'s output
@@ -57,11 +53,6 @@ next_root="Shift+Right"
 
 # Safe permissions
 umask 077
-img_viewer="display"
-
-has_qrencode() {
-  command -v qrencode >/dev/null 2>&1
-}
 
 has_qrencode() {
   command -v qrencode >/dev/null 2>&1
