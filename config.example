@@ -59,7 +59,11 @@ help_color="#4872FF"
 # Possible options: primary, clipboard, both
 clip=primary
 
-# Options for generating new password entries
+## Options for generating new password entries
+
+# open new password entries in editor
+open_new_pass="true"
+
 # default_user is also used for password files that have no user field.
 #default_user="${ROFI_PASS_DEFAULT_USER-$(whoami)}"
 #default_user2=mary_ann
