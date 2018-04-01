@@ -39,10 +39,10 @@ wait=0.2
 
 ## Programs to be used
 # Editor
-EDITOR='gvim -f'
+#EDITOR='gvim -f'
 
 # Browser
-BROWSER='xdg-open'
+#BROWSER='xdg-open'
 
 ## Misc settings
 
