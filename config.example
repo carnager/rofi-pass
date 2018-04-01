@@ -86,3 +86,9 @@ type_menu="Alt+t"
 help="Alt+h"
 switch="Alt+x"
 insert_pass="Alt+n"
+
+# BROWSER -> incognito_switch association
+declare -A incognito_switches
+incognito_switches[google-chrome-stable]="--incognito"
+incognito_switches[chromium]="--incognito"
+incognito_switches[firefox]="-private-window"

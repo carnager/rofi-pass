@@ -136,19 +136,17 @@ generateQrCode() {
 
 openURL () {
   checkIfPass
-  local url private_switch
+  local url incognito_switch
   url="$(PASSWORD_STORE_DIR="${root}" pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"
   if PASSWORD_STORE_DIR="${root}" pass "$selected_password" | grep -qE '^(private|incognito)$'; then
     # We deal with private browsing
-    case "$BROWSER" in
-      *chrom*) private_switch="--incognito" ;;
-      *firefox*) private_switch="-private-window" ;;
-      *) # We fail hard
-         notify-send "can't find private switch for BROWSER $BROWSER; aborting"
-         exit 99 ;;
-    esac
+    incognito_switch="${incognito_switches["$BROWSER"]}"
+    if [[ -z "$incognito_switch" ]]; then
+      notify-send "can't find private switch for BROWSER $BROWSER; aborting"
+      exit 99
+    fi
   fi
-  $BROWSER "$private_switch"  "$url" &
+  "$BROWSER" "$incognito_switch" "$url" &
   unset url
   clearUp
 }

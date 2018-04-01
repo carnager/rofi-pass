@@ -93,6 +93,10 @@ ROFI_PASS_CONFIG="$HOME/path/to/config" rofi-pass
 
 For an example configuration please take a look at the included `config.example` file.
 
+If you use a browser that is neither `chromium` nor `firefox`, you may edit the
+`incognito_switches` array to add your own browser. Maybe even open a PR to
+include it by default?
+
 ## Extras
 
 ### addpass
