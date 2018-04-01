@@ -8,6 +8,8 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
 ## Features
 
 * Open URLs of entries with hotkey
+* Open URLs of entries with hotkey in private browsing windows if the pass file
+  contains either `private` or `incognito` alone on a line.
 * Add new Entries to Password Storage
 * Edit existing Entries
 * Generate new passwords for entries
