@@ -369,8 +369,8 @@ mainMenu () {
     # Actions based on exit code, which do not need the entry.
     # The exit code for -kb-custom-X is X+9.
     case "${rofi_exit}" in
-      19) roots_index=$(( (roots_index-1+roots_length) % roots_length)); root=${roots[$roots_index]}; mainMenu;;
-      20) roots_index=$(( (roots_index+1) % roots_length)); root=${roots[$roots_index]}; mainMenu;;
+      19) roots_index=$(( (roots_index-1+roots_length) % roots_length)); root=${roots[$roots_index]}; mainMenu; return;;
+      20) roots_index=$(( (roots_index+1) % roots_length)); root=${roots[$roots_index]}; mainMenu; return;;
       25) helpMenu; return;;
       26) ${basecommand} --bmarks; return;;
     esac
@@ -476,8 +476,8 @@ ${show}: Show Password File
 ${insert_pass}: Insert new Pass Entry
 ${switch}: Switch Pass/Bookmark Mode
 ---
-${previous_root}: Switch to previous password store (--roots)
-${next_root}: Switch to next password store (--roots)
+${previous_root}: Switch to previous password store (--root)
+${next_root}: Switch to next password store (--root)
 " | _rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > "
 help_val=$?
 if [[ $help_val -eq 1 ]]; then exit;
