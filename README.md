@@ -8,6 +8,8 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
 ## Features
 
 * Open URLs of entries with hotkey
+* Open URLs of entries with hotkey in private browsing windows if the pass file
+  contains either `private` or `incognito` alone on a line.
 * Add new Entries to Password Storage
 * Edit existing Entries
 * Generate new passwords for entries
@@ -90,6 +92,10 @@ ROFI_PASS_CONFIG="$HOME/path/to/config" rofi-pass
 ```
 
 For an example configuration please take a look at the included `config.example` file.
+
+If you use a browser that is neither `chromium` nor `firefox`, you may edit the
+`incognito_switches` array to add your own browser. Maybe even open a PR to
+include it by default?
 
 ## Extras
 
