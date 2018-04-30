@@ -82,21 +82,35 @@ checkIfPass () {
 
 autopass () {
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
+  local inclip='false'
+  local clipcontent=""
   xset r off
 
   rm -f "$HOME/.cache/rofi-pass/last_used"
   printf '%s\n' "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
   for word in ${stuff["$AUTOTYPE_field"]}; do
-  case "$word" in
-    ":tab") xdotool key Tab;;
-    ":space") xdotool key space;;
-    ":delay") sleep "${delay}";;
-    ":enter") xdotool key Return;;
-    ":otp") printf '%s' "$(generateOTP)" | xdotool type --clearmodifiers --file -;;
-    "pass") printf '%s' "${password}" | xdotool type --clearmodifiers --file -;;
-    *) printf '%s' "${stuff[${word}]}" | xdotool type --clearmodifiers --file -;;
-  esac
+    wordToPrint=""
+    case "$word" in
+      ":tab") xdotool key Tab;;
+      ":space") xdotool key space;;
+      ":delay") sleep "${delay}";;
+      ":enter") xdotool key Return;;
+      ":otp") wordToPrint="$(generateOTP)";;
+      "pass") wordToPrint="${password}";;
+      ":clip") inclip=true;;
+      *) wordToPrint="${stuff[${word}]}";;
+    esac
+    if [[ ! -z "$wordToPrint" ]]; then
+      if [[ ${inclip} == "true" ]]; then
+        clipcontent=$(printf '%s%s ' "$clipcontent" "$wordToPrint")
+      else
+        printf '%s' "$wordToPrint" | xdotool type --clearmodifiers --file -
+      fi
+     fi
   done
+  if [[ ${inclip} == "true" ]]; then
+      printf '%s' "$clipcontent" | sed -e 's/ *$//' | doClip
+  fi
   if [[ ${auto_enter} == "true" ]]; then
     xdotool key Return
   fi

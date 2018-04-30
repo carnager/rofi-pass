@@ -59,6 +59,17 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
 * The field names for `user`, `url` and `autotype` are configurable
 * Bookmarks mode (open stored URLs in browser, default: Alt+x)
 * Share common used passwords between several entries (with different URLs, usernames etc)
+* Each field after `:clip` gets copied into the clipbard.
+
+```
+hunter2
+user: foo
+url: http://example.com
+oauth://[...]
+autotype: user :tab pass :clip :otp
+```
+
+The otp token will now be copied into the clipboard after auto-typing.
 
 ## Requirements
 
