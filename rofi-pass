@@ -88,17 +88,17 @@ autopass () {
   printf '%s\n' "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
   for word in ${stuff["$AUTOTYPE_field"]}; do
   case "$word" in
-    ":tab") xdotool key Tab;;
-    ":space") xdotool key space;;
+    ":tab") emulatekb $'\t';;
+    ":space") emulatekb ' ';;
     ":delay") sleep "${delay}";;
-    ":enter") xdotool key Return;;
-    ":otp") printf '%s' "$(generateOTP)" | xdotool type --clearmodifiers --file -;;
-    "pass") printf '%s' "${password}" | xdotool type --clearmodifiers --file -;;
-    *) printf '%s' "${stuff[${word}]}" | xdotool type --clearmodifiers --file -;;
+    ":enter") emulatekb $'\n';;
+    ":otp") emulatekb "$(generateOTP)" ;;
+    "pass") emulatekb "${password}" ;;
+    *) emulatekb "${stuff[${word}]}" ;;
   esac
   done
   if [[ ${auto_enter} == "true" ]]; then
-    xdotool key Return
+    emulatekb $'\n'
   fi
   xset r "$x_repeat_enabled"
   unset x_repeat_enabled
@@ -146,7 +146,7 @@ typeUser () {
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
   xset r off
 
-  printf '%s' "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
+  emulatekb "${stuff[${USERNAME_field}]}"
 
   xset r "$x_repeat_enabled"
   unset x_repeat_enabled
@@ -160,7 +160,7 @@ typePass () {
   x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
   xset r off
 
-  printf '%s' "${password}" | xdotool type --clearmodifiers --file -
+  emulatekb "${password}"
   if [[ $notify == "true" ]]; then
     if [[ "${stuff[notify]}" == "false" ]]; then
       :
@@ -193,7 +193,7 @@ typeField () {
     *) to_type="${stuff[${typefield}]}" ;;
   esac
 
-  printf '%s' "$to_type" | xdotool type --clearmodifiers --file -
+  emulatekb "$to_type"
 
   xset r "$x_repeat_enabled"
   unset x_repeat_enabled
