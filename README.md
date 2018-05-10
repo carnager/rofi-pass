@@ -67,7 +67,7 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
 * rofi (https://github.com/DaveDavenport/rofi)
 * xdotool
 * gawk
-* bash
+* bash 4.x
 * pwgen
 * pass-otp(1) (https://github.com/tadfisher/pass-otp) (optional: for OTPs)
 ### BSD
