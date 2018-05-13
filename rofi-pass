@@ -345,7 +345,7 @@ mainMenu () {
 			-kb-custom-17 "${switch}"
 			-kb-custom-18 "${insert_pass}"
 			-kb-custom-19 "${qrcode}")
-		args+=(--kb-mode-previous ""    # These keyboard shortcut options are needed, because
+		args+=(-kb-mode-previous ""    # These keyboard shortcut options are needed, because
 			-kb-mode-next ""            # Shift+<Left|Right> are otherwise taken by rofi.
 			-select "$entry"
 			-p "> ")
