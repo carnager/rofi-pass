@@ -490,7 +490,7 @@ typeMenu () {
 			checkIfPass
 			local -a keys=("${!stuff[@]}")
 			keys=("${keys[@]/$AUTOTYPE_field}")
-			typefield=$({ echo ${AUTOTYPE_field} ; printf '%s\n' "${keys[@]}" | sort; } | _rofi -dmenu  -p "Choose Field to type > ")
+			typefield=$({ echo -n ${AUTOTYPE_field} ; printf '%s\n' "${keys[@]}" | sort; } | _rofi -dmenu  -p "Choose Field to type > ")
 			typefield_exit=$?
 			if [[ $typefield_exit -eq 1 ]]; then
 				exit
