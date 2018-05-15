@@ -110,7 +110,7 @@ generateQrCode() {
 	has_qrencode
 
 	if [[ $? -eq "1" ]]; then
-		echo "qrencode not found" | _rofi -dmenu
+		printf '%s\n' "qrencode not found" | _rofi -dmenu
 		exit_code=$?
 		if [[ $exit_code -eq "1" ]]; then
 			exit
@@ -122,7 +122,7 @@ generateQrCode() {
 	checkIfPass
 	pass "$selected_password" | head -n 1 | qrencode -d 300 -v 8 -l H -o - | _image_viewer
 	if [[ $? -eq "1" ]]; then
-		echo "" | _rofi -dmenu -mesg "Image viewer not defined or cannot read from pipe"
+		printf '%s\n' "" | _rofi -dmenu -mesg "Image viewer not defined or cannot read from pipe"
 		exit_value=$?
 		if [[ $exit_value -eq "1" ]]; then
 			exit
@@ -490,7 +490,7 @@ typeMenu () {
 			checkIfPass
 			local -a keys=("${!stuff[@]}")
 			keys=("${keys[@]/$AUTOTYPE_field}")
-			typefield=$({ echo -n ${AUTOTYPE_field} ; printf '%s\n' "${keys[@]}" | sort; } | _rofi -dmenu  -p "Choose Field to type > ")
+			typefield=$({ printf '%s' "${AUTOTYPE_field}" ; printf '%s\n' "${keys[@]}" | sort; } | _rofi -dmenu  -p "Choose Field to type > ")
 			typefield_exit=$?
 			if [[ $typefield_exit -eq 1 ]]; then
 				exit
