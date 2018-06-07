@@ -416,7 +416,9 @@ mainMenu () {
 		fi
 	fi
 	if [[ -z "${stuff["${USERNAME_field}"]}" ]]; then
-		if [[ -n $default_user ]]; then
+		if [[ -n "${stuff["User"]}" ]]; then
+			stuff["${USERNAME_field}"]="${stuff["User"]}"
+		elif [[ -n $default_user ]]; then
 			stuff["${USERNAME_field}"]="${default_user}"
 		fi
 	fi
