@@ -417,7 +417,7 @@ mainMenu () {
 	fi
 	if [[ -z "${stuff["${USERNAME_field}"]}" ]]; then
 		if [[ -n $default_user ]]; then
-		    if [[ "$default_user" == "%filename" ]]; then
+		    if [[ "$default_user" == ":filename" ]]; then
 		      stuff["${USERNAME_field}"]="$(basename $selected_password)"
 		    else
     			stuff["${USERNAME_field}"]="${default_user}"
