@@ -135,7 +135,11 @@ generateQrCode() {
 
 openURL () {
 	checkIfPass
-	$BROWSER "$(PASSWORD_STORE_DIR="${root}" pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
+	local url="$(PASSWORD_STORE_DIR="${root}" pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"
+	if [ "$url" == "" ]; then
+	  url="$(basename $(dirname $selected_password))"
+	fi
+	$BROWSER "$url"; exit;
 	clearUp
 }
 
@@ -417,7 +421,11 @@ mainMenu () {
 	fi
 	if [[ -z "${stuff["${USERNAME_field}"]}" ]]; then
 		if [[ -n $default_user ]]; then
-			stuff["${USERNAME_field}"]="${default_user}"
+		    if [[ "$default_user" == "%filename" ]]; then
+		      stuff["${USERNAME_field}"]="$(basename $selected_password)"
+		    else
+    			stuff["${USERNAME_field}"]="${default_user}"
+    	  fi
 		fi
 	fi
 	pass_content="$(for key in "${!stuff[@]}"; do printf '%s\n' "${key}: ${stuff[$key]}"; done)"
