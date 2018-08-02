@@ -135,7 +135,11 @@ generateQrCode() {
 
 openURL () {
 	checkIfPass
-	$BROWSER "$(PASSWORD_STORE_DIR="${root}" pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
+	local url="$(PASSWORD_STORE_DIR="${root}" pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"
+	if [ "$url" == "" ]; then
+	  url="$(basename $(dirname $selected_password))"
+	fi
+	$BROWSER "$url"; exit;
 	clearUp
 }
 
