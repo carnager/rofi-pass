@@ -121,6 +121,12 @@ Rofi-pass allows you to easily share common used passwords across multiple entri
 For example, if you have an academic account which includes several services (such as a library, Salary, Student portal etc),  all with different URL's, login forms etc. you can share one password across all of them. This is very handy when the passwords change annually.
 To use this function you need to add the following line instead of the password, referencing a pass file which holds the password.
 
+## User filename as user
+
+If your password file has no user field you can ask rofi-pass to use the filename instead.
+For example with this password file path : `web/fsf.org/rms` rofi-pass will user `rms` as your username.
+To get this, you need to set `default_user` to `:filename` in your configuration.
+
 ```
 #FILE=PATH/to/filename
 ```
