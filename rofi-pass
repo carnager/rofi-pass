@@ -22,6 +22,7 @@ OTPmethod_field='otp_method'
 default_autotype="user :tab pass"
 delay=2
 wait=0.2
+xdotool_delay=12
 default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
 notify='false'
@@ -91,9 +92,9 @@ autopass () {
 			":space") xdotool key space;;
 			":delay") sleep "${delay}";;
 			":enter") xdotool key Return;;
-			":otp") printf '%s' "$(generateOTP)" | xdotool type --clearmodifiers --file -;;
-			"pass") printf '%s' "${password}" | xdotool type --clearmodifiers --file -;;
-			*) printf '%s' "${stuff[${word}]}" | xdotool type --clearmodifiers --file -;;
+			":otp") printf '%s' "$(generateOTP)" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
+			"pass") printf '%s' "${password}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
+			*) printf '%s' "${stuff[${word}]}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
 		esac
 	done
 
@@ -145,7 +146,7 @@ typeUser () {
 	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
 	xset r off
 
-	printf '%s' "${stuff[${USERNAME_field}]}" | xdotool type --clearmodifiers --file -
+	printf '%s' "${stuff[${USERNAME_field}]}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
 
 	xset r "$x_repeat_enabled"
 	unset x_repeat_enabled
@@ -159,7 +160,7 @@ typePass () {
 	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
 	xset r off
 
-	printf '%s' "${password}" | xdotool type --clearmodifiers --file -
+	printf '%s' "${password}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
 
 	if [[ $notify == "true" ]]; then
 		if [[ "${stuff[notify]}" == "false" ]]; then
@@ -192,7 +193,7 @@ typeField () {
 		*) to_type="${stuff[${typefield}]}" ;;
 	esac
 
-	printf '%s' "$to_type" | xdotool type --clearmodifiers --file -
+	printf '%s' "$to_type" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
 
 	xset r "$x_repeat_enabled"
 	unset x_repeat_enabled
