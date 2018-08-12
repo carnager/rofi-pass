@@ -37,6 +37,9 @@ delay=2
 # rofi-pass needs to close itself before it can type passwords. Set delay here.
 wait=0.2
 
+# delay between keypresses when typing (in ms)
+xdotool_delay=12
+
 ## Programs to be used
 # Editor
 EDITOR='gvim -f'
