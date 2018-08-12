@@ -418,11 +418,11 @@ mainMenu () {
 	fi
 	if [[ -z "${stuff["${USERNAME_field}"]}" ]]; then
 		if [[ -n $default_user ]]; then
-		    if [[ "$default_user" == ":filename" ]]; then
-		      stuff["${USERNAME_field}"]="$(basename $selected_password)"
+			if [[ "$default_user" == ":filename" ]]; then
+		    	stuff["${USERNAME_field}"]="$(basename $selected_password)"
 		    else
-    			stuff["${USERNAME_field}"]="${default_user}"
-    	  fi
+		    	stuff["${USERNAME_field}"]="${default_user}"
+    		fi
 		fi
 	fi
 	pass_content="$(for key in "${!stuff[@]}"; do printf '%s\n' "${key}: ${stuff[$key]}"; done)"
