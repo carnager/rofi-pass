@@ -714,7 +714,7 @@ insertPass () {
 	pw=$(printf '%s' "Generate" | _rofi -dmenu -p "Password > " -mesg "Type Password or hit Enter to generate one")
 
 	if [[ $pw == "Generate" ]]; then
-		pw=$(pwgen "${password_length}")
+		pw=$(_pwgen "${password_length}")
 	fi
 
 	clear
