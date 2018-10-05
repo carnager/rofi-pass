@@ -67,6 +67,9 @@ help_color="#4872FF"
 # Possible options: primary, clipboard, both
 clip=primary
 
+# Seconds before clearing pass from clipboard 
+clip_clear=45
+
 ## Options for generating new password entries
 
 # open new password entries in editor
