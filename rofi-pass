@@ -28,6 +28,7 @@ auto_enter='false'
 notify='false'
 help_color=""
 clip=primary
+clip_clear=45
 default_user="${ROFI_PASS_DEFAULT_USER-$(whoami)}"
 default_user2=john_doe
 password_length=12
@@ -239,13 +240,13 @@ copyPass () {
 	checkIfPass
 	printf '%s' "$password" | doClip
 	if [[ $notify == "true" ]]; then
-		notify-send "rofi-pass" "Copied Password\\nClearing in 45 seconds"
+		notify-send "rofi-pass" "Copied Password\\nClearing in $clip_clear seconds"
 	fi
 
 	if [[ $notify == "true" ]]; then
-		(sleep 45; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+		(sleep $clip_clear; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
 	elif [[ $notify == "false" ]]; then
-		(sleep 45; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard) &
+		(sleep $clip_clear; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard) &
 	fi
 }
 
@@ -602,12 +603,12 @@ showEntry () {
 				printf '%s' "${stuff[${word}]}" | doClip
 			fi
 			if [[ $notify == "true" ]]; then
-				notify-send "rofi-pass" "Copied Password\\nClearing in 45 seconds"
+				notify-send "rofi-pass" "Copied Password\\nClearing in $clip_clear seconds"
 			fi
 			if [[ $notify == "true" ]]; then
-				(sleep 45; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+				(sleep $clip_clear; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
 			elif [[ $notify == "false" ]]; 	then
-				(sleep 45; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard) &
+				(sleep $clip_clear; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard) &
 			fi
 			exit
 		fi
