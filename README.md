@@ -34,7 +34,7 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
   SomeField: foobar
   AnotherField: barfoo
   url: http://my.url.foo
-  autotype: SomeField :tab UserName :tab AnotherField :tab pass
+  autotype: SomeField :tab user :tab AnotherField :tab pass
   ```
 
   You can use `:tab`, `:enter`, or `:space` here to type <kbd>Tab</kbd>,
