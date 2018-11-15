@@ -816,7 +816,7 @@ main () {
 	elif [[ -n "$2" && "$1" == "--root" ]]; then
 		custom_root=true; IFS=: read -r -a roots <<< "$2"
 	elif [[ -n $root ]]; then
-		roots=("${root}")
+		custom_root=true; IFS=: read -r -a roots <<< "${root}"
 	elif [[ -n ${PASSWORD_STORE_DIR} ]]; then
 		roots=("${PASSWORD_STORE_DIR}")
 	else
