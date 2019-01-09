@@ -89,7 +89,7 @@ autopass () {
 	printf '%s\n' "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
 	for word in ${stuff["$AUTOTYPE_field"]}; do
 		case "$word" in
-			":tab") xdotool key Tab;;
+			":tab") xdotool keyup Control_L Control_R; xdotool key Tab --clearmodifiers;;
 			":space") xdotool key space;;
 			":delay") sleep "${delay}";;
 			":enter") xdotool key Return;;
