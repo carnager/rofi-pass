@@ -25,6 +25,14 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
   url: http://my.url.foo
   ```
 
+* Auto-typing username based on path.
+  The structure of your password store must be like:
+
+  ```
+  foo/bar/site.com/username
+  ```
+  And you must set the `default-autotype` to `'path :tab pass'`.
+
 * Auto-typing of more than one field, using the `autotype` entry:
 
   ```
