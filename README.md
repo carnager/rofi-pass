@@ -31,7 +31,7 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
   ```
   foo/bar/site.com/username
   ```
-  And you must set the `default-autotype` to `'path :tab pass'`.
+  And you must set the `default_autotype` to `'path :tab pass'`.
 
 * Auto-typing of more than one field, using the `autotype` entry:
 
