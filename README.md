@@ -31,6 +31,7 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
   ```
   foo/bar/site.com/username
   ```
+
   And you must set the `default-autotype` to `'path :tab pass'`.
 
 * Auto-typing of more than one field, using the `autotype` entry:
@@ -51,17 +52,20 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
   `:otp` will generate an OTP, either `pass-otp(1)` style, or according to the
   `otp_method:`, if it is defined.
 * Generating OTPs.
-  The format for OTPs should either be `pass-otp(1)`-compatible
+  The format for OTPs should either compatible with `pass-otp(1)`:
+
   ```
   [...]
   otpauth://[...]
   ```
+
   Or it should define a method for generating OTPs:
+
   ```
   [...]
   otp_method: /opt/obscure-otp-generator/oog --some-option some args
   ```
-  
+
   `:delay` will trigger a delay (2 seconds by default).
 * All hotkeys are configurable in the config file
 * The field names for `user`, `url` and `autotype` are configurable
@@ -70,14 +74,15 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
 
 ## Requirements
 
-* pass (http://www.passwordstore.org/)
+* [pass](http://www.passwordstore.org/)
 * sed
-* rofi (https://github.com/DaveDavenport/rofi)
+* [rofi](https://github.com/DaveDavenport/rofi)
 * xdotool
 * gawk
 * bash 4.x
 * pwgen
-* pass-otp(1) (https://github.com/tadfisher/pass-otp) (optional: for OTPs)
+* [pass-otp](https://github.com/tadfisher/pass-otp) (optional: for OTPs)
+
 ### BSD
 
 * gnugrep
@@ -89,6 +94,7 @@ rofi-pass may read its configuration values from different locations in the foll
 * `ROFI_PASS_CONFIG` (environment variable)
 * `$HOME/.config/rofi-pass/config`
 * `/etc/rofi-pass.conf`
+
 rofi-pass only loads the first existing file.
 In case no config file exists, rofi-pass uses its internal default values.
 You can set the environment variable like this:
@@ -127,11 +133,12 @@ Finally a script to export your pass database to csv is included. The resulting 
 
 Rofi-pass allows you to easily share common used passwords across multiple entries.
 For example, if you have an academic account which includes several services (such as a library, Salary, Student portal etc),  all with different URL's, login forms etc. you can share one password across all of them. This is very handy when the passwords change annually.
-To use this function you need to add the following line instead of the password, referencing a pass file which holds the password.
+To use this function you need to add the following line instead of the password, referencing a pass file which holds the password:
 
 ```
 #FILE=PATH/to/filename
 ```
+
 where PATH is relative to your password-store.
 
 *And yes, you should slap your service provider for forcing you to share passwords across services.*
