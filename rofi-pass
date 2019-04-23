@@ -385,7 +385,7 @@ mainMenu () {
 		fields=$(printf '%s\n' "${password_temp[@]:1}" | awk '$1 ~ /:$/ || /otpauth:\/\// {$1=$1;print}')
 		declare -A stuff
 		stuff["pass"]=${password}
-	
+
 		if [[ -n $fields ]]; then
 			while read -r LINE; do
 				unset _id _val
@@ -713,7 +713,7 @@ insertPass () {
 		exit
 	fi
 
-	pw=$(printf '%s' "Generate" | _rofi -dmenu -p "Password > " -mesg "Type Password or hit Enter to generate one")
+	pw=$(printf '%s' "Generate" | _rofi -dmenu -password -p "Password > " -mesg "Type Password or hit Enter to generate one")
 
 	if [[ $pw == "Generate" ]]; then
 		pw=$(_pwgen "${password_length}")
@@ -754,7 +754,7 @@ insertPass () {
 }
 
 help_msg () {
-	cat <<'EOF' 
+	cat <<'EOF'
 	Usage:
 	rofi-pass [command]
 
