@@ -89,10 +89,10 @@ autopass () {
 	printf '%s\n' "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
 	for word in ${stuff["$AUTOTYPE_field"]}; do
 		case "$word" in
-			":tab") ydotool key Tab;;
-			":space") ydotool key space;;
+			":tab") ydotool key tab;;
+			":space") ydotool key " ";;
 			":delay") sleep "${delay}";;
-			":enter") ydotool key Return;;
+			":enter") ydotool key enter;;
 			":otp") printf '%s' "$(generateOTP)" | ydotool type ${ydotool_delay} --file /dev/stdin;;
 			"pass") printf '%s' "${password}" | ydotool type ${ydotool_delay} --file /dev/stdin;;
  			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | ydotool type --file /dev/stdin;;
@@ -101,7 +101,7 @@ autopass () {
 	done
 
 	if [[ ${auto_enter} == "true" ]]; then
-		ydotool key Return
+		ydotool key enter
 	fi
 
 	xset r "$x_repeat_enabled"
