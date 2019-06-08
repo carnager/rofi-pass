@@ -463,23 +463,23 @@ clearUp () {
 
 helpMenu () {
 	printf '%s' "${autotype}: Autotype
-	${type_user}: Type Username
-	${type_pass}: Type Password
-	${qrcode}: Generate and display qrcode
-	---
-	${copy_name}: Copy Username
-	${copy_pass}: Copy Password
-	${copy_url}: Copy URL
-	${open_url}: Open URL
-	${copy_menu}: Copy Custom Field
-	---
-	${action_menu}: Edit, Move, Delete, Re-generate Submenu
-	${show}: Show Password File
-	${insert_pass}: Insert new Pass Entry
-	${switch}: Switch Pass/Bookmark Mode
-	---
-	${previous_root}: Switch to previous password store (--root)
-	${next_root}: Switch to next password store (--root)
+${type_user}: Type Username
+${type_pass}: Type Password
+${qrcode}: Generate and display qrcode
+---
+${copy_name}: Copy Username
+${copy_pass}: Copy Password
+${copy_url}: Copy URL
+${open_url}: Open URL
+${copy_menu}: Copy Custom Field
+---
+${action_menu}: Edit, Move, Delete, Re-generate Submenu
+${show}: Show Password File
+${insert_pass}: Insert new Pass Entry
+${switch}: Switch Pass/Bookmark Mode
+---
+${previous_root}: Switch to previous password store (--root)
+${next_root}: Switch to next password store (--root)
 	" | _rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > "
 	help_val=$?
 
