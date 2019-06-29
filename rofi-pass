@@ -13,6 +13,10 @@ _image_viewer () {
 	feh -
 }
 
+_pwgen () {
+	pwgen "$@"
+}
+
 # We expect to find these fields in pass(1)'s output
 URL_field='url'
 USERNAME_field='user'
@@ -33,6 +37,7 @@ default_user="${ROFI_PASS_DEFAULT_USER-$(whoami)}"
 default_user2=john_doe
 password_length=12
 fix_layout=false
+edit_new_pass=false
 
 # default shortcuts
 autotype="Alt+1"
@@ -397,6 +402,7 @@ mainMenu () {
 
 		stuff["pass"]=${password}
 
+
 		if [[ -n $fields ]]; then
 			while read -r LINE; do
 				unset _id _val
@@ -706,7 +712,7 @@ insertPass () {
 		"${USER}"
 		"${default_user}")
 
-	user=$(printf '%s\n' "${user_content[@]}" | _rofi -dmenu -mesg "Chose Username or type" -p "> ")
+	user=$(printf '%s\n' "${user_content[@]}" | _rofi -dmenu -mesg "Choose Username or type" -p "> ")
 	val=$?
 
 	if [[ $val -eq 1 ]]; then
@@ -738,12 +744,19 @@ insertPass () {
 				"---"
 				"${USERNAME_field}: ${user}"
 				"${URL_field}: ${url}")
-			printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
+			printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null 
+			if [[ $edit_new_pass == "true" ]]; then
+				EDITOR=$EDITOR PASSWORD_STORE_DIR="${root}" pass edit "${name}"
+			fi
+
 		else
 			pass_content=("${pw}"
 				"---"
 				"${USERNAME_field}: ${user}")
-			printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
+			printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null
+			if [[ $edit_new_pass == "true" ]]; then
+				EDITOR=$EDITOR PASSWORD_STORE_DIR="${root}" pass edit "${name}"
+			fi
 		fi
 	else
 		if [[ $url == http* ]]; then
@@ -751,17 +764,38 @@ insertPass () {
 				"---"
 				"${USERNAME_field}: ${user}"
 				"${URL_field}: ${url}")
-			printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
+			printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null
+			if [[ $edit_new_pass == "true" ]]; then
+				EDITOR=$EDITOR PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
+			fi
+
 		else
 			pass_content=("${pw}"
 				"---"
 				"${USERNAME_field}: ${user}")
 			printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null
 			if [[ $edit_new_pass == "true" ]]; then
-				PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
+				EDITOR=$EDITOR PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
 			fi
 		fi
 	fi
+
+	askmenu_content=(
+		"Yes"
+		"No")
+	
+	askGenMenu=$(printf '%s\n' "${askmenu_content[@]}" | _rofi -dmenu -p "Copy Password for ${name}? > ")
+	askgen_exit=$?
+	
+	if [[ $askgen_exit -eq 1 ]]; then
+		exit
+	fi
+	if [[ $askGenMenu == "Yes" ]]; then
+		password=${pw}
+		copyPass
+	fi
+
+
 }
 
 help_msg () {
