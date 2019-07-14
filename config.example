@@ -20,9 +20,13 @@ _image_viewer () {
 #    display
 }
 
+# for automatic typing either xdotool or ydotool is used.
+# rofi-pass will default to ydotool, if present. Set
+# your preferred backend here.
+backend=ydotool
+
 # xdotool needs the keyboard layout to be set using setxkbmap
 # You can do this in your autostart scripts (e.g. xinitrc)
-
 # If for some reason, you cannot do this, you can set the command here.
 # and set fix_layout to true
 fix_layout=false
