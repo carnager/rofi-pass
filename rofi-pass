@@ -123,7 +123,7 @@ generateQrCode() {
 	fi
 
 	checkIfPass
-	pass "$selected_password" | head -n 1 | qrencode -d 300 -v 8 -l H -o - | _image_viewer
+	echo -n $(pass "$selected_password" | head -n 1) | qrencode -d 300 -v 8 -l H -o - | _image_viewer
 	if [[ $? -eq "1" ]]; then
 		printf '%s\n' "" | _rofi -dmenu -mesg "Image viewer not defined or cannot read from pipe"
 		exit_value=$?
