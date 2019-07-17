@@ -51,7 +51,7 @@ xdotool_delay=12
 
 ## Programs to be used
 # Editor
-EDITOR='gvim -f'
+EDITOR='gvim -u NONE -c "set noswapfile" -c "set nobackup" -c "set noundofile" -c "set ft=yaml" -f"'
 
 # Browser
 BROWSER='xdg-open'
