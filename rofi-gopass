@@ -143,17 +143,18 @@ options () {
 	options_menu_content=(
 		"add/edit keys"
 		"delete entry"
-		"generate new password")
+		"generate new password"
+	)
 
-		options_menu="$(printf '%s\n' "${options_menu_content[@]}" | _rofi -no-custom -mesg "Chose action" -p '> ')"
-		exit_check $?
+	options_menu="$(printf '%s\n' "${options_menu_content[@]}" | _rofi -no-custom -mesg "Chose action" -p '> ')"
+	exit_check $?
 
-		case "${options_menu}" in
-			"add/edit keys") edit_key "${entry}" ;;
-			"delete entry") confirm "delete ${entry}"; gopass rm -f "${entry}" ;;
-			"generate new password") confirm "generate a new password for ${entry}"; gopass generate -f "${entry}" ;;
-		esac
-	}
+	case "${options_menu}" in
+		"add/edit keys") edit_key "${entry}" ;;
+		"delete entry") confirm "delete ${entry}"; gopass rm -f "${entry}" ;;
+		"generate new password") confirm "generate a new password for ${entry}"; gopass generate -f "${entry}" ;;
+	esac
+}
 
 do_menu () {
 	local entry
@@ -164,19 +165,20 @@ do_menu () {
 		"type user"
 		"type custom field"
 		"---"
-		"options")
+		"options"
+	)
 
-		action_menu="$(printf '%s\n' "${action_menu_content[@]}" | _rofi -no-custom -mesg "Chose field to type" -p '> ')"
-		exit_check $?
+	action_menu="$(printf '%s\n' "${action_menu_content[@]}" | _rofi -no-custom -mesg "Chose field to type" -p '> ')"
+	exit_check $?
 
-		case "${action_menu}" in
-			"autotype") autopass "${entry}" ;;
-			"type password") printf '%s' "$(gopass show --password "${entry}")" | _dotool type ;;
-			"type user") printf '%s' "$(gopass show "${entry}" user)" | _dotool type ;;
-			"type custom field") custom_type "${entry}" ;;
-			"options") options "${entry}" ;;
-		esac
-	}
+	case "${action_menu}" in
+		"autotype") autopass "${entry}" ;;
+		"type password") printf '%s' "$(gopass show --password "${entry}")" | _dotool type ;;
+		"type user") printf '%s' "$(gopass show "${entry}" user)" | _dotool type ;;
+		"type custom field") custom_type "${entry}" ;;
+		"options") options "${entry}" ;;
+	esac
+}
 
 
 main () {
