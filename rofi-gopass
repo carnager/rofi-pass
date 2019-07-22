@@ -67,7 +67,7 @@ autopass () {
 	local autotype="$(gopass show "${entry}" autotype)"
 	local autotype="${autotype:-user :tab pass}"
 
-    for word in "${autotype}"; do
+    for word in ${autotype}; do
         case "$word" in
             ":tab") _dotool key Tab;;
             ":space") _dotool key " ";;
