@@ -100,7 +100,7 @@ edit_key () {
 	local entry
 	local keys
 	entry="${1}"
-	keys=$(list_keys "${entry}")
+	keys="$(list_keys "${entry}")"
 	key_name=$(printf '%s\n' "${keys}" | _rofi -mesg "Enter new key or chose existing one")
 	exit_check $?
 	value_name=$(printf '%s' "" | _rofi -mesg "Enter Value for key \"${key_name}\"")
@@ -127,6 +127,34 @@ confirm () {
 	esac
 }
 
+custom_type () {
+	local entry
+	local keys
+	entry="${1}"
+	keys="$(list_keys "${entry}")"
+	key_name=$(printf '%s\n' "${keys}" | _rofi -no-custom -mesg "Chose field to type")
+	exit_check $?
+	printf '%s' "$(gopass show "${entry}" "${key_name}")" | _dotool type
+}
+
+options () {
+	local entry
+	entry="${1}"
+	options_menu_content=(
+		"add/edit keys"
+		"delete entry"
+		"generate new password")
+
+		options_menu="$(printf '%s\n' "${options_menu_content[@]}" | _rofi -no-custom -mesg "Chose action" -p '> ')"
+		exit_check $?
+
+		case "${options_menu}" in
+			"add/edit keys") edit_key "${entry}" ;;
+			"delete entry") confirm "delete ${entry}"; gopass rm -f "${entry}" ;;
+			"generate new password") confirm "generate a new password for ${entry}"; gopass generate -f "${entry}" ;;
+		esac
+	}
+
 do_menu () {
 	local entry
 	entry="${1}"
@@ -134,23 +162,19 @@ do_menu () {
 		"autotype"
 		"type password"
 		"type user"
-		"type custom"
+		"type custom field"
 		"---"
-		"edit keys"
-		"delete password file"
-		"generate new password")
+		"options")
 
-		action_menu=$(printf '%s\n' "${action_menu_content[@]}" | _rofi -mesg "Chose field to type" -p '> ')
+		action_menu="$(printf '%s\n' "${action_menu_content[@]}" | _rofi -no-custom -mesg "Chose field to type" -p '> ')"
 		exit_check $?
 
 		case "${action_menu}" in
 			"autotype") autopass "${entry}" ;;
 			"type password") printf '%s' "$(gopass show --password "${entry}")" | _dotool type ;;
 			"type user") printf '%s' "$(gopass show "${entry}" user)" | _dotool type ;;
-			"edit keys") edit_key "${entry}" ;;
-			"delete password file") confirm "delete ${entry}"; gopass rm -f "${entry}" ;;
-			"generate new password") confirm "generate a new password for ${entry}"; gopass generate -f "${entry}" ;;
-			*) exit
+			"type custom field") custom_type "${entry}" ;;
+			"options") options "${entry}" ;;
 		esac
 	}
 
