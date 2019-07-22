@@ -38,8 +38,10 @@ _ydotoold () {
 }
 
 _dotool () {
-	local mode="${1}"
-	local key="${2:-null}"
+	local mode
+	local key
+	mode="${1}"
+	key="${2:-null}"
 	case "${mode}" in
 		"type")
 			case "${backend}" in
@@ -63,9 +65,11 @@ _rofi () {
 }
 
 autopass () {
-	local entry="${1}"
-	local autotype="$(gopass show "${entry}" autotype)"
-	local autotype="${autotype:-user :tab pass}"
+	local entry
+	local autotype
+	entry="${1}"
+	autotype="$(gopass show "${entry}" autotype)"
+	autotype="${autotype:-user :tab pass}"
 
     for word in ${autotype}; do
         case "$word" in
@@ -81,9 +85,11 @@ autopass () {
 
 list_keys () {
 	# gopass has no option to only list keys, so we need to build the list ourselves.
-	local entry="${1}"
-	local keys="$(gopass show "${entry}")"
-	printf '%s\n' "${keys}" | while read line; do
+	local entry
+	local keys
+	entry="${1}"
+	keys="$(gopass show "${entry}")"
+	printf '%s\n' "${keys}" | while read -r line; do
 		if [[ "${line}" == *": "* ]]; then
 			printf '%s\n' "${line%: *}"
 		fi
@@ -91,21 +97,24 @@ list_keys () {
 }
 
 edit_key () {
-	local entry="${1}"
-	local keys=$(list_keys "${entry}")
+	local entry
+	local keys
+	entry="${1}"
+	keys=$(list_keys "${entry}")
 	key_name=$(printf '%s\n' "${keys}" | _rofi -mesg "Enter new key or chose existing one")
 	exit_check $?
 	value_name=$(printf '%s' "" | _rofi -mesg "Enter Value for key \"${key_name}\"")
 	exit_check $?
 	if [[ -z "${key_name}" ]]; then
-		printf "${value_name}" | gopass insert -a "${entry}" "${key_name}"
+		printf '%s' "${value_name}" | gopass insert -a "${entry}" "${key_name}"
 	else
-		printf "${value_name}" | gopass insert "${entry}" "${key_name}"
+		printf '%s' "${value_name}" | gopass insert "${entry}" "${key_name}"
 	fi
 }
 	
 confirm () {
-	local message="${1}"
+	local message
+	message="${1}"
 	confirm_content=(
 		"Yes"
 		"No")
@@ -119,7 +128,8 @@ confirm () {
 }
 
 do_menu () {
-	local entry="${1}"
+	local entry
+	entry="${1}"
 	action_menu_content=(
 		"autotype"
 		"type password"
