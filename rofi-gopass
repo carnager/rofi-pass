@@ -111,7 +111,9 @@ edit_key () {
 		printf '%s' "${value_name}" | gopass insert "${entry}" "${key_name}"
 	fi
 }
-	
+
+# For dangerous operations call this function first. You can provide a message as argument.
+# Example: confirm "Are you sure you want to delete entry?"
 confirm () {
 	local message
 	message="${1}"
@@ -119,7 +121,7 @@ confirm () {
 		"Yes"
 		"No")
 
-	confirm_menu=$(printf '%s\n' "${confirm_content[@]}" | _rofi -mesg "Are you sure you want to ${message}")
+	confirm_menu=$(printf '%s\n' "${confirm_content[@]}" | _rofi -mesg "${message}")
 	exit_check $?
 	case "${confirm_menu}" in
 		"Yes") : ;;
@@ -151,8 +153,8 @@ options () {
 
 	case "${options_menu}" in
 		"add/edit keys") edit_key "${entry}" ;;
-		"delete entry") confirm "delete ${entry}"; gopass rm -f "${entry}" ;;
-		"generate new password") confirm "generate a new password for ${entry}"; gopass generate -f "${entry}" ;;
+		"delete entry") confirm "Delete ${entry}?"; gopass rm -f "${entry}" ;;
+		"generate new password") confirm "Generate a new password for ${entry}?"; gopass generate -f "${entry}" ;;
 	esac
 }
 
