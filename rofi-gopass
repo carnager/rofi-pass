@@ -9,14 +9,14 @@ backend=ydotool
 # ydotools delay behaves differently to xdotool and only delays initial typing.
 # xdotool on the other hand sets a delay between each keystroke.
 # This might be a bug in ydotool, see: https://github.com/ReimuNotMoe/ydotool/issues/5#issuecomment-513602774
-dotool_delay=200
+dotool_delay=20
 
 # Daemon does not autofork, so we have to guess it's startup time for the time being.
 # This hopefully gets some enhancements: https://github.com/ReimuNotMoe/ydotool/issues/20
-daemon_delay=2
+daemon_wait=2
 
 # delay for :delay keyword of the autotype functionality. This value is defined in seconds.
-delay=2
+autotype_delay=2
 
 # Make sure ESC will always end the programm.
 # Call this function with "exit_check $?" after each rofi call.
@@ -27,13 +27,26 @@ exit_check () {
 	fi
 }
 
+clipboard () {
+	local entry
+	local key
+	local value
+	entry="${1}"
+	key="${2}"
+	value="$(gopass show "${entry}" "${key}")"
+	printf '%s' "${value}" | xclip -sel clip
+	notify-send "rofi-gopass" "Copied ${key} to clipboard\nClearing in 45 seconds."
+	(sleep 45; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard | notify-send "rofi-gopass" "Clipboard cleared") &
+	exit
+}
+
 _ydotoold () {
     if ! pgrep -x "ydotoold" >/dev/null; then
     	# ydotoold blocks the terminal, so we need to background it.
     	# Sadly this way we never know when the process finished starting up.
     	# Until ydotoold receives proper daemonizing we add a sleep value here.
         ydotoold&
-        sleep "${daemon_delay}"
+        sleep "${daemon_wait}"
     fi
 }
 
@@ -75,7 +88,7 @@ autopass () {
         case "$word" in
             ":tab") _dotool key Tab;;
             ":space") _dotool key " ";;
-            ":delay") sleep "${delay}";;
+            ":delay") sleep "${autotype_delay}";;
             ":enter") _dotool key enter;;
             "pass") printf '%s' "$(gopass show --password "${entry}")" | _dotool type ;;
             *) printf '%s' "$(gopass show "${entry}" "${word}")" | _dotool type ;;
@@ -134,27 +147,12 @@ custom_type () {
 	local keys
 	entry="${1}"
 	keys="$(list_keys "${entry}")"
-	key_name=$(printf '%s\n' "${keys}" | _rofi -no-custom -mesg "Chose field to type")
-	exit_check $?
-	printf '%s' "$(gopass show "${entry}" "${key_name}")" | _dotool type
-}
-
-options () {
-	local entry
-	entry="${1}"
-	options_menu_content=(
-		"add/edit keys"
-		"delete entry"
-		"generate new password"
-	)
-
-	options_menu="$(printf '%s\n' "${options_menu_content[@]}" | _rofi -no-custom -mesg "Chose action" -p '> ')"
-	exit_check $?
-
-	case "${options_menu}" in
-		"add/edit keys") edit_key "${entry}" ;;
-		"delete entry") confirm "Delete ${entry}?"; gopass rm -f "${entry}" ;;
-		"generate new password") confirm "Generate a new password for ${entry}?"; gopass generate -f "${entry}" ;;
+	key_name=$(printf '%s\n' "${keys}" | _rofi -no-custom -kb-custom-1 "Alt+1" -mesg "Alt+1: Copy to Clipboard | Enter: Type Field")
+	local exit_value=$?
+	exit_check "${exit_value}"
+	case "${exit_value}" in
+		"10") clipboard "${entry}" "${key_name}" ;;
+		"0") printf '%s' "$(gopass show "${entry}" "${key_name}")" | _dotool type; exit ;;
 	esac
 }
 
@@ -162,31 +160,38 @@ do_menu () {
 	local entry
 	entry="${1}"
 	action_menu_content=(
-		"autotype"
-		"type password"
-		"type user"
-		"type custom field"
+		"< Go Back"
 		"---"
-		"options"
+		"Show Fields"
+		"Add/Edit Keys"
+		"Generate New Password"
+		"Delete Entry"
 	)
 
-	action_menu="$(printf '%s\n' "${action_menu_content[@]}" | _rofi -no-custom -mesg "Chose field to type" -p '> ')"
-	exit_check $?
+	action_menu="$(printf '%s\n' "${action_menu_content[@]}" | _rofi -no-custom -kb-custom-1 "Alt+1" -mesg "Selected Entry: ${entry}" -p '> ')"
+	exit_value=$?
+	exit_check "${exit_value}"
 
 	case "${action_menu}" in
-		"autotype") autopass "${entry}" ;;
-		"type password") printf '%s' "$(gopass show --password "${entry}")" | _dotool type ;;
-		"type user") printf '%s' "$(gopass show "${entry}" user)" | _dotool type ;;
-		"type custom field") custom_type "${entry}" ;;
-		"options") options "${entry}" ;;
+		"< Go Back") main ;;
+		"Show Fields") custom_type "${entry}" ;;
+		"Add/Edit Keys") edit_key "${entry}" ;;
+		"Delete Entry") confirm "Delete ${entry}?"; gopass rm -f "${entry}" ;;
+		"Generate New Password") confirm "Generate a new password for ${entry}?"; gopass generate -f "${entry}" ;;
 	esac
 }
 
 
 main () {
-	menu="$(list_passwords | _rofi)"
-	exit_check $?
-	do_menu "${menu}"
+	entry="$(list_passwords | _rofi -kb-custom-1 "Alt+1" -mesg "Alt+1: Autotype | Alt+2: Type User | Alt+3: Type Pass | Enter: More Actions")"
+	exit_value=$?
+	exit_check "${exit_value}"
+	case "${exit_value}" in
+		"10") autopass "${entry}"; exit ;;
+		"11") printf '%s' "$(gopass show "${entry}" user)" | _dotool type; exit ;;
+		"12") printf '%s' "$(gopass show --password "${entry}")" | _dotool type; exit ;;
+	esac
+	do_menu "${entry}"
 }
 
 main
