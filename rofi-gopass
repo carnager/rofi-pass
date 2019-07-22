@@ -1,0 +1,154 @@
+#!/bin/bash
+
+# Available backends: xdotool, ydotool
+# xdotool only works under X, but has issues with keyboard layouts, see:
+# https://github.com/jordansissel/xdotool/issues/97
+# ydotool works everywhere, but user needs permission to write to /dev/uinput
+backend=ydotool
+
+# ydotools delay behaves differently to xdotool and only delays initial typing.
+# xdotool on the other hand sets a delay between each keystroke.
+# This might be a bug in ydotool, see: https://github.com/ReimuNotMoe/ydotool/issues/5#issuecomment-513602774
+dotool_delay=200
+
+# Daemon does not autofork, so we have to guess it's startup time for the time being.
+# This hopefully gets some enhancements: https://github.com/ReimuNotMoe/ydotool/issues/20
+daemon_delay=2
+
+# delay for :delay keyword of the autotype functionality. This value is defined in seconds.
+delay=2
+
+# Make sure ESC will always end the programm.
+# Call this function with "exit_check $?" after each rofi call.
+exit_check () {
+	exit_value=$1
+	if [[ "${exit_value}" == "1" ]]; then
+		exit
+	fi
+}
+
+_ydotoold () {
+    if ! pgrep -x "ydotoold" >/dev/null; then
+    	# ydotoold blocks the terminal, so we need to background it.
+    	# Sadly this way we never know when the process finished starting up.
+    	# Until ydotoold receives proper daemonizing we add a sleep value here.
+        ydotoold&
+        sleep "${daemon_delay}"
+    fi
+}
+
+_dotool () {
+	local mode="${1}"
+	local key="${2:-null}"
+	case "${mode}" in
+		"type")
+			case "${backend}" in
+				"xdotool") xdotool type --delay "${dotool_delay}" --file - ;;
+				"ydotool") _ydotoold; ydotool type --delay "${dotool_delay}" --file - ;;
+			esac ;;
+		"key")
+			case "${backend}" in
+				"xdotool") xdotool key "${key}" ;;
+				"ydotool") _ydotoold; ydotool key "${key}" ;;
+			esac ;;
+	esac
+}
+
+list_passwords () {
+	gopass list --flat
+}
+
+_rofi () {
+	rofi -dmenu -no-auto-select -i "$@"
+}
+
+autopass () {
+	local entry="${1}"
+	local autotype="$(gopass show "${entry}" autotype)"
+	local autotype="${autotype:-user :tab pass}"
+
+    for word in "${autotype}"; do
+        case "$word" in
+            ":tab") _dotool key Tab;;
+            ":space") _dotool key " ";;
+            ":delay") sleep "${delay}";;
+            ":enter") _dotool key enter;;
+            "pass") printf '%s' "$(gopass show --password "${entry}")" | _dotool type ;;
+            *) printf '%s' "$(gopass show "${entry}" "${word}")" | _dotool type ;;
+        esac
+    done
+}
+
+list_keys () {
+	# gopass has no option to only list keys, so we need to build the list ourselves.
+	local entry="${1}"
+	local keys="$(gopass show "${entry}")"
+	printf '%s\n' "${keys}" | while read line; do
+		if [[ "${line}" == *": "* ]]; then
+			printf '%s\n' "${line%: *}"
+		fi
+	done
+}
+
+edit_key () {
+	local entry="${1}"
+	local keys=$(list_keys "${entry}")
+	key_name=$(printf '%s\n' "${keys}" | _rofi -mesg "Enter new key or chose existing one")
+	exit_check $?
+	value_name=$(printf '%s' "" | _rofi -mesg "Enter Value for key \"${key_name}\"")
+	exit_check $?
+	if [[ -z "${key_name}" ]]; then
+		printf "${value_name}" | gopass insert -a "${entry}" "${key_name}"
+	else
+		printf "${value_name}" | gopass insert "${entry}" "${key_name}"
+	fi
+}
+	
+confirm () {
+	local message="${1}"
+	confirm_content=(
+		"Yes"
+		"No")
+
+	confirm_menu=$(printf '%s\n' "${confirm_content[@]}" | _rofi -mesg "Are you sure you want to ${message}")
+	exit_check $?
+	case "${confirm_menu}" in
+		"Yes") : ;;
+		"No") exit ;;
+	esac
+}
+
+do_menu () {
+	local entry="${1}"
+	action_menu_content=(
+		"autotype"
+		"type password"
+		"type user"
+		"type custom"
+		"---"
+		"edit keys"
+		"delete password file"
+		"generate new password")
+
+		action_menu=$(printf '%s\n' "${action_menu_content[@]}" | _rofi -mesg "Chose field to type" -p '> ')
+		exit_check $?
+
+		case "${action_menu}" in
+			"autotype") autopass "${entry}" ;;
+			"type password") printf '%s' "$(gopass show --password "${entry}")" | _dotool type ;;
+			"type user") printf '%s' "$(gopass show "${entry}" user)" | _dotool type ;;
+			"edit keys") edit_key "${entry}" ;;
+			"delete password file") confirm "delete ${entry}"; gopass rm -f "${entry}" ;;
+			"generate new password") confirm "generate a new password for ${entry}"; gopass generate -f "${entry}" ;;
+			*) exit
+		esac
+	}
+
+
+main () {
+	menu="$(list_passwords | _rofi)"
+	exit_check $?
+	do_menu "${menu}"
+}
+
+main
