@@ -18,6 +18,18 @@ daemon_wait=2
 # delay for :delay keyword of the autotype functionality. This value is defined in seconds.
 autotype_delay=2
 
+## Hotkeys
+
+# Main menu
+key_autotype="Return"
+key_usertype="Alt+2"
+key_passtype="Alt+3"
+key_actions="Alt+a"
+
+# Show fields menu
+key_clipboard="Alt+1"
+key_fieldtype="Return"
+
 # Make sure ESC will always end the programm.
 # Call this function with "exit_check $?" after each rofi call.
 exit_check () {
@@ -147,7 +159,7 @@ custom_type () {
 	local keys
 	entry="${1}"
 	keys="$(list_keys "${entry}")"
-	key_name=$(printf '%s\n' "${keys}" | _rofi -no-custom -kb-custom-1 "Alt+1" -mesg "Alt+1: Copy to Clipboard | Enter: Type Field")
+	key_name=$(printf '%s\n' "${keys}" | _rofi -kb-accept-entry "" -no-custom -kb-custom-1 "${key_clipboard}" -kb-custom-2 "${key_fieldtype}" -mesg "${key_clipboard}: Copy to Clipboard | ${key_fieldtype}: Type Field")
 	local exit_value=$?
 	exit_check "${exit_value}"
 	case "${exit_value}" in
@@ -168,7 +180,7 @@ do_menu () {
 		"Delete Entry"
 	)
 
-	action_menu="$(printf '%s\n' "${action_menu_content[@]}" | _rofi -no-custom -kb-custom-1 "Alt+1" -mesg "Selected Entry: ${entry}" -p '> ')"
+	action_menu="$(printf '%s\n' "${action_menu_content[@]}" | _rofi -no-custom -mesg "Selected Entry: ${entry}" -p '> ')"
 	exit_value=$?
 	exit_check "${exit_value}"
 
@@ -183,7 +195,7 @@ do_menu () {
 
 
 main () {
-	entry="$(list_passwords | _rofi -kb-custom-1 "Alt+1" -mesg "Alt+1: Autotype | Alt+2: Type User | Alt+3: Type Pass | Enter: More Actions")"
+	entry="$(list_passwords | _rofi -kb-accept-entry "" -kb-custom-1 "${key_autotype}" -kb-custom-2 "${key_usetype}" -kb-custom-3 "${key_passtype}" -kb-custom-4 "${key_actions}" -mesg "${key_autotype}: Autotype | ${key_usertype}: Type User | ${key_passtype}: Type Pass | ${key_actions}: More Actions")"
 	exit_value=$?
 	exit_check "${exit_value}"
 	case "${exit_value}" in
