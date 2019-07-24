@@ -9,7 +9,7 @@ backend=ydotool
 # ydotools delay behaves differently to xdotool and only delays initial typing.
 # xdotool on the other hand sets a delay between each keystroke.
 # This might be a bug in ydotool, see: https://github.com/ReimuNotMoe/ydotool/issues/5#issuecomment-513602774
-dotool_delay=20
+dotool_delay=200
 
 # Daemon does not autofork, so we have to guess it's startup time for the time being.
 # This hopefully gets some enhancements: https://github.com/ReimuNotMoe/ydotool/issues/20
@@ -164,7 +164,7 @@ custom_type () {
 	exit_check "${exit_value}"
 	case "${exit_value}" in
 		"10") clipboard "${entry}" "${key_name}" ;;
-		"0") printf '%s' "$(gopass show "${entry}" "${key_name}")" | _dotool type; exit ;;
+		"11") printf '%s' "$(gopass show "${entry}" "${key_name}")" | _dotool type; exit ;;
 	esac
 }
 
