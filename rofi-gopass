@@ -5,6 +5,18 @@ _rofi () {
 	rofi -dmenu -no-auto-select -i "$@"
 }
 
+# default settings
+backend=ydotool
+dotool_delay=200
+daemon_wait=2
+autotype_delay=2
+key_autotype="Return"
+key_usertype="Alt+2"
+key_passtype="Alt+3"
+key_actions="Alt+a"
+key_clipboard="Alt+1"
+key_fieldtype="Return"
+
 # read config file
 get_config_file () {
 	configs=("$ROFI_PASS_CONFIG"
