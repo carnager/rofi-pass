@@ -195,7 +195,7 @@ do_menu () {
 
 
 main () {
-	entry="$(list_passwords | _rofi -kb-accept-entry "" -kb-custom-1 "${key_autotype}" -kb-custom-2 "${key_usetype}" -kb-custom-3 "${key_passtype}" -kb-custom-4 "${key_actions}" -mesg "${key_autotype}: Autotype | ${key_usertype}: Type User | ${key_passtype}: Type Pass | ${key_actions}: More Actions")"
+	entry="$(list_passwords | _rofi -kb-accept-entry "" -kb-custom-1 "${key_autotype}" -kb-custom-2 "${key_usertype}" -kb-custom-3 "${key_passtype}" -kb-custom-4 "${key_actions}" -mesg "${key_autotype}: Autotype | ${key_usertype}: Type User | ${key_passtype}: Type Pass | ${key_actions}: More Actions")"
 	exit_value=$?
 	exit_check "${exit_value}"
 	case "${exit_value}" in
