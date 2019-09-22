@@ -675,10 +675,10 @@ insertPass () {
 	if [[ "${url:0:4}" == "http" ]]; then
 		domain_name="$(printf '%s\n' "${url}" | awk -F / '{l=split($3,a,"."); print (a[l-1]=="com"?a[l-2] OFS:X) a[l-1] OFS a[l]}' OFS=".")"
 		help_content="Domain: ${domain_name}
-		Type name, make sure it is unique"
+Type name, make sure it is unique"
 	else
 		help_content="Hint: Copy URL to clipboard before calling this menu.
-		Type name, make sure it is unique"
+Type name, make sure it is unique"
 	fi
 
 	cd "${root}" || exit
@@ -695,7 +695,7 @@ insertPass () {
 		"${USER}"
 		"${default_user}")
 
-	user=$(printf '%s\n' "${user_content[@]}" | _rofi -dmenu -mesg "Chose Username or type" -p "> ")
+	user=$(printf '%s\n' "${user_content[@]}" | _rofi -dmenu -mesg "Choose Username or type" -p "> ")
 	val=$?
 
 	if [[ $val -eq 1 ]]; then
