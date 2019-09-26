@@ -63,7 +63,7 @@ has_qrencode() {
 # get all password files and create an array
 list_passwords() {
 	cd "${root}" || exit
-	pw_list=(**/*.gpg)
+   pw_list=($(find -L * -name "*.gpg"))
 	printf '%s\n' "${pw_list[@]%.gpg}" | sort -n
 
 }
