@@ -9,6 +9,10 @@ _rofi () {
 	rofi -no-auto-select -i "$@"
 }
 
+_pwgen () {
+	pwgen -y "$@"
+}
+
 _image_viewer () {
 	feh -
 }
