@@ -82,6 +82,7 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
 * bash 4.x
 * pwgen
 * [pass-otp](https://github.com/tadfisher/pass-otp) (optional: for OTPs)
+* [wl-clipboard](https://github.com/bugaevc/wl-clipboard) (optional: for use with Wayland)
 
 ### BSD
 
