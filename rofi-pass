@@ -77,6 +77,7 @@ doClip () {
 		"primary") xclip ;;
 		"clipboard") xclip -selection clipboard;;
 		"both") xclip; xclip -o | xclip -selection clipboard;;
+		"wayland") wl-copy -o ;;
 	esac
 }
 

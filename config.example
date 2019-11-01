@@ -64,7 +64,11 @@ default_autotype='user :tab pass'
 help_color="#4872FF"
 
 # Clipboard settings
-# Possible options: primary, clipboard, both
+# Possible options:
+#  - primary (X11),
+#  - clipboard (X11),
+#  - both (both of the above)
+#  - wayland (needs wl-copy from wl-clipboard)
 clip=primary
 
 # Seconds before clearing pass from clipboard 
