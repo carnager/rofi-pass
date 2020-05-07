@@ -800,7 +800,7 @@ main () {
 
 	# create tmp dir
 	if [[ ! -d "$cache_dir/rofi-pass" ]]; then
-		mkdir "$cache_dir/rofi-pass"
+		mkdir -p "$cache_dir/rofi-pass"
 	fi
 
 	# fix keyboard layout if enabled in config
