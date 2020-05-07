@@ -17,6 +17,8 @@ _image_viewer () {
 	feh -
 }
 
+cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
+
 # We expect to find these fields in pass(1)'s output
 URL_field='url'
 USERNAME_field='user'
@@ -81,7 +83,7 @@ doClip () {
 }
 
 checkIfPass () {
-	printf '%s\n' "${root}: $selected_password" >| "$HOME/.cache/rofi-pass/last_used"
+	printf '%s\n' "${root}: $selected_password" >| "$cache_dir/rofi-pass/last_used"
 }
 
 
@@ -89,8 +91,8 @@ autopass () {
 	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
 	xset r off
 
-	rm -f "$HOME/.cache/rofi-pass/last_used"
-	printf '%s\n' "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
+	rm -f "$cache_dir/rofi-pass/last_used"
+	printf '%s\n' "${root}: $selected_password" > "$cache_dir/rofi-pass/last_used"
 	for word in ${stuff["$AUTOTYPE_field"]}; do
 		case "$word" in
 			":tab") xdotool key Tab;;
@@ -797,8 +799,8 @@ main () {
 	[[ ! -z "$config_file" ]] && source "$config_file"
 
 	# create tmp dir
-	if [[ ! -d "$HOME/.cache/rofi-pass" ]]; then
-		mkdir "$HOME/.cache/rofi-pass"
+	if [[ ! -d "$cache_dir/rofi-pass" ]]; then
+		mkdir "$cache_dir/rofi-pass"
 	fi
 
 	# fix keyboard layout if enabled in config
@@ -817,8 +819,8 @@ main () {
 	fi
 
 	# check if alternative root directory was given on commandline
-	if [[ -r "$HOME/.cache/rofi-pass/last_used" ]] && [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
-		roots=("$(awk -F ': ' '{ print $1 }' "$HOME/.cache/rofi-pass/last_used")")
+	if [[ -r "$cache_dir/rofi-pass/last_used" ]] && [[ $1 == "--last-used" || $1 == "--show-last" ]]; then
+		roots=("$(awk -F ': ' '{ print $1 }' "$cache_dir/rofi-pass/last_used")")
 	elif [[ -n "$2" && "$1" == "--root" ]]; then
 		custom_root=true; IFS=: read -r -a roots <<< "$2"
 	elif [[ -n $root ]]; then
@@ -843,14 +845,14 @@ main () {
 			help_msg
 			;;
 		--last-used)
-			if [[ -r "$HOME/.cache/rofi-pass/last_used" ]]; then
-				entry="$(awk -F ': ' '{ print $2 }' "$HOME/.cache/rofi-pass/last_used")"
+			if [[ -r "$cache_dir/rofi-pass/last_used" ]]; then
+				entry="$(awk -F ': ' '{ print $2 }' "$cache_dir/rofi-pass/last_used")"
 			fi
 			mainMenu
 			;;
 		--show-last)
-			if [[ -r "$HOME/.cache/rofi-pass/last_used" ]]; then
-				selected_password="$(awk -F ': ' '{ print $2 }' "$HOME/.cache/rofi-pass/last_used")" viewEntry
+			if [[ -r "$cache_dir/rofi-pass/last_used" ]]; then
+				selected_password="$(awk -F ': ' '{ print $2 }' "$cache_dir/rofi-pass/last_used")" viewEntry
 			else
 				mainMenu
 			fi
