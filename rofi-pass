@@ -698,9 +698,11 @@ insertPass () {
 		exit
 	fi
 
-	user_content=("${default_user2}"
-		"${USER}"
-		"${default_user}")
+	if [[ -z "${user_content[@]:-}" ]]; then
+		user_content=("${default_user2}"
+			"${USER}"
+			"${default_user}")
+	fi
 
 	user=$(printf '%s\n' "${user_content[@]}" | _rofi -dmenu -mesg "Chose Username or type" -p "> ")
 	val=$?
