@@ -69,10 +69,7 @@ has_qrencode() {
 
 # get all password files and create an array
 list_passwords() {
-	cd "${root}" || exit
-	pw_list=(**/*.gpg)
-	printf '%s\n' "${pw_list[@]%.gpg}" | sort -n
-
+	find -L "${root}" -name \*.gpg -printf '%P\n' | sed 's/\.gpg$//g' | sort -n
 }
 
 doClip () {
@@ -672,8 +669,7 @@ manageEntry () {
 }
 
 listgpg () {
-	pw_list=(**/*.gpg)
-	printf '%s\n' "${pw_list[@]}" | sort -n
+	find -L . -name \*.gpg -printf '%P\n' | sort -n
 }
 
 insertPass () {
@@ -792,9 +788,6 @@ get_config_file () {
 }
 
 main () {
-	# enable extended globbing
-	shopt -s nullglob globstar
-
 	# load config file
 	config_file="$(get_config_file)"
 	[[ ! -z "$config_file" ]] && source "$config_file"
