@@ -67,12 +67,13 @@ has_qrencode() {
 	command -v qrencode >/dev/null 2>&1
 }
 
-# get all password files and create an array
+# get all password files and ouput as newline-delimited text
 list_passwords() {
 	cd "${root}" || exit
-   pw_list=($(find -L * -name "*.gpg"))
-	printf '%s\n' "${pw_list[@]%.gpg}" | sort -n
-
+	listgpg |
+		while IFS= read pfile; do
+			echo ${pfile%.gpg}
+		done | sort -n
 }
 
 doClip () {
@@ -102,7 +103,7 @@ autopass () {
 			":enter") xdotool key Return;;
 			":otp") printf '%s' "$(generateOTP)" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
 			"pass") printf '%s' "${password}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
- 			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | xdotool type --clearmodifiers --file -;;
+			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | xdotool type --clearmodifiers --file -;;
 			*) printf '%s' "${stuff[${word}]}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
 		esac
 	done
@@ -428,10 +429,10 @@ mainMenu () {
 	if [[ -z "${stuff["${USERNAME_field}"]}" ]]; then
 		if [[ -n $default_user ]]; then
 			if [[ "$default_user" == ":filename" ]]; then
-		    	stuff["${USERNAME_field}"]="$(basename $selected_password)"
-		    else
-		    	stuff["${USERNAME_field}"]="${default_user}"
-    		fi
+				stuff["${USERNAME_field}"]="$(basename $selected_password)"
+			else
+				stuff["${USERNAME_field}"]="${default_user}"
+			fi
 		fi
 	fi
 	pass_content="$(for key in "${!stuff[@]}"; do printf '%s\n' "${key}: ${stuff[$key]}"; done)"
@@ -615,7 +616,7 @@ showEntry () {
 			fi
 			if [[ $notify == "true" ]]; then
 				(sleep $clip_clear; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
-			elif [[ $notify == "false" ]]; 	then
+			elif [[ $notify == "false" ]];	then
 				(sleep $clip_clear; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard) &
 			fi
 			exit
@@ -672,8 +673,7 @@ manageEntry () {
 }
 
 listgpg () {
-	pw_list=(**/*.gpg)
-	printf '%s\n' "${pw_list[@]}" | sort -n
+	find -L . -name \*.gpg -printf '%P\n' | sort -n
 }
 
 insertPass () {
@@ -792,9 +792,6 @@ get_config_file () {
 }
 
 main () {
-	# enable extended globbing
-	shopt -s nullglob globstar
-
 	# load config file
 	config_file="$(get_config_file)"
 	[[ ! -z "$config_file" ]] && source "$config_file"
