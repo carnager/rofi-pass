@@ -100,7 +100,7 @@ autopass () {
 			":enter") xdotool key Return;;
 			":otp") printf '%s' "$(generateOTP)" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
 			"pass") printf '%s' "${password}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
- 			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | xdotool type --clearmodifiers --file -;;
+			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | xdotool type --clearmodifiers --file -;;
 			*) printf '%s' "${stuff[${word}]}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
 		esac
 	done
@@ -426,10 +426,10 @@ mainMenu () {
 	if [[ -z "${stuff["${USERNAME_field}"]}" ]]; then
 		if [[ -n $default_user ]]; then
 			if [[ "$default_user" == ":filename" ]]; then
-		    	stuff["${USERNAME_field}"]="$(basename $selected_password)"
-		    else
-		    	stuff["${USERNAME_field}"]="${default_user}"
-    		fi
+				stuff["${USERNAME_field}"]="$(basename $selected_password)"
+			else
+				stuff["${USERNAME_field}"]="${default_user}"
+			fi
 		fi
 	fi
 	pass_content="$(for key in "${!stuff[@]}"; do printf '%s\n' "${key}: ${stuff[$key]}"; done)"
@@ -613,7 +613,7 @@ showEntry () {
 			fi
 			if [[ $notify == "true" ]]; then
 				(sleep $clip_clear; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
-			elif [[ $notify == "false" ]]; 	then
+			elif [[ $notify == "false" ]];	then
 				(sleep $clip_clear; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard) &
 			fi
 			exit
