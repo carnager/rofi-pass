@@ -69,7 +69,8 @@ has_qrencode() {
 
 # get all password files and ouput as newline-delimited text
 list_passwords() {
-	find -L "${root}" -name \*.gpg -printf '%P\n' |
+	cd "${root}" || exit
+	listgpg |
 		while IFS= read pfile; do
 			echo ${pfile%.gpg}
 		done | sort -n
