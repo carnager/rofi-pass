@@ -70,7 +70,10 @@ has_qrencode() {
 # get all password files and ouput as newline-delimited text
 list_passwords() {
 	cd "${root}" || exit
-	find -L * -name "*.gpg" | sed -e 's/.gpg$//' | sort -n
+	find -L * -name "*.gpg" |
+		while IFS= read pfile; do
+			echo ${pfile%.gpg}
+		done | sort -n
 }
 
 doClip () {
