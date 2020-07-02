@@ -67,12 +67,10 @@ has_qrencode() {
 	command -v qrencode >/dev/null 2>&1
 }
 
-# get all password files and create an array
+# get all password files and ouput as newline-delimited text
 list_passwords() {
 	cd "${root}" || exit
-   pw_list=($(find -L * -name "*.gpg"))
-	printf '%s\n' "${pw_list[@]%.gpg}" | sort -n
-
+	find -L * -name "*.gpg" | sed -e 's/.gpg$//' | sort -n
 }
 
 doClip () {
