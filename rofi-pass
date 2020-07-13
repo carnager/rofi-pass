@@ -36,8 +36,7 @@ notify='false'
 help_color=""
 clip=primary
 clip_clear=45
-default_user="${ROFI_PASS_DEFAULT_USER-$(whoami)}"
-default_user2=john_doe
+default_users=("${ROFI_PASS_DEFAULT_USER-$(whoami)}")
 password_length=12
 fix_layout=false
 
@@ -426,12 +425,12 @@ mainMenu () {
 		fi
 	fi
 	if [[ -z "${stuff["${USERNAME_field}"]}" ]]; then
-		if [[ -n $default_user ]]; then
-			if [[ "$default_user" == ":filename" ]]; then
-		    	stuff["${USERNAME_field}"]="$(basename $selected_password)"
-		    else
-		    	stuff["${USERNAME_field}"]="${default_user}"
-    		fi
+		if [[ -n ${default_users[0]} ]]; then
+			if [[ "${default_users[0]}" == ":filename" ]]; then
+				stuff["${USERNAME_field}"]="$(basename $selected_password)"
+			else
+				stuff["${USERNAME_field}"]="${default_users[0]}"
+			fi
 		fi
 	fi
 	pass_content="$(for key in "${!stuff[@]}"; do printf '%s\n' "${key}: ${stuff[$key]}"; done)"
@@ -698,11 +697,7 @@ insertPass () {
 		exit
 	fi
 
-	user_content=("${default_user2}"
-		"${USER}"
-		"${default_user}")
-
-	user=$(printf '%s\n' "${user_content[@]}" | _rofi -dmenu -mesg "Chose Username or type" -p "> ")
+	user=$(printf '%s\n' "${default_users[@]}" | _rofi -dmenu -mesg "Chose Username or type" -p "> ")
 	val=$?
 
 	if [[ $val -eq 1 ]]; then
@@ -798,6 +793,23 @@ main () {
 	# load config file
 	config_file="$(get_config_file)"
 	[[ ! -z "$config_file" ]] && source "$config_file"
+
+	# Handle deprecated default_user/default_user2 config.
+	if [[ -z "${default_users[*]}" ]]; then
+		# shellcheck disable=SC2154
+		if [[ -n "$default_user" ]]; then
+			default_users+=("$default_user")
+		fi
+		# shellcheck disable=SC2154
+		if [[ -n "$default_user2" ]]; then
+			default_users+=("$default_user2")
+		fi
+		if [[ ${#default_users[@]} -eq 0 ]]; then
+			default_users=("$USER")
+		fi
+	else
+		default_users=("$USER")
+	fi
 
 	# create tmp dir
 	if [[ ! -d "$cache_dir/rofi-pass" ]]; then
