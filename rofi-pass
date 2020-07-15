@@ -98,6 +98,7 @@ autopass () {
 		case "$word" in
 			":tab") xdotool key Tab;;
 			":space") xdotool key space;;
+			":delay_"*) sleep "${word#:delay_}";;
 			":delay") sleep "${delay}";;
 			":enter") xdotool key Return;;
 			":otp") printf '%s' "$(generateOTP)" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;

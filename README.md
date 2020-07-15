@@ -71,6 +71,9 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
 * The field names for `user`, `url` and `autotype` are configurable
 * Bookmarks mode (open stored URLs in browser, default: Alt+x)
 * Share common used passwords between several entries (with different URLs, usernames etc)
+* The `:delay` keyword for autotyping can be either set by default in the config
+  (2 seconds by default), or we can use `:delay_time` where `time` is a number,
+  for example: `:delay_5` in an `autotype` field will `sleep 5`
 
 ## Requirements
 
