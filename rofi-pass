@@ -67,12 +67,17 @@ has_qrencode() {
 	command -v qrencode >/dev/null 2>&1
 }
 
-# get all password files and create an array
+listgpg () {
+	mapfile -d '' pw_list < <(find -L . -name '*.gpg' -print0)
+	pw_list=("${pw_list[@]#./}")
+	printf '%s\n' "${pw_list[@]}" | sort -n
+}
+
+# get all password files and output as newline-delimited text
 list_passwords() {
 	cd "${root}" || exit
-	pw_list=($(find -L * -name "*.gpg"))
+	mapfile -t pw_list < <(listgpg)
 	printf '%s\n' "${pw_list[@]%.gpg}" | sort -n
-
 }
 
 doClip () {
@@ -678,11 +683,6 @@ manageEntry () {
 	fi
 }
 
-listgpg () {
-	pw_list=(**/*.gpg)
-	printf '%s\n' "${pw_list[@]}" | sort -n
-}
-
 insertPass () {
 	url=$(xclip --selection clipboard -o)
 
@@ -805,9 +805,6 @@ get_config_file () {
 }
 
 main () {
-	# enable extended globbing
-	shopt -s nullglob globstar
-
 	# load config file
 	config_file="$(get_config_file)"
 	[[ ! -z "$config_file" ]] && source "$config_file"
@@ -881,4 +878,3 @@ main () {
 }
 
 main "$@"
-
