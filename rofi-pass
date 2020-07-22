@@ -70,7 +70,7 @@ has_qrencode() {
 # get all password files and create an array
 list_passwords() {
 	cd "${root}" || exit
-   pw_list=($(find -L * -name "*.gpg"))
+	pw_list=($(find -L * -name "*.gpg"))
 	printf '%s\n' "${pw_list[@]%.gpg}" | sort -n
 
 }
@@ -102,7 +102,7 @@ autopass () {
 			":enter") xdotool key Return;;
 			":otp") printf '%s' "$(generateOTP)" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
 			"pass") printf '%s' "${password}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
- 			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | xdotool type --clearmodifiers --file -;;
+			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | xdotool type --clearmodifiers --file -;;
 			*) printf '%s' "${stuff[${word}]}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
 		esac
 	done
@@ -266,7 +266,8 @@ viewEntry () {
 generatePass () {
 	askmenu_content=(
 		"Yes"
-		"No")
+		"No"
+	)
 
 	askGenMenu=$(printf '%s\n' "${askmenu_content[@]}" | _rofi -dmenu -p "Generate new Password for ${selected_password}? > ")
 	askgen_exit=$?
@@ -285,7 +286,8 @@ generatePass () {
 	symbols_content=(
 		"0  Cancel"
 		"1  Yes"
-		"2  No")
+		"2  No"
+	)
 
 	symbols=$(printf '%s\n' "${symbols_content[@]}" | _rofi -dmenu -p "Use Symbols? > ")
 	symbols_val=$?
@@ -319,11 +321,11 @@ generatePass () {
 mainMenu () {
 	if [[ $1 == "--bmarks" ]]; then
 		selected_password="$(list_passwords 2>/dev/null \
-		| _rofi -mesg "Bookmarks Mode. ${switch} to switch" \
-		-dmenu \
-		-kb-custom-10 "${switch}" \
-		-select "$entry" \
-		-p "rofi-pass > ")"
+			| _rofi -mesg "Bookmarks Mode. ${switch} to switch" \
+			-dmenu \
+			-kb-custom-10 "${switch}" \
+			-select "$entry" \
+			-p "rofi-pass > ")"
 
 		rofi_exit=$?
 
@@ -354,11 +356,12 @@ mainMenu () {
 			-kb-custom-16 "${help}"
 			-kb-custom-17 "${switch}"
 			-kb-custom-18 "${insert_pass}"
-			-kb-custom-19 "${qrcode}")
-		args+=(-kb-mode-previous ""    # These keyboard shortcut options are needed, because
-			-kb-mode-next ""            # Shift+<Left|Right> are otherwise taken by rofi.
-			-select "$entry"
-			-p "> ")
+			-kb-custom-19 "${qrcode}"
+		)
+		args+=( -kb-mode-previous ""    # These keyboard shortcut options are needed, because
+		-kb-mode-next ""            # Shift+<Left|Right> are otherwise taken by rofi.
+		-select "$entry"
+		-p "> "	)
 
 		if [[ ${#roots[@]} -gt "1" || $custom_root == "true" ]]; then
 			args+=(-mesg "PW Store: ${root}")
@@ -404,7 +407,7 @@ mainMenu () {
 					*)
 						_id="${LINE%%: *}"
 						_val="${LINE#* }"
-					;;
+						;;
 				esac
 
 				if [[ -n "$_id" ]]; then
@@ -428,10 +431,10 @@ mainMenu () {
 	if [[ -z "${stuff["${USERNAME_field}"]}" ]]; then
 		if [[ -n $default_user ]]; then
 			if [[ "$default_user" == ":filename" ]]; then
-		    	stuff["${USERNAME_field}"]="$(basename $selected_password)"
-		    else
-		    	stuff["${USERNAME_field}"]="${default_user}"
-    		fi
+				stuff["${USERNAME_field}"]="$(basename $selected_password)"
+			else
+				stuff["${USERNAME_field}"]="${default_user}"
+			fi
 		fi
 	fi
 	pass_content="$(for key in "${!stuff[@]}"; do printf '%s\n' "${key}: ${stuff[$key]}"; done)"
@@ -470,23 +473,23 @@ clearUp () {
 
 helpMenu () {
 	printf '%s' "${autotype}: Autotype
-${type_user}: Type Username
-${type_pass}: Type Password
-${qrcode}: Generate and display qrcode
----
-${copy_name}: Copy Username
-${copy_pass}: Copy Password
-${copy_url}: Copy URL
-${open_url}: Open URL
-${copy_menu}: Copy Custom Field
----
-${action_menu}: Edit, Move, Delete, Re-generate Submenu
-${show}: Show Password File
-${insert_pass}: Insert new Pass Entry
-${switch}: Switch Pass/Bookmark Mode
----
-${previous_root}: Switch to previous password store (--root)
-${next_root}: Switch to next password store (--root)
+	${type_user}: Type Username
+	${type_pass}: Type Password
+	${qrcode}: Generate and display qrcode
+	---
+	${copy_name}: Copy Username
+	${copy_pass}: Copy Password
+	${copy_url}: Copy URL
+	${open_url}: Open URL
+	${copy_menu}: Copy Custom Field
+	---
+	${action_menu}: Edit, Move, Delete, Re-generate Submenu
+	${show}: Show Password File
+	${insert_pass}: Insert new Pass Entry
+	${switch}: Switch Pass/Bookmark Mode
+	---
+	${previous_root}: Switch to previous password store (--root)
+	${next_root}: Switch to next password store (--root)
 	" | _rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > "
 	help_val=$?
 
@@ -547,7 +550,8 @@ actionMenu () {
 		"2 Copy Password File"
 		"3 Delete Password File"
 		"4 Edit Password File"
-		"5 Generate New Password")
+		"5 Generate New Password"
+	)
 
 	action=$(printf '%s\n' "${action_content[@]}" | _rofi -dmenu -p "Choose Action > ")
 	if [[ ${action} == "1 Move Password File" ]]; then
@@ -592,7 +596,8 @@ showEntry () {
 	fi
 
 	bla_content=("< Return"
-		"${pass_content}")
+		"${pass_content}"
+	)
 
 	bla=$(printf '%s\n' "${bla_content[@]}" | _rofi -dmenu -mesg "Enter: Copy entry to clipboard" -p "> ")
 	rofi_exit=$?
@@ -657,7 +662,8 @@ manageEntry () {
 	elif [[ "$1" == "delete" ]]; then
 		HELP="<span color='$help_color'>Selected entry: ${selected_password}</span>"
 		ask_content=("Yes"
-			"No")
+			"No"
+		)
 		ask=$(printf '%s\n' "${ask_content[@]}" | _rofi -mesg "${HELP}" -dmenu -p "Are You Sure? > ")
 		if [[ "$ask" == "Yes" ]]; then
 			PASSWORD_STORE_DIR="${root}" pass rm --force "${selected_password}"
@@ -700,7 +706,8 @@ insertPass () {
 
 	user_content=("${default_user2}"
 		"${USER}"
-		"${default_user}")
+		"${default_user}"
+	)
 
 	user=$(printf '%s\n' "${user_content[@]}" | _rofi -dmenu -mesg "Chose Username or type" -p "> ")
 	val=$?
@@ -711,7 +718,8 @@ insertPass () {
 
 	group_content=("No Group"
 		"---"
-		"${grouplist}")
+		"${grouplist}"
+	)
 
 	group=$(printf '%s\n' "${group_content[@]}" | _rofi -dmenu -p "Choose Group > ")
 	val=$?
@@ -733,12 +741,14 @@ insertPass () {
 			pass_content=("${pw}"
 				"---"
 				"${USERNAME_field}: ${user}"
-				"${URL_field}: ${url}")
+				"${URL_field}: ${url}"
+			)
 			printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
 		else
 			pass_content=("${pw}"
 				"---"
-				"${USERNAME_field}: ${user}")
+				"${USERNAME_field}: ${user}"
+			)
 			printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${name}"
 		fi
 	else
@@ -746,12 +756,14 @@ insertPass () {
 			pass_content=("${pw}"
 				"---"
 				"${USERNAME_field}: ${user}"
-				"${URL_field}: ${url}")
+				"${URL_field}: ${url}"
+			)
 			printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null && PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
 		else
 			pass_content=("${pw}"
 				"---"
-				"${USERNAME_field}: ${user}")
+				"${USERNAME_field}: ${user}"
+			)
 			printf '%s\n' "${pass_content[@]}" | PASSWORD_STORE_DIR="${root}" pass insert -m "${group}/${name}" > /dev/null
 			if [[ $edit_new_pass == "true" ]]; then
 				PASSWORD_STORE_DIR="${root}" pass edit "${group}/${name}"
