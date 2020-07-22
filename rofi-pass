@@ -436,7 +436,7 @@ mainMenu () {
 	if [[ -z "${stuff["${USERNAME_field}"]}" ]]; then
 		if [[ -n $default_user ]]; then
 			if [[ "$default_user" == ":filename" ]]; then
-				stuff["${USERNAME_field}"]="$(basename $selected_password)"
+				stuff["${USERNAME_field}"]="$(basename "$selected_password")"
 			else
 				stuff["${USERNAME_field}"]="${default_user}"
 			fi
@@ -796,8 +796,8 @@ get_config_file () {
 
 	# return the first config file with a valid path
 	for config in "${configs[@]}"; do
-		# '! -z' is needed in case ROFI_PASS_CONFIG is not set
-		if [[ ! -z "${config}" && -f "${config}" ]]; then
+		# '-n' is needed in case ROFI_PASS_CONFIG is not set
+		if [[ -n "${config}" && -f "${config}" ]]; then
 			printf "%s" "$config"
 			return
 		fi
@@ -807,7 +807,7 @@ get_config_file () {
 main () {
 	# load config file
 	config_file="$(get_config_file)"
-	[[ ! -z "$config_file" ]] && source "$config_file"
+	[[ -n "$config_file" ]] && source "$config_file"
 
 	# create tmp dir
 	if [[ ! -d "$cache_dir/rofi-pass" ]]; then
