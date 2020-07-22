@@ -472,7 +472,8 @@ clearUp () {
 }
 
 helpMenu () {
-	printf '%s' "${autotype}: Autotype
+	_rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > " <<- EOM
+	${autotype}: Autotype
 	${type_user}: Type Username
 	${type_pass}: Type Password
 	${qrcode}: Generate and display qrcode
@@ -490,14 +491,14 @@ helpMenu () {
 	---
 	${previous_root}: Switch to previous password store (--root)
 	${next_root}: Switch to next password store (--root)
-	" | _rofi -dmenu -mesg "Hint: All hotkeys are configurable in config file" -p "Help > "
-	help_val=$?
+EOM
+help_val=$?
 
-	if [[ $help_val -eq 1 ]]; then
-		exit;
-	else
-		unset helptext; mainMenu;
-	fi
+if [[ $help_val -eq 1 ]]; then
+	exit;
+else
+	unset helptext; mainMenu;
+fi
 }
 
 
