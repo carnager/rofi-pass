@@ -774,7 +774,7 @@ insertPass () {
 }
 
 help_msg () {
-    version_number=$(git describe --tags --abbrev=0)
+    version_number="2.0.2"
 	cat <<EOF
 	Usage:
 	rofi-pass [command]
