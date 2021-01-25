@@ -17,6 +17,23 @@ _image_viewer () {
 	feh -
 }
 
+_clip_in_primary() {
+	xclip
+}
+
+_clip_in_clipboard() {
+	xclip -selection clipboard
+}
+
+_clip_out_primary() {
+	xclip -o
+}
+
+_clip_out_clipboard() {
+	xclip --selection clipboard -o
+}
+
+
 config_dir=${XDG_CONFIG_HOME:-$HOME/.config}
 cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
 
@@ -82,9 +99,9 @@ list_passwords() {
 
 doClip () {
 	case "$clip" in
-		"primary") xclip ;;
-		"clipboard") xclip -selection clipboard;;
-		"both") xclip; xclip -o | xclip -selection clipboard;;
+		"primary") _clip_in_primary ;;
+		"clipboard") _clip_in_clipboard ;;
+		"both") _clip_in_primary; _clip_out_primary | _clip_in_clipboard;;
 	esac
 }
 
@@ -257,9 +274,9 @@ copyPass () {
 	fi
 
 	if [[ $notify == "true" ]]; then
-		(sleep $clip_clear; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+		(sleep $clip_clear; printf '%s' "" | _clip_in_primary; printf '%s' "" | _clip_in_clipboard | notify-send "rofi-pass" "Clipboard cleared") &
 	elif [[ $notify == "false" ]]; then
-		(sleep $clip_clear; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard) &
+		(sleep $clip_clear; printf '%s' "" | _clip_in_primary; printf '%s' "" | _clip_in_clipboard) &
 	fi
 }
 
@@ -625,9 +642,9 @@ showEntry () {
 				notify-send "rofi-pass" "Copied Password\\nClearing in $clip_clear seconds"
 			fi
 			if [[ $notify == "true" ]]; then
-				(sleep $clip_clear; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+				(sleep $clip_clear; printf '%s' "" | _clip_in_primary; printf '%s' "" | _clip_in_clipboard | notify-send "rofi-pass" "Clipboard cleared") &
 			elif [[ $notify == "false" ]]; 	then
-				(sleep $clip_clear; printf '%s' "" | xclip; printf '%s' "" | xclip -selection clipboard) &
+				(sleep $clip_clear; printf '%s' "" | _clip_in_primary; printf '%s' "" | _clip_in_clipboard) &
 			fi
 			exit
 		fi
@@ -684,7 +701,7 @@ manageEntry () {
 }
 
 insertPass () {
-	url=$(xclip --selection clipboard -o)
+	url=$(_clip_out_clipboard)
 
 	if [[ "${url:0:4}" == "http" ]]; then
 		domain_name="$(printf '%s\n' "${url}" | awk -F / '{l=split($3,a,"."); print (a[l-1]=="com"?a[l-2] OFS:X) a[l-1] OFS a[l]}' OFS=".")"
