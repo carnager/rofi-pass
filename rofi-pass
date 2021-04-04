@@ -332,11 +332,9 @@ generatePass () {
 	if [[ $length_exit -eq 1 ]]; then
 		exit
 	fi
-	if [[ $length == "" ]]; then
-		PASSWORD_STORE_DIR="${root}" pass generate ${symbols} -i "$selected_password" "${password_length}" > /dev/null;
-	else
-		PASSWORD_STORE_DIR="${root}" pass generate ${symbols} -i "$selected_password" "${length}" > /dev/null;
-	fi
+
+	pw=$(_pwgen ${password_length:?length})
+	{ echo $pw; pass $selected_password; } | sed -s 2d | PASSWORD_STORE_DIR="${root}" pass insert -fm $selected_password > /dev/null
 }
 
 # main Menu
