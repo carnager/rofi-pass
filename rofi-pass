@@ -22,6 +22,7 @@ _xdotool () {
 		else
 			printf "%s\n" "starting daemon"
 			ydotoold&
+			sleep 0.1
 		fi
 		ydotool "$@"
 	fi
