@@ -25,22 +25,22 @@ _image_viewer () {
 # and comment the xclip lines
 #
 _clip_in_primary() {
-	xclip
-  # wl-copy-p
+  xclip
+  # wl-copy -p
 }
 
 _clip_in_clipboard() {
-	xclip -selection clipboard
+  xclip -selection clipboard
   # wl-copy
 }
 
 _clip_out_primary() {
-	xclip -o
+  xclip -o
   # wl-paste -p
 }
 
 _clip_out_clipboard() {
-	xclip --selection clipboard -o
+  xclip --selection clipboard -o
   # wl-paste
 }
 
