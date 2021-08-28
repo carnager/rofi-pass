@@ -107,7 +107,7 @@ autopass () {
 
 	rm -f "$HOME/.cache/rofi-pass/last_used"
 	printf '%s\n' "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
-	for word in ${stuff["$AUTOTYPE_field"]}; do
+	for word in ${stuff["$1"]}; do
 		case "$word" in
 			":tab") _xdotool key tab;;
 			":space") _xdotool key " ";;
@@ -453,7 +453,7 @@ mainMenu () {
 	# The exit code for -kb-custom-X is X+9.
 	case "${rofi_exit}" in
 		0) typeMenu;;
-		10) sleep $wait; autopass;;
+		10) sleep $wait; autopass $AUTOTYPE_field;;
 		11) sleep $wait; typeUser;;
 		12) sleep $wait; typePass;;
 		13) openURL;;
@@ -525,12 +525,12 @@ typeMenu () {
 			case "$typefield" in
 				'') exit;;
 				'pass') sleep $wait; typePass;;
-				"${AUTOTYPE_field}") sleep $wait; autopass;;
+				"auto"*) sleep $wait; autopass $typefield;;
 				*) sleep $wait; typeField
 			esac
 			clearUp
-		elif [[ $default_do == "${AUTOTYPE_field}" ]]; then
-			sleep $wait; autopass
+		elif [[ $default_do == "auto"* ]]; then
+			sleep $wait; autopass $default_do
 		else
 			${default_do}
 		fi
