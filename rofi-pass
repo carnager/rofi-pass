@@ -13,17 +13,21 @@ _image_viewer () {
 	feh -
 }
 
-_xdotool () {
-	if [[ $backend == "xdotool" ]]; then
-		xdotool "$@"
-	elif [[ $backend == "ydotool" ]]; then
+start_ydotool () {
+	if [[ $backend == "ydotool" ]]; then
 		if pgrep -x "ydotoold" >/dev/null; then
 			printf "%s\n" "ydotool daemon already running"
 		else
 			printf "%s\n" "starting daemon"
 			ydotoold&
-			sleep 0.1
 		fi
+	fi
+}
+
+_xdotool () {
+	if [[ $backend == "xdotool" ]]; then
+		xdotool "$@"
+	elif [[ $backend == "ydotool" ]]; then
 		ydotool "$@"
 	fi
 }
@@ -846,6 +850,7 @@ main () {
 	roots_length=${#roots[@]}
 	export root=${roots[$roots_index]}
 	export PASSWORD_STORE_DIR="${root}"
+	start_ydotool
 	case $1 in
 		--insert)
 			insertPass
