@@ -113,6 +113,7 @@ autopass () {
 			":space") _xdotool key " ";;
 			":delay") sleep "${delay}";;
 			":enter") _xdotool key enter;;
+			":esc"|":escape") _xdotool key esc;;
 			":otp") printf '%s' "$(generateOTP)" | _xdotool type --key-delay ${xdotool_delay} --file /dev/stdin;;
 			"pass") printf '%s' "${password}" | _xdotool type --key-delay ${xdotool_delay} --file /dev/stdin;;
  			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | _xdotool type --file /dev/stdin;;
