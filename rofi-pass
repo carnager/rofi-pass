@@ -76,9 +76,31 @@ insert_pass="Alt+n"
 qrcode="Alt+q"
 previous_root="Shift+Left"
 next_root="Shift+Right"
+backend=${ROFI_PASS_BACKEND:-xdotool}
+
+case "$backend" in
+    "xdotool");;
+    *)
+        >&2 echo "Invalid backend '$backend', falling back to xdotool"
+        backend=xdotool
+        ;;
+esac
 
 # Safe permissions
 umask 077
+
+# Backends for typing what's in stdin
+_do_type_xdotool() {
+	xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
+}
+
+# Backends for pressing the key specified by the first argument ($1)
+_do_press_key_xdotool() {
+	xdotool key "$1"
+}
+
+do_type=_do_type_${backend}
+do_press_key=_do_press_key_${backend}
 
 has_qrencode() {
 	command -v qrencode >/dev/null 2>&1
@@ -118,19 +140,19 @@ autopass () {
 	printf '%s\n' "${root}: $selected_password" > "$cache_dir/rofi-pass/last_used"
 	for word in ${stuff["$AUTOTYPE_field"]}; do
 		case "$word" in
-			":tab") xdotool key Tab;;
-			":space") xdotool key space;;
+			":tab") ${do_press_key} Tab;;
+			":space") ${do_press_key} space;;
 			":delay") sleep "${delay}";;
-			":enter") xdotool key Return;;
-			":otp") printf '%s' "$(generateOTP)" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
-			"pass") printf '%s' "${password}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
-			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | xdotool type --clearmodifiers --file -;;
-			*) printf '%s' "${stuff[${word}]}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
+			":enter") ${do_press_key} Return;;
+			":otp") printf '%s' "$(generateOTP)" | ${do_type};;
+			"pass") printf '%s' "${password}" | ${do_type};;
+			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | ${do_type};;
+			*) printf '%s' "${stuff[${word}]}" | ${do_type};;
 		esac
 	done
 
 	if [[ ${auto_enter} == "true" ]]; then
-		xdotool key Return
+		${do_press_key} Return
 	fi
 
 	xset r "$x_repeat_enabled"
@@ -177,7 +199,7 @@ typeUser () {
 	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
 	xset r off
 
-	printf '%s' "${stuff[${USERNAME_field}]}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
+	printf '%s' "${stuff[${USERNAME_field}]}" | ${do_type}
 
 	xset r "$x_repeat_enabled"
 	unset x_repeat_enabled
@@ -191,7 +213,7 @@ typePass () {
 	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
 	xset r off
 
-	printf '%s' "${password}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
+	printf '%s' "${password}" | ${do_type}
 
 	if [[ $notify == "true" ]]; then
 		if [[ "${stuff[notify]}" == "false" ]]; then
@@ -224,7 +246,7 @@ typeField () {
 		*) to_type="${stuff[${typefield}]}" ;;
 	esac
 
-	printf '%s' "$to_type" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
+	printf '%s' "$to_type" | ${do_type}
 
 	xset r "$x_repeat_enabled"
 	unset x_repeat_enabled
