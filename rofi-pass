@@ -856,10 +856,13 @@ main () {
 		mkdir -p "$cache_dir/rofi-pass"
 	fi
 
-	# fix keyboard layout if enabled in config
-	if [[ $fix_layout == "true" ]]; then
-		layout_cmd
-	fi
+        # Only valid for the xdotool backend
+        if [[ $backend == "xdotool" ]]; then
+		# fix keyboard layout if enabled in config
+		if [[ $fix_layout == "true" ]]; then
+			layout_cmd
+		fi
+        fi
 
 	# set help color
 	if [[ $help_color == "" ]]; then
