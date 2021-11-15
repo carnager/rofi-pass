@@ -71,13 +71,22 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
 * The field names for `user`, `url` and `autotype` are configurable
 * Bookmarks mode (open stored URLs in browser, default: Alt+x)
 * Share common used passwords between several entries (with different URLs, usernames etc)
+* Change backend with environment variable `ROFI_PASS_BACKEND`, valid
+  backends are `xdotool` or `wtype`. For example use `rofi-pass` with
+  [wtype](https://github.com/atx/wtype):
 
+  ```
+  ROFI_PASS_BACKEND=wtype rofi-pass
+  ```
+
+  Alternative change the backend in the config file using
+  `backend=wtype`.
 ## Requirements
 
 * [pass](http://www.passwordstore.org/)
 * sed
 * [rofi](https://github.com/DaveDavenport/rofi)
-* xdotool
+* xdotool or wtype
 * gawk
 * bash 4.x
 * find
