@@ -80,6 +80,7 @@ backend=${ROFI_PASS_BACKEND:-xdotool}
 
 case "$backend" in
     "xdotool");;
+    "wtype");;
     *)
         >&2 echo "Invalid backend '$backend', falling back to xdotool"
         backend=xdotool
@@ -94,9 +95,17 @@ _do_type_xdotool() {
 	xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
 }
 
+_do_type_wtype() {
+	wtype -
+}
+
 # Backends for pressing the key specified by the first argument ($1)
 _do_press_key_xdotool() {
 	xdotool key "$1"
+}
+
+_do_press_key_wtype() {
+	wtype -P "$1" -p "$1"
 }
 
 do_type=_do_type_${backend}
