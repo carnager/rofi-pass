@@ -32,19 +32,19 @@ _xdotool () {
 }
 
 _clip_in_primary() {
-	xclip
+	wl-copy -p
 }
 
 _clip_in_clipboard() {
-	xclip -selection clipboard
+	wl-copy
 }
 
 _clip_out_primary() {
-	xclip -o
+	wl-paste -p
 }
 
 _clip_out_clipboard() {
-	xclip --selection clipboard -o
+	wl-paste
 }
 
 

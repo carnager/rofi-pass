@@ -25,28 +25,28 @@ _image_viewer () {
 # your preferred backend here.
 backend=ydotool
 
-# It is possible to use wl-copy and wl-paste from wl-clipboard
-# Just uncomment the lines with wl-copy and wl-paste
-# and comment the xclip lines
+# It is possible to use xclip
+# Just uncomment the lines with xclip
+# and comment the wl-copy and wl-paste lines
 #
 _clip_in_primary() {
-	xclip
-  # wl-copy-p
+	wl-copy -p
+	# xclip
 }
 
 _clip_in_clipboard() {
-	xclip -selection clipboard
-  # wl-copy
+	wl-copy
+	# xclip -selection clipboard
 }
 
 _clip_out_primary() {
-	xclip -o
-  # wl-paste -p
+	wl-paste -p
+	# xclip -o
 }
 
 _clip_out_clipboard() {
-	xclip --selection clipboard -o
-  # wl-paste
+	wl-paste
+	# xclip --selection clipboard -o
 }
 
 
