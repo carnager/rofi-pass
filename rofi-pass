@@ -137,10 +137,10 @@ autopass () {
 			":space") _xdotool key 57:1 57:0;;
 			":delay") sleep "${delay}";;
 			":enter") _xdotool key 28:1 28:0;;
-			":otp") printf '%s' "$(generateOTP)" | _xdotool type ${xdotool_delay} --file /dev/stdin;;
-			"pass") printf '%s' "${password}" | _xdotool type ${xdotool_delay} --file /dev/stdin;;
- 			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | _xdotool type --file /dev/stdin;;
-			*) printf '%s' "${stuff[${word}]}" | _xdotool type --delay ${xdotool_delay} --file /dev/stdin;;
+			":otp") printf '%s' "$(generateOTP)" | _xdotool type --key-delay ${xdotool_delay} --file /dev/stdin;;
+			"pass") printf '%s' "${password}" | _xdotool type --key-delay ${xdotool_delay} --file /dev/stdin;;
+ 			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | _xdotool type --key-delay ${xdotool_delay} --file /dev/stdin;;
+			*) printf '%s' "${stuff[${word}]}" | _xdotool type --key-delay ${xdotool_delay} --file /dev/stdin;;
 		esac
 	done
 
@@ -192,7 +192,7 @@ typeUser () {
 	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
 	xset r off
 
-	printf '%s' "${stuff[${USERNAME_field}]}" | _xdotool type --delay ${xdotool_delay} --file /dev/stdin
+	printf '%s' "${stuff[${USERNAME_field}]}" | _xdotool type --key-delay ${xdotool_delay} --file /dev/stdin
 
 	xset r "$x_repeat_enabled"
 	unset x_repeat_enabled
@@ -206,7 +206,7 @@ typePass () {
 	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
 	xset r off
 
-	printf '%s' "${password}" | _xdotool type ${xdotool_delay} --file /dev/stdin
+	printf '%s' "${password}" | _xdotool type --key-delay ${xdotool_delay} --file /dev/stdin
 
 	if [[ $notify == "true" ]]; then
 		if [[ "${stuff[notify]}" == "false" ]]; then
@@ -239,7 +239,7 @@ typeField () {
 		*) to_type="${stuff[${typefield}]}" ;;
 	esac
 
-	printf '%s' "$to_type" | _xdotool type ${xdotool_delay} --file /dev/stdin
+	printf '%s' "$to_type" | _xdotool type --key-delay ${xdotool_delay} --file /dev/stdin
 
 	xset r "$x_repeat_enabled"
 	unset x_repeat_enabled
