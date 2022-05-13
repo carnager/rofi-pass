@@ -104,10 +104,10 @@ autopass () {
 	printf '%s\n' "${root}: $selected_password" > "$HOME/.cache/rofi-pass/last_used"
 	for word in ${stuff["$AUTOTYPE_field"]}; do
 		case "$word" in
-			":tab") _xdotool key tab;;
-			":space") _xdotool key " ";;
+			":tab") _xdotool key 15:1 15:0;;
+			":space") _xdotool key 57:1 57:0;;
 			":delay") sleep "${delay}";;
-			":enter") _xdotool key enter;;
+			":enter") _xdotool key 28:1 28:0;;
 			":otp") printf '%s' "$(generateOTP)" | _xdotool type ${xdotool_delay} --file /dev/stdin;;
 			"pass") printf '%s' "${password}" | _xdotool type ${xdotool_delay} --file /dev/stdin;;
  			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | _xdotool type --file /dev/stdin;;
@@ -116,7 +116,7 @@ autopass () {
 	done
 
 	if [[ ${auto_enter} == "true" ]]; then
-		_xdotool key enter
+		_xdotool key 28:1 28:0
 	fi
 
 	xset r "$x_repeat_enabled"
