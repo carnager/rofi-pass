@@ -25,6 +25,31 @@ _image_viewer () {
 # your preferred backend here.
 backend=ydotool
 
+# It is possible to use wl-copy and wl-paste from wl-clipboard
+# Just uncomment the lines with wl-copy and wl-paste
+# and comment the xclip lines
+#
+_clip_in_primary() {
+	xclip
+  # wl-copy-p
+}
+
+_clip_in_clipboard() {
+	xclip -selection clipboard
+  # wl-copy
+}
+
+_clip_out_primary() {
+	xclip -o
+  # wl-paste -p
+}
+
+_clip_out_clipboard() {
+	xclip --selection clipboard -o
+  # wl-paste
+}
+
+
 # xdotool needs the keyboard layout to be set using setxkbmap
 # You can do this in your autostart scripts (e.g. xinitrc)
 # If for some reason, you cannot do this, you can set the command here.
