@@ -45,17 +45,6 @@ _clip_out_clipboard() {
 }
 
 
-# xdotool needs the keyboard layout to be set using setxkbmap
-# You can do this in your autostart scripts (e.g. xinitrc)
-
-# If for some reason, you cannot do this, you can set the command here.
-# and set fix_layout to true
-fix_layout=false
-
-layout_cmd () {
-  setxkbmap us
-}
-
 # fields to be used
 URL_field='url'
 USERNAME_field='user'
@@ -66,9 +55,6 @@ delay=2
 
 # rofi-pass needs to close itself before it can type passwords. Set delay here.
 wait=0.2
-
-# delay between keypresses when typing (in ms)
-xdotool_delay=12
 
 ## Programs to be used
 # Editor

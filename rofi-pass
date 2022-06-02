@@ -46,7 +46,6 @@ OTPmethod_field='otp_method'
 default_autotype="user :tab pass"
 delay=2
 wait=0.2
-xdotool_delay=12
 default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
 notify='false'
@@ -56,7 +55,6 @@ clip_clear=45
 default_user="${ROFI_PASS_DEFAULT_USER-$(whoami)}"
 default_user2=john_doe
 password_length=12
-fix_layout=false
 
 # default shortcuts
 autotype="Alt+1"
@@ -109,6 +107,69 @@ checkIfPass () {
 	printf '%s\n' "${root}: $selected_password" >| "$cache_dir/rofi-pass/last_used"
 }
 
+press () {
+	tcc "$(pkgconf --libs libfakekey)" -run - "$@" <<'EOF'
+#include <fakekey/fakekey.h>
+#include <stdio.h>
+
+static Display *disp;
+static FakeKey *fk;
+
+static int press(const char *str)
+{
+	int len;
+	unsigned char *c = (unsigned char *) str;
+	while (*c) {
+		if (!(*c & 0x80)) {
+			len = 1;
+		} else if (!(*c & 0x40)) {
+			fprintf(stderr, "Invalid\n");
+			return 1;
+		} else if (!(*c & 0x20)) {
+			len = 2;
+		} else if (!(*c & 0x10)) {
+			len = 3;
+		} else if (!(*c & 0x08)) {
+			len = 4;
+		} else if (!(*c & 0x04)) {
+			len = 5;
+		} else if (!(*c & 0x02)) {
+			len = 6;
+		} else {
+			fprintf(stderr, "Invalid\n");
+			return 1;
+		}
+
+		if (*c == 0x09) {
+			fakekey_press_keysym(fk, 0xff09, 0);
+		} else {
+			fakekey_press(fk, c, len, 0);
+		}
+		fakekey_release(fk);
+		c += len;
+	}
+
+	return 0;
+}
+
+int main(int argc, char *argv[])
+{
+	if (argc != 2) {
+		fprintf(stderr, "Usage: %s <string>\n", argv[0]);
+		return 1;
+	}
+
+	if ((disp = XOpenDisplay(NULL)) == NULL) {
+		fprintf(stderr, "Failed to open display\n");
+		return 1;
+	}
+
+	fk = fakekey_init(disp);
+
+	return press(argv[1]);
+}
+EOF
+}
 
 autopass () {
 	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
@@ -118,19 +179,19 @@ autopass () {
 	printf '%s\n' "${root}: $selected_password" > "$cache_dir/rofi-pass/last_used"
 	for word in ${stuff["$AUTOTYPE_field"]}; do
 		case "$word" in
-			":tab") xdotool key Tab;;
-			":space") xdotool key space;;
+			":tab") press $'\t';;
+			":space") press ' ';;
 			":delay") sleep "${delay}";;
-			":enter") xdotool key Return;;
-			":otp") printf '%s' "$(generateOTP)" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
-			"pass") printf '%s' "${password}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
-			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | xdotool type --clearmodifiers --file -;;
-			*) printf '%s' "${stuff[${word}]}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
+			":enter") press $'\n';;
+			":otp") press "$(printf '%s' "$(generateOTP)")";;
+			"pass") press "$(printf '%s' "${password}")";;
+			"path") press "$(printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev)";;
+			*) press "$(printf '%s' "${stuff[${word}]}")";;
 		esac
 	done
 
 	if [[ ${auto_enter} == "true" ]]; then
-		xdotool key Return
+		press $'\n'
 	fi
 
 	xset r "$x_repeat_enabled"
@@ -177,7 +238,7 @@ typeUser () {
 	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
 	xset r off
 
-	printf '%s' "${stuff[${USERNAME_field}]}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
+	press "$(printf '%s' "${stuff[${USERNAME_field}]}")"
 
 	xset r "$x_repeat_enabled"
 	unset x_repeat_enabled
@@ -191,7 +252,7 @@ typePass () {
 	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
 	xset r off
 
-	printf '%s' "${password}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
+	press "$(printf '%s' "${password}")"
 
 	if [[ $notify == "true" ]]; then
 		if [[ "${stuff[notify]}" == "false" ]]; then
@@ -224,7 +285,7 @@ typeField () {
 		*) to_type="${stuff[${typefield}]}" ;;
 	esac
 
-	printf '%s' "$to_type" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
+	press "$(printf '%s' "$to_type")"
 
 	xset r "$x_repeat_enabled"
 	unset x_repeat_enabled
@@ -832,11 +893,6 @@ main () {
 	# create tmp dir
 	if [[ ! -d "$cache_dir/rofi-pass" ]]; then
 		mkdir -p "$cache_dir/rofi-pass"
-	fi
-
-	# fix keyboard layout if enabled in config
-	if [[ $fix_layout == "true" ]]; then
-		layout_cmd
 	fi
 
 	# set help color

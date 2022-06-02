@@ -77,7 +77,8 @@ in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
 * [pass](http://www.passwordstore.org/)
 * sed
 * [rofi](https://github.com/DaveDavenport/rofi)
-* xdotool
+* tcc
+* libfakekey
 * gawk
 * bash 4.x
 * find
