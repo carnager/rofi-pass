@@ -412,12 +412,6 @@ mainMenu () {
 					stuff["${_id}"]=${_val}
 				fi
 			done < <(printf '%s\n' "${fields}")
-
-			if test "${stuff['autotype']+autotype}"; then
-				:
-			else
-				stuff["autotype"]="${USERNAME_field} :tab pass"
-			fi
 		fi
 	fi
 
