@@ -120,6 +120,7 @@ autopass () {
 		case "$word" in
 			":tab") xdotool key Tab;;
 			":space") xdotool key space;;
+			":delay_"*) sleep "${word#:delay_}";;
 			":delay") sleep "${delay}";;
 			":enter") xdotool key Return;;
 			":otp") printf '%s' "$(generateOTP)" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
@@ -436,12 +437,6 @@ mainMenu () {
 					stuff["${_id}"]=${_val}
 				fi
 			done < <(printf '%s\n' "${fields}")
-
-			if test "${stuff['autotype']+autotype}"; then
-				:
-			else
-				stuff["autotype"]="${USERNAME_field} :tab pass"
-			fi
 		fi
 	fi
 
