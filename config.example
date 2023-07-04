@@ -68,7 +68,7 @@ delay=2
 wait=0.2
 
 # delay between keypresses when typing (in ms)
-xdotool_delay=12
+type_delay=12
 
 ## Programs to be used
 # Editor
@@ -92,7 +92,7 @@ help_color="#4872FF"
 # Possible options: primary, clipboard, both
 clip=primary
 
-# Seconds before clearing pass from clipboard 
+# Seconds before clearing pass from clipboard
 clip_clear=45
 
 ## Options for generating new password entries
@@ -122,3 +122,13 @@ type_menu="Alt+t"
 help="Alt+h"
 switch="Alt+x"
 insert_pass="Alt+n"
+
+# Change the clipboard backend for rofi-pass, valid backends are:
+# xclip
+# wl-clipboard
+#clibpoard_backend=xclip
+
+# Change the backend for rofi-pass, valid backends are:
+# xdotool
+# wtype
+#backend=xdotool
