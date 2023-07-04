@@ -17,23 +17,6 @@ _image_viewer () {
 	feh -
 }
 
-_clip_in_primary() {
-	xclip
-}
-
-_clip_in_clipboard() {
-	xclip -selection clipboard
-}
-
-_clip_out_primary() {
-	xclip -o
-}
-
-_clip_out_clipboard() {
-	xclip --selection clipboard -o
-}
-
-
 config_dir=${XDG_CONFIG_HOME:-$HOME/.config}
 cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
 
@@ -46,7 +29,7 @@ OTPmethod_field='otp_method'
 default_autotype="user :tab pass"
 delay=2
 wait=0.2
-xdotool_delay=12
+type_delay=12
 default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
 notify='false'
@@ -76,9 +59,80 @@ insert_pass="Alt+n"
 qrcode="Alt+q"
 previous_root="Shift+Left"
 next_root="Shift+Right"
+clipboard_backend=${ROFI_PASS_CLIPBOARD_BACKEND:-xclip}
+backend=${ROFI_PASS_BACKEND:-xdotool}
+
+case "$clipboard_backend" in
+	"xclip");;
+	"wl-clipboard");;
+	*)
+		>&2 echo "Invalid clipboard backend '$clipboard_backend', falling back to xclip"
+		clipboard_backend=xclip
+		;;
+esac
+
+case "$backend" in
+	"xdotool");;
+	"wtype");;
+	*)
+		>&2 echo "Invalid backend '$backend', falling back to xdotool"
+		backend=xdotool
+		;;
+esac
 
 # Safe permissions
 umask 077
+
+# Backends for clipboard manipulation
+_clip_in_primary_wl-clipboard() {
+	wl-copy -p
+}
+
+_clip_in_clipboard_wl-clipboard() {
+	wl-copy
+}
+
+_clip_out_primary_wl-clipboard() {
+	wl-paste -p
+}
+
+_clip_out_clipboard_wl-clipboard() {
+	wl-paste
+}
+
+_clip_in_primary_xclip() {
+	xclip
+}
+
+_clip_in_clipboard_xclip() {
+	xclip -selection clipboard
+}
+
+_clip_out_primary_xclip() {
+	xclip -o
+}
+
+_clip_out_clipboard_xclip() {
+	xclip --selection clipboard -o
+}
+
+# Backends for typing what's in stdin
+_do_type_xdotool() {
+	xdotool type --delay ${type_delay} --clearmodifiers --file -
+}
+
+_do_type_wtype() {
+	wtype -d ${type_delay} -
+}
+
+# Backends for pressing the key specified by the first argument ($1)
+_do_press_key_xdotool() {
+	xdotool key "$1"
+}
+
+_do_press_key_wtype() {
+	wtype -P "$1" -p "$1"
+}
 
 has_qrencode() {
 	command -v qrencode >/dev/null 2>&1
@@ -99,9 +153,9 @@ list_passwords() {
 
 doClip () {
 	case "$clip" in
-		"primary") _clip_in_primary ;;
-		"clipboard") _clip_in_clipboard ;;
-		"both") _clip_in_primary; _clip_out_primary | _clip_in_clipboard;;
+		"primary") ${clip_in_primary} ;;
+		"clipboard") ${clip_in_clipboard} ;;
+		"both") ${clip_in_primary}; ${clip_out_primary} | ${clip_in_clipboard};;
 	esac
 }
 
@@ -111,30 +165,35 @@ checkIfPass () {
 
 
 autopass () {
-	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
-	xset r off
+	if [[ $backend == "xdotool" ]]; then
+		x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
+		xset r off
+	fi
 
 	rm -f "$cache_dir/rofi-pass/last_used"
 	printf '%s\n' "${root}: $selected_password" > "$cache_dir/rofi-pass/last_used"
 	for word in ${stuff["$AUTOTYPE_field"]}; do
 		case "$word" in
-			":tab") xdotool key Tab;;
-			":space") xdotool key space;;
+			":tab") ${do_press_key} Tab;;
+			":space") ${do_press_key} space;;
 			":delay") sleep "${delay}";;
-			":enter") xdotool key Return;;
-			":otp") printf '%s' "$(generateOTP)" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
-			"pass") printf '%s' "${password}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
-			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | xdotool type --clearmodifiers --file -;;
-			*) printf '%s' "${stuff[${word}]}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -;;
+			":enter") ${do_press_key} Return;;
+			":otp") printf '%s' "$(generateOTP)" | ${do_type};;
+			"pass") printf '%s' "${password}" | ${do_type};;
+			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | ${do_type};;
+			*) printf '%s' "${stuff[${word}]}" | ${do_type};;
 		esac
 	done
 
 	if [[ ${auto_enter} == "true" ]]; then
-		xdotool key Return
+		${do_press_key} Return
 	fi
 
-	xset r "$x_repeat_enabled"
-	unset x_repeat_enabled
+	if [[ $backend == "xdotool" ]]; then
+		xset r "$x_repeat_enabled"
+		unset x_repeat_enabled
+	fi
+
 	clearUp
 }
 
@@ -174,13 +233,17 @@ openURL () {
 typeUser () {
 	checkIfPass
 
-	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
-	xset r off
+	if [[ $backend == "xdotool" ]]; then
+		x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
+		xset r off
+	fi
 
-	printf '%s' "${stuff[${USERNAME_field}]}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
+	printf '%s' "${stuff[${USERNAME_field}]}" | ${do_type}
 
-	xset r "$x_repeat_enabled"
-	unset x_repeat_enabled
+	if [[ $backend == "xdotool" ]]; then
+		xset r "$x_repeat_enabled"
+		unset x_repeat_enabled
+	fi
 
 	clearUp
 }
@@ -188,10 +251,12 @@ typeUser () {
 typePass () {
 	checkIfPass
 
-	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
-	xset r off
+	if [[ $backend == "xdotool" ]]; then
+		x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
+		xset r off
+	fi
 
-	printf '%s' "${password}" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
+	printf '%s' "${password}" | ${do_type}
 
 	if [[ $notify == "true" ]]; then
 		if [[ "${stuff[notify]}" == "false" ]]; then
@@ -207,8 +272,11 @@ typePass () {
 		fi
 	fi
 
-	xset r "$x_repeat_enabled"
-	unset x_repeat_enabled
+	if [[ $backend == "xdotool" ]]; then
+		xset r "$x_repeat_enabled"
+		unset x_repeat_enabled
+	fi
+
 	clearUp
 }
 
@@ -216,18 +284,23 @@ typeField () {
 	checkIfPass
 	local to_type
 
-	x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
-	xset r off
+	if [[ $backend == "xdotool" ]]; then
+		x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
+		xset r off
+	fi
 
 	case $typefield in
 		"OTP") to_type="$(generateOTP)" ;;
 		*) to_type="${stuff[${typefield}]}" ;;
 	esac
 
-	printf '%s' "$to_type" | xdotool type --delay ${xdotool_delay} --clearmodifiers --file -
+	printf '%s' "$to_type" | ${do_type}
 
-	xset r "$x_repeat_enabled"
-	unset x_repeat_enabled
+	if [[ $backend == "xdotool" ]]; then
+		xset r "$x_repeat_enabled"
+		unset x_repeat_enabled
+	fi
+
 	unset to_type
 
 	clearUp
@@ -274,9 +347,9 @@ copyPass () {
 	fi
 
 	if [[ $notify == "true" ]]; then
-		(sleep $clip_clear; printf '%s' "" | _clip_in_primary; printf '%s' "" | _clip_in_clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+		(sleep $clip_clear; printf '%s' "" | ${clip_in_primary}; printf '%s' "" | ${clip_in_clipboard} | notify-send "rofi-pass" "Clipboard cleared") &
 	elif [[ $notify == "false" ]]; then
-		(sleep $clip_clear; printf '%s' "" | _clip_in_primary; printf '%s' "" | _clip_in_clipboard) &
+		(sleep $clip_clear; printf '%s' "" | ${clip_in_primary}; printf '%s' "" | ${clip_in_clipboard}) &
 	fi
 }
 
@@ -325,7 +398,7 @@ generatePass () {
 		symbols="-n";
 	fi
 
-	HELP="<span color='$help_color'>Enter Number or hit Enter to use default length</span>"
+	HELP="<span$help_color_attribute>Enter Number or hit Enter to use default length</span>"
 	length=$(printf '%s' "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${password_length}) > ")
 	length_exit=$?
 
@@ -642,9 +715,9 @@ showEntry () {
 				notify-send "rofi-pass" "Copied Password\\nClearing in $clip_clear seconds"
 			fi
 			if [[ $notify == "true" ]]; then
-				(sleep $clip_clear; printf '%s' "" | _clip_in_primary; printf '%s' "" | _clip_in_clipboard | notify-send "rofi-pass" "Clipboard cleared") &
+				(sleep $clip_clear; printf '%s' "" | ${clip_in_primary}; printf '%s' "" | ${clip_in_clipboard} | notify-send "rofi-pass" "Clipboard cleared") &
 			elif [[ $notify == "false" ]]; 	then
-				(sleep $clip_clear; printf '%s' "" | _clip_in_primary; printf '%s' "" | _clip_in_clipboard) &
+				(sleep $clip_clear; printf '%s' "" | ${clip_in_primary}; printf '%s' "" | ${clip_in_clipboard}) &
 			fi
 			exit
 		fi
@@ -683,7 +756,7 @@ manageEntry () {
 		PASSWORD_STORE_DIR="${root}" pass cp "$selected_password" "${group}/${new_name}"
 		mainMenu
 	elif [[ "$1" == "delete" ]]; then
-		HELP="<span color='$help_color'>Selected entry: ${selected_password}</span>"
+		HELP="<span$help_color_attribute>Selected entry: ${selected_password}</span>"
 		ask_content=("Yes"
 			"No"
 		)
@@ -707,7 +780,7 @@ edit_pass() {
 }
 
 insertPass () {
-	url=$(_clip_out_clipboard)
+	url=$(${clip_out_clipboard})
 
 	if [[ "${url:0:4}" == "http" ]]; then
 		domain_name="$(printf '%s\n' "${url}" | awk -F / '{l=split($3,a,"."); print (a[l-1]=="com"?a[l-2] OFS:X) a[l-1] OFS a[l]}' OFS=".")"
@@ -834,14 +907,34 @@ main () {
 		mkdir -p "$cache_dir/rofi-pass"
 	fi
 
-	# fix keyboard layout if enabled in config
-	if [[ $fix_layout == "true" ]]; then
-		layout_cmd
+	# set backends
+	clip_in_primary=_clip_in_primary_${clipboard_backend}
+	clip_in_clipboard=_clip_in_clipboard_${clipboard_backend}
+	clip_out_primary=_clip_out_primary_${clipboard_backend}
+	clip_out_clipboard=_clip_out_clipboard_${clipboard_backend}
+
+	do_type=_do_type_${backend}
+	do_press_key=_do_press_key_${backend}
+
+	# backwards compat
+	if [[ -n "$xdotool_delay" ]]; then
+		>&2 echo "Setting 'xdotool_delay' is deprecated. Please update your configuration to use 'type_delay' instead"
+		type_delay=${xdotool_delay}
+	fi
+
+	# Only valid for the xdotool backend
+	if [[ $backend == "xdotool" ]]; then
+		# fix keyboard layout if enabled in config
+		if [[ $fix_layout == "true" ]]; then
+			layout_cmd
+		fi
 	fi
 
 	# set help color
 	if [[ $help_color == "" ]]; then
-		help_color=$(rofi -dump-xresources | grep 'rofi.color.normal' | gawk -F ',' '/,/{gsub(/ /, "", $2); print $2}')
+		help_color_attribute=""
+	else
+		help_color_attribute=" color='$help_color'"
 	fi
 
 	# check for BROWSER variable, use xdg-open as fallback
