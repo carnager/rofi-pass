@@ -173,6 +173,23 @@ To get this, you need to set `default_user` to `:filename` in your configuration
 Make sure to run `setxkbmap <language> <variant>` at the start of your Xorg
 session.
 
+### rofi pass hangs after selecting password
+
+To access passwords your GPG agent needs to have unlocked your secret key
+you're using to encrypt your passwords with. If the secret key hasn't been
+unlocked yet it will prompt for the secret key password using `pinentry`. If
+`pinentry` is configured to read from a `tty` then `rofi-pass` will hang
+indefinitely. To fix this you need to [configure gpg][gpg_pinentry_config] to
+use a gui version of `pinentry`. E.g.
+```
+$ cat ~/.gnupg/gpg-agent.conf
+pinentry-program /usr/bin/pinentry-qt
+```
+You may have to kill the GPG agent if it's still in a bad state:
+```
+killall -9 gpg-agent
+```
+
 ## Alternative
 
 jreinert has written the roughly compatible tool
@@ -180,3 +197,5 @@ jreinert has written the roughly compatible tool
 definately saner code.
 Also he provided a nice little script called `passed` to change your
 fieldnames. [link](https://github.com/jreinert/passed)
+
+[gpg_pinentry_config][https://github.com/bfrg/gpg-guide/blob/master/gpg-agent.conf#L15]
