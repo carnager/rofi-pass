@@ -247,8 +247,9 @@ generateQrCode() {
 
 openURL () {
 	checkIfPass
-	$BROWSER "$(PASSWORD_STORE_DIR="${root}" pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"; exit;
+	$BROWSER "$(PASSWORD_STORE_DIR="${root}" pass "$selected_password" | grep "${URL_field}: " | gawk '{sub(/:/,"")}{print $2}1' | head -1)"
 	clearUp
+	exit
 }
 
 typeUser () {
@@ -565,7 +566,6 @@ clearUp () {
 	unset password
 	unset selected_password
 	unset password_temp
-	unset stuff
 }
 
 helpMenu () {
@@ -724,12 +724,8 @@ showEntry () {
 			exit
 		fi
 	fi
-	exit
-	unset stuff
-	unset password
-	unset selected_password
-	unset password_temp
-	unset stuff
+
+	clearUp
 	exit
 }
 
@@ -776,6 +772,7 @@ manageEntry () {
 }
 
 edit_pass() {
+    # shellcheck disable=SC2154
     if [[ $edit_new_pass == "true" ]]; then
         PASSWORD_STORE_DIR="${root}" pass edit "${1}"
     fi
@@ -902,6 +899,7 @@ get_config_file () {
 main () {
 	# load config file
 	config_file="$(get_config_file)"
+	# shellcheck source=/dev/null
 	[[ -n "$config_file" ]] && source "$config_file"
 
 	# create tmp dir
