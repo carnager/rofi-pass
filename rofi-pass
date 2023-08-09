@@ -9,14 +9,6 @@ _rofi () {
 	rofi -no-auto-select -i "$@"
 }
 
-_pwgen () {
-	pwgen -y "$@"
-}
-
-_image_viewer () {
-	feh -
-}
-
 config_dir=${XDG_CONFIG_HOME:-$HOME/.config}
 cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
 
@@ -82,6 +74,42 @@ esac
 
 # Safe permissions
 umask 077
+
+_exists () {
+       type -P "$1" >/dev/null 2>&1 ;
+}
+
+ _pwgen () {
+	if _exists pwgen ; then
+		pwgen -y "$@" | cat
+	else
+		tr -dc '[:graph:]' </dev/urandom | head -c${1:-32} ; echo
+	fi
+}
+
+_image_viewer () {
+	if _exists feh ; then
+		feh -
+	elif _exists imv ; then
+		imv -
+	elif _exists display ; then
+		display -
+	fi
+}
+
+_save_auto_repeat () {
+	if [[ $backend == "xdotool" ]]; then
+		x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
+		xset r off
+	fi
+}
+
+_restore_auto_repeat () {
+	if [[ $backend == "xdotool" ]]; then
+		xset r "$x_repeat_enabled"
+		unset x_repeat_enabled
+	fi
+}
 
 # Backends for clipboard manipulation
 _clip_in_primary_wl-clipboard() {
@@ -165,10 +193,7 @@ checkIfPass () {
 
 
 autopass () {
-	if [[ $backend == "xdotool" ]]; then
-		x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
-		xset r off
-	fi
+	_save_auto_repeat
 
 	rm -f "$cache_dir/rofi-pass/last_used"
 	printf '%s\n' "${root}: $selected_password" > "$cache_dir/rofi-pass/last_used"
@@ -189,11 +214,7 @@ autopass () {
 		${do_press_key} Return
 	fi
 
-	if [[ $backend == "xdotool" ]]; then
-		xset r "$x_repeat_enabled"
-		unset x_repeat_enabled
-	fi
-
+	_restore_auto_repeat
 	clearUp
 }
 
@@ -233,28 +254,18 @@ openURL () {
 typeUser () {
 	checkIfPass
 
-	if [[ $backend == "xdotool" ]]; then
-		x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
-		xset r off
-	fi
+	_save_auto_repeat
 
 	printf '%s' "${stuff[${USERNAME_field}]}" | ${do_type}
 
-	if [[ $backend == "xdotool" ]]; then
-		xset r "$x_repeat_enabled"
-		unset x_repeat_enabled
-	fi
-
+	_restore_auto_repeat
 	clearUp
 }
 
 typePass () {
 	checkIfPass
 
-	if [[ $backend == "xdotool" ]]; then
-		x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
-		xset r off
-	fi
+	_save_auto_repeat
 
 	printf '%s' "${password}" | ${do_type}
 
@@ -272,10 +283,7 @@ typePass () {
 		fi
 	fi
 
-	if [[ $backend == "xdotool" ]]; then
-		xset r "$x_repeat_enabled"
-		unset x_repeat_enabled
-	fi
+	_restore_auto_repeat
 
 	clearUp
 }
@@ -284,10 +292,7 @@ typeField () {
 	checkIfPass
 	local to_type
 
-	if [[ $backend == "xdotool" ]]; then
-		x_repeat_enabled=$(xset q | awk '/auto repeat:/ {print $3}')
-		xset r off
-	fi
+	_save_auto_repeat
 
 	case $typefield in
 		"OTP") to_type="$(generateOTP)" ;;
@@ -296,10 +301,7 @@ typeField () {
 
 	printf '%s' "$to_type" | ${do_type}
 
-	if [[ $backend == "xdotool" ]]; then
-		xset r "$x_repeat_enabled"
-		unset x_repeat_enabled
-	fi
+	_restore_auto_repeat
 
 	unset to_type
 
