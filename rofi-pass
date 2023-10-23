@@ -30,6 +30,7 @@ default_autotype="user :tab pass"
 delay=2
 wait=0.2
 type_delay=12
+type_hold=8
 default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
 notify='false'
@@ -74,6 +75,7 @@ esac
 case "$backend" in
 	"xdotool");;
 	"wtype");;
+	"dotool");;
 	*)
 		>&2 echo "Invalid backend '$backend', falling back to xdotool"
 		backend=xdotool
@@ -118,11 +120,15 @@ _clip_out_clipboard_xclip() {
 
 # Backends for typing what's in stdin
 _do_type_xdotool() {
-	xdotool type --delay ${type_delay} --clearmodifiers --file -
+	printf '%s' "$1" | xdotool type --delay ${type_delay} --clearmodifiers --file -
 }
 
 _do_type_wtype() {
-	wtype -d ${type_delay} -
+	printf '%s' "$1" | wtype -d ${type_delay} -
+}
+
+_do_type_dotool() {
+	printf 'typedelay %i\ntypehold %i\ntype %s\n' "${type_delay}" "${type_hold}" "$1" | dotoolc
 }
 
 # Backends for pressing the key specified by the first argument ($1)
@@ -132,6 +138,10 @@ _do_press_key_xdotool() {
 
 _do_press_key_wtype() {
 	wtype -P "$1" -p "$1"
+}
+
+_do_press_key_dotool() {
+	printf 'keydelay %i\nkeyhold %i\nkey x:%s\n' "${type_delay}" "${type_hold}" "$1" | dotoolc
 }
 
 has_qrencode() {
@@ -178,10 +188,10 @@ autopass () {
 			":space") ${do_press_key} space;;
 			":delay") sleep "${delay}";;
 			":enter") ${do_press_key} Return;;
-			":otp") printf '%s' "$(generateOTP)" | ${do_type};;
-			"pass") printf '%s' "${password}" | ${do_type};;
-			"path") printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev | ${do_type};;
-			*) printf '%s' "${stuff[${word}]}" | ${do_type};;
+			":otp") ${do_type} "$(generateOTP)";;
+			"pass") ${do_type} "${password}";;
+			"path") ${do_type} "$(printf '%s' "${selected_password}" | rev | cut -d'/' -f1 | rev)";;
+			*) ${do_type} "${stuff[${word}]}";;
 		esac
 	done
 
@@ -238,7 +248,7 @@ typeUser () {
 		xset r off
 	fi
 
-	printf '%s' "${stuff[${USERNAME_field}]}" | ${do_type}
+	${do_type} "${stuff[${USERNAME_field}]}"
 
 	if [[ $backend == "xdotool" ]]; then
 		xset r "$x_repeat_enabled"
@@ -256,7 +266,7 @@ typePass () {
 		xset r off
 	fi
 
-	printf '%s' "${password}" | ${do_type}
+	${do_type} "${password}"
 
 	if [[ $notify == "true" ]]; then
 		if [[ "${stuff[notify]}" == "false" ]]; then
@@ -294,7 +304,7 @@ typeField () {
 		*) to_type="${stuff[${typefield}]}" ;;
 	esac
 
-	printf '%s' "$to_type" | ${do_type}
+	${do_type} "$to_type"
 
 	if [[ $backend == "xdotool" ]]; then
 		xset r "$x_repeat_enabled"
