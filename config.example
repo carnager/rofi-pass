@@ -26,7 +26,7 @@ _image_viewer () {
 #
 _clip_in_primary() {
 	xclip
-  # wl-copy-p
+  # wl-copy -p
 }
 
 _clip_in_clipboard() {
