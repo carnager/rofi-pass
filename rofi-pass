@@ -33,7 +33,7 @@ type_delay=12
 default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
 notify='false'
-help_color=""
+help_color="#4872FF"
 clip=primary
 clip_clear=45
 default_user="${ROFI_PASS_DEFAULT_USER-$(whoami)}"
@@ -931,11 +931,7 @@ main () {
 	fi
 
 	# set help color
-	if [[ $help_color == "" ]]; then
-		help_color_attribute=""
-	else
-		help_color_attribute=" color='$help_color'"
-	fi
+	help_color_attribute=" color='$help_color'"
 
 	# check for BROWSER variable, use xdg-open as fallback
 	if [[ -z $BROWSER ]]; then
