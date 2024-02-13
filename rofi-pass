@@ -33,7 +33,6 @@ type_delay=12
 default_do='menu' # menu, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
 auto_enter='false'
 notify='false'
-help_color="#4872FF"
 clip=primary
 clip_clear=45
 default_user="${ROFI_PASS_DEFAULT_USER-$(whoami)}"
@@ -398,7 +397,7 @@ generatePass () {
 		symbols="-n";
 	fi
 
-	HELP="<span$help_color_attribute>Enter Number or hit Enter to use default length</span>"
+	HELP="Enter Number or hit Enter to use default length"
 	length=$(printf '%s' "" | _rofi -dmenu -mesg "${HELP}" -p "Password length? (Default: ${password_length}) > ")
 	length_exit=$?
 
@@ -756,7 +755,7 @@ manageEntry () {
 		PASSWORD_STORE_DIR="${root}" pass cp "$selected_password" "${group}/${new_name}"
 		mainMenu
 	elif [[ "$1" == "delete" ]]; then
-		HELP="<span$help_color_attribute>Selected entry: ${selected_password}</span>"
+		HELP="Selected entry: ${selected_password}"
 		ask_content=("Yes"
 			"No"
 		)
@@ -929,9 +928,6 @@ main () {
 			layout_cmd
 		fi
 	fi
-
-	# set help color
-	help_color_attribute=" color='$help_color'"
 
 	# check for BROWSER variable, use xdg-open as fallback
 	if [[ -z $BROWSER ]]; then
