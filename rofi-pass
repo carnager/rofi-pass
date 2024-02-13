@@ -45,6 +45,7 @@ autotype="Alt+1"
 type_user="Alt+2"
 type_pass="Alt+3"
 open_url="Alt+4"
+type_otp="Alt+5"
 copy_name="Alt+u"
 copy_url="Alt+l"
 copy_pass="Alt+p"
@@ -445,6 +446,7 @@ mainMenu () {
 			-kb-custom-9 "${type_menu}"
 			-kb-custom-10 "${previous_root}"
 			-kb-custom-11 "${next_root}"
+			-kb-custom-12 "${type_otp}"
 			-kb-custom-14 "${action_menu}"
 			-kb-custom-15 "${copy_menu}"
 			-kb-custom-16 "${help}"
@@ -546,6 +548,7 @@ mainMenu () {
 		16) viewEntry;;
 		17) copyURL;;
 		18) default_do="menu" typeMenu;;
+		21) sleep $wait; typefield=OTP; typeField;;
 		23) actionMenu;;
 		24) copyMenu;;
 		27) insertPass;;
@@ -570,6 +573,7 @@ helpMenu () {
 	${autotype}: Autotype
 	${type_user}: Type Username
 	${type_pass}: Type Password
+	${type_otp}: Type OTP
 	${qrcode}: Generate and display qrcode
 	---
 	${copy_name}: Copy Username
