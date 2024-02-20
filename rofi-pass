@@ -26,6 +26,10 @@ USERNAME_field='user'
 AUTOTYPE_field='autotype'
 OTPmethod_field='otp_method'
 
+# Display these fields with entries.
+# NOTE: no default here, handled in code.
+SHOWFIELDS_field='showfields'
+
 default_autotype="user :tab pass"
 delay=2
 wait=0.2
@@ -604,9 +608,17 @@ typeMenu () {
 	if [[ -n $default_do ]]; then
 		if [[ $default_do == "menu" ]]; then
 			checkIfPass
-			local -a keys=("${!stuff[@]}")
-			keys=("${keys[@]/$AUTOTYPE_field}")
-			typefield=$({ printf '%s' "${AUTOTYPE_field}" ; printf '%s\n' "${keys[@]}" | sort; } | _rofi -dmenu  -p "Choose Field to type > ")
+
+			local show_fields
+			if [[ -z "${stuff[$SHOWFIELDS_field]}" ]]; then
+				local -a keys=("${!stuff[@]}")
+				keys=("${keys[@]/$AUTOTYPE_field}")
+				declare -p keys stuff
+				show_fields=$(printf '%s' "${AUTOTYPE_field}" ; printf '%s\n' "${keys[@]}" | sort)
+			else
+				show_fields=$(printf '%s\n' "${stuff["$SHOWFIELDS_field"]}")
+			fi
+			typefield=$(echo "$show_fields" | _rofi -dmenu  -p "Choose Field to type > ")
 			typefield_exit=$?
 			if [[ $typefield_exit -eq 1 ]]; then
 				exit
