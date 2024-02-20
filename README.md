@@ -198,4 +198,4 @@ definately saner code.
 Also he provided a nice little script called `passed` to change your
 fieldnames. [link](https://github.com/jreinert/passed)
 
-[gpg_pinentry_config][https://github.com/bfrg/gpg-guide/blob/master/gpg-agent.conf#L15]
+[gpg_pinentry_config]: https://github.com/bfrg/gpg-guide/blob/master/gpg-agent.conf#L15
