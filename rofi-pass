@@ -870,7 +870,8 @@ insertPass () {
 }
 
 help_msg () {
-	cat <<'EOF'
+    version_number="2.0.2"
+	cat <<EOF
 	Usage:
 	rofi-pass [command]
 
@@ -881,7 +882,7 @@ help_msg () {
 	--show-last      show details of last used Entry
 	--bmarks         start in bookmarks mode
 
-	rofi-pass version 1.5.3
+	rofi-pass version $version_number
 EOF
 }
 
