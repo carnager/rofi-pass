@@ -315,7 +315,7 @@ generateOTP () {
 		bash -c "$(PASSWORD_STORE_DIR="${root}" pass "$selected_password" | grep "${OTPmethod_field}: " | cut -d' ' -f2-)"
 	else
 		# If there is no method defined, fallback to pass-otp
-		PASSWORD_STORE_DIR="${root}" pass otp "$selected_password"
+		PASSWORD_STORE_DIR="${root}" pass otp -q "$selected_password"
 	fi
 
 	clearUp
