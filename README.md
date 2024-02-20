@@ -3,7 +3,7 @@
 A bash script to handle [Simple Password Store](http://www.passwordstore.org/)
 in a convenient way using [rofi](https://github.com/DaveDavenport/rofi).
 
-![rofi-pass](https://53280.de/rofi/rofi-pass.png "rofi-pass in action")
+![rofi-pass](https://user-images.githubusercontent.com/17950515/252150474-ecdb4671-94df-493b-bb8c-8fdf144d9b3f.png "rofi-pass in action")
 
 ## Features
 
