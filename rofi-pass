@@ -321,6 +321,12 @@ generateOTP () {
 	clearUp
 }
 
+ copyOTP () {
+     checkIfPass
+     generateOTP | doClip
+     clearUp
+ }
+
 copyUser () {
 	checkIfPass
 	printf '%s' "${stuff[${USERNAME_field}]}" | doClip
@@ -635,6 +641,8 @@ copyMenu () {
 	fi
 	if [[ $copyfield == "pass" ]]; then
 		copyPass;
+     	elif [[ $copyfield == "OTP" ]]; then
+         	copyOTP;
 	else
 		copyField
 	fi
