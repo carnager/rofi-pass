@@ -31,6 +31,11 @@ layout_cmd () {
   setxkbmap us
 }
 
+# dotool needs to be run in long-running instance mode (dotoolc, dotoold) to speed up uinput device creation
+# Keyboard layout specifiers DOTOOL_XKB_LAYOUT and DOTOOL_XKB_VARIANT should be environment variables visible to dotoold
+# Path to dotool pipe DOTOOL_PIPE should be an environment variable visible to dotoolc
+# export DOTOOL_PIPE=/tmp/rofi-pass-dotoo-pipe
+
 # fields to be used
 URL_field='url'
 USERNAME_field='user'
@@ -44,6 +49,9 @@ wait=0.2
 
 # delay between keypresses when typing (in ms)
 type_delay=12
+
+# hold duration between key press and release (in ms)
+type_hold=8
 
 ## Programs to be used
 # Editor
@@ -106,4 +114,5 @@ insert_pass="Alt+n"
 # Change the backend for rofi-pass, valid backends are:
 # xdotool
 # wtype
+# dotool
 #backend=xdotool
