@@ -517,6 +517,11 @@ mainMenu () {
 				stuff["autotype"]="${USERNAME_field} :tab pass"
 			fi
 		fi
+
+		if [[ "$password" == "otpauth://"* || "$password" == "${OTPmethod_field}"* ]]; then
+			stuff["OTP"]=""
+		fi
+
 	fi
 
 	if [[ -z "${stuff["${AUTOTYPE_field}"]}" ]]; then
