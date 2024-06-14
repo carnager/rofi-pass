@@ -343,7 +343,7 @@ copyPass () {
 	checkIfPass
 	printf '%s' "$password" | doClip
 	if [[ $notify == "true" ]]; then
-		notify-send "rofi-pass" "Copied Password\\nClearing in $clip_clear seconds"
+		notify-send "rofi-pass" "Copied Password" "Clearing in $clip_clear seconds"
 	fi
 
 	if [[ $notify == "true" ]]; then
