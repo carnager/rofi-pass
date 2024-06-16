@@ -1,3 +1,5 @@
+# !!! This script is unmaintained !!!
+
 # rofi-pass
 
 A bash script to handle [Simple Password Store](http://www.passwordstore.org/)
